@@ -33,7 +33,7 @@
       margin: 0;
       background: linear-gradient(180deg, #f2f5f8 0%, #e7edf3 100%);
       color: var(--text);
-      padding-bottom: 110px;
+      padding-bottom: 120px;
     }
 
     .app {
@@ -203,13 +203,6 @@
       color: #fff;
     }
 
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
     .pill {
       display: inline-block;
       padding: 5px 10px;
@@ -248,19 +241,41 @@
       line-height: 1.5;
     }
 
-    .vtr-header {
-      background: linear-gradient(135deg, #f7fafc, #eef4f9);
+    .vtr-collapsible {
+      margin-bottom: 12px;
       border: 1px solid #d9e3ec;
       border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f7fafc, #eef4f9);
     }
 
-    .vtr-header-title {
-      font-size: 17px;
-      font-weight: 800;
+    .vtr-toggle {
+      width: 100%;
+      text-align: left;
+      background: transparent;
       color: var(--blue);
-      margin-bottom: 8px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .vtr-toggle span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .vtr-content {
+      padding: 0 14px 14px;
+      display: none;
+    }
+
+    .vtr-content.open {
+      display: block;
     }
 
     .vtr-grid {
@@ -377,11 +392,43 @@
       background: #fff;
     }
 
+    .footer-tools {
+      margin-top: 18px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+    }
+
+    .footer-tools-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .footer-tools-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-tools-list button {
+      background: #f8fafc;
+      color: var(--text);
+      border: 1px solid #e3e9f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+    }
+
     .footer-note {
       text-align: center;
       color: var(--muted);
       font-size: 12px;
-      padding: 8px 0 20px;
+      padding: 12px 0 10px;
     }
 
     .hidden {
@@ -399,7 +446,7 @@
       .grid-cards {
         grid-template-columns: 1fr 1fr;
       }
-      .row-2, .toolbar, .vtr-grid, .registro-grid {
+      .row-2, .vtr-grid, .registro-grid {
         grid-template-columns: 1fr;
       }
       .topbar h1 {
@@ -460,7 +507,13 @@
       <h2>➕ Novo Registro</h2>
       <div class="subtitle">Selecione a VTR e preencha a saída em formato simples de lista.</div>
 
-      <div id="vtrHeader" class="vtr-header hidden"></div>
+      <div id="vtrHeaderWrap" class="vtr-collapsible hidden">
+        <button type="button" class="vtr-toggle" id="btnToggleVtrInfo">
+          🚘 Informações da VTR
+          <span id="toggleText">toque para expandir</span>
+        </button>
+        <div id="vtrContent" class="vtr-content"></div>
+      </div>
 
       <form id="formRegistro" class="list-form">
         <input type="hidden" id="editId" />
@@ -556,22 +609,22 @@
     </div>
 
     <div class="card">
-      <h2>🧰 Ferramentas</h2>
-      <div class="toolbar">
-        <button class="btn-green" id="btnExportarJson">⬇️ Exportar Backup</button>
-        <button class="btn-orange" id="btnExportarCsv">📄 Exportar CSV</button>
-        <button class="btn-secondary" onclick="document.getElementById('inputImportar').click()">📤 Importar Backup</button>
-        <button class="btn-danger" id="btnLimparTudo">🗑️ Limpar Tudo</button>
-      </div>
-      <input type="file" id="inputImportar" accept=".json" class="hidden" />
-    </div>
-
-    <div class="card">
       <h2>🔎 Consulta de Registros</h2>
       <div class="search-box">
         <input id="busca" type="text" placeholder="Pesquisar por VTR, placa, condutor, data, local, observação..." />
       </div>
       <div id="listaRegistros"></div>
+    </div>
+
+    <div class="footer-tools">
+      <div class="footer-tools-title">⚙️ Ferramentas</div>
+      <div class="footer-tools-list">
+        <button type="button" id="btnExportarJson">⬇️ Exportar Backup</button>
+        <button type="button" id="btnExportarCsv">📄 Exportar CSV</button>
+        <button type="button" onclick="document.getElementById('inputImportar').click()">📤 Importar Backup</button>
+        <button type="button" id="btnLimparTudo">🗑️ Limpar Tudo</button>
+      </div>
+      <input type="file" id="inputImportar" accept=".json" class="hidden" />
     </div>
 
     <div class="footer-note">
@@ -604,141 +657,21 @@
     ];
 
     const VTRS = [
-      {
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        prefixo: "ATP-9316",
-        placa: "IUW6520",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "RENAULT DUSTER - 4P - VERMELHA",
-        ano: "2013"
-      },
-      {
-        tipo: "SALA DE OPERAÇÕES",
-        prefixo: "COBOM-SLS",
-        placa: "COBOM",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "OPERADOR DO COBOM SÃO LOURENÇO DO SUL",
-        ano: ""
-      },
-      {
-        tipo: "EMBARCAÇÃO DE TRANSPORTE RÁPIDO",
-        prefixo: "ETR-1902",
-        placa: "SEM PLACAS",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "BAIXADA",
-        descricao: "EMBARCAÇÃO DE TRANSPORTE RÁPIDO - FIBRA COM MOTOR DE POPA MERCURY, 4T, 50HP",
-        ano: ""
-      },
-      {
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        prefixo: "ATP-370",
-        placa: "JBG3A67",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "BAIXADA",
-        descricao: "FIAT TORO PICAPE 2022",
-        ano: ""
-      },
-      {
-        tipo: "AUTO TRANSPORTE DE MATERIAL",
-        prefixo: "ATM-3509",
-        placa: "JBM-0039",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "PARA DESCARGA",
-        descricao: "VIATURA LEVE - GOL, 2001",
-        ano: ""
-      },
-      {
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        prefixo: "ATP-8370",
-        placa: "ITQ-6814",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "VIATURA LEVE - PALIO WEEKEND",
-        ano: "2012"
-      },
-      {
-        tipo: "REBOQUE PARA TRANSPORTE DE EMBARCAÇÃO",
-        prefixo: "RTE-115",
-        placa: "SEM PLACAS",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "ARTESANAL",
-        ano: ""
-      },
-      {
-        tipo: "AUTO TRANSPORTE DE MATERIAL",
-        prefixo: "ATM-9359",
-        placa: "IKY-4633",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "CHEVROLET S10, 2002",
-        ano: ""
-      },
-      {
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        prefixo: "ATP-1225",
-        placa: "TQV-8D59",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "PICKUP 4X4",
-        ano: "2025"
-      },
-      {
-        tipo: "AUTO RESGATE",
-        prefixo: "AR-426",
-        placa: "JBN7A45",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "FORD TRANSIT TCA AMBULÂNCIA 2022",
-        ano: "2023"
-      },
-      {
-        tipo: "EMBARCAÇÃO INFLÁVEL",
-        prefixo: "EIN-1377",
-        placa: "0000000",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "SALVAMENTO 33 - BOTE INFLÁVEL FLEXBOAT SR15 - MOTOR MERCURY (MOTOR Nº ON471570)",
-        ano: "2025"
-      },
-      {
-        tipo: "REBOQUE PARA TRANSPORTE DE EMBARCAÇÃO",
-        prefixo: "RTE-1441",
-        placa: "TQR-1C79",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "CARGA /REBOQUE, MARCA R/EKMAN RN1",
-        ano: "2025"
-      },
-      {
-        tipo: "REBOQUE PARA TRANSPORTE DE MATERIAL",
-        prefixo: "RTM-825",
-        placa: "JDC-0G96",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "CARGA /REBOQUE, MARCA REK CL2 RNCE8178",
-        ano: "2024"
-      },
-      {
-        tipo: "AUTO BOMBA TANQUE",
-        prefixo: "ABT-7992",
-        placa: "JBM-3781",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "IVECO 170 E25 - ABT 5000L, ANO 2011, COM DESENCARCERADOR + EQUIP APH + EQUIP ALTURA + GERADOR + TORRE DE ILUMINAÇÃO",
-        ano: "2011"
-      },
-      {
-        tipo: "AUTO BOMBA TANQUE",
-        prefixo: "ABT-0535",
-        placa: "JCO-7I27",
-        obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        descricao: "ABT VOLKSWAGEN, CONSTELLATION, 2023/2024",
-        ano: "2023"
-      }
+      { tipo: "AUTO TRANSPORTE DE PESSOAL", prefixo: "ATP-9316", placa: "IUW6520", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "RENAULT DUSTER - 4P - VERMELHA", ano: "2013" },
+      { tipo: "SALA DE OPERAÇÕES", prefixo: "COBOM-SLS", placa: "COBOM", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "OPERADOR DO COBOM SÃO LOURENÇO DO SUL", ano: "" },
+      { tipo: "EMBARCAÇÃO DE TRANSPORTE RÁPIDO", prefixo: "ETR-1902", placa: "SEM PLACAS", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "BAIXADA", descricao: "EMBARCAÇÃO DE TRANSPORTE RÁPIDO - FIBRA COM MOTOR DE POPA MERCURY, 4T, 50HP", ano: "" },
+      { tipo: "AUTO TRANSPORTE DE PESSOAL", prefixo: "ATP-370", placa: "JBG3A67", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "BAIXADA", descricao: "FIAT TORO PICAPE 2022", ano: "" },
+      { tipo: "AUTO TRANSPORTE DE MATERIAL", prefixo: "ATM-3509", placa: "JBM-0039", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "PARA DESCARGA", descricao: "VIATURA LEVE - GOL, 2001", ano: "" },
+      { tipo: "AUTO TRANSPORTE DE PESSOAL", prefixo: "ATP-8370", placa: "ITQ-6814", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "VIATURA LEVE - PALIO WEEKEND", ano: "2012" },
+      { tipo: "REBOQUE PARA TRANSPORTE DE EMBARCAÇÃO", prefixo: "RTE-115", placa: "SEM PLACAS", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "ARTESANAL", ano: "" },
+      { tipo: "AUTO TRANSPORTE DE MATERIAL", prefixo: "ATM-9359", placa: "IKY-4633", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "CHEVROLET S10, 2002", ano: "" },
+      { tipo: "AUTO TRANSPORTE DE PESSOAL", prefixo: "ATP-1225", placa: "TQV-8D59", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "PICKUP 4X4", ano: "2025" },
+      { tipo: "AUTO RESGATE", prefixo: "AR-426", placa: "JBN7A45", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "FORD TRANSIT TCA AMBULÂNCIA 2022", ano: "2023" },
+      { tipo: "EMBARCAÇÃO INFLÁVEL", prefixo: "EIN-1377", placa: "0000000", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "SALVAMENTO 33 - BOTE INFLÁVEL FLEXBOAT SR15 - MOTOR MERCURY (MOTOR Nº ON471570)", ano: "2025" },
+      { tipo: "REBOQUE PARA TRANSPORTE DE EMBARCAÇÃO", prefixo: "RTE-1441", placa: "TQR-1C79", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "CARGA /REBOQUE, MARCA R/EKMAN RN1", ano: "2025" },
+      { tipo: "REBOQUE PARA TRANSPORTE DE MATERIAL", prefixo: "RTM-825", placa: "JDC-0G96", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "CARGA /REBOQUE, MARCA REK CL2 RNCE8178", ano: "2024" },
+      { tipo: "AUTO BOMBA TANQUE", prefixo: "ABT-7992", placa: "JBM-3781", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "IVECO 170 E25 - ABT 5000L, ANO 2011, COM DESENCARCERADOR + EQUIP APH + EQUIP ALTURA + GERADOR + TORRE DE ILUMINAÇÃO", ano: "2011" },
+      { tipo: "AUTO BOMBA TANQUE", prefixo: "ABT-0535", placa: "JCO-7I27", obm: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL", status: "ATIVA", descricao: "ABT VOLKSWAGEN, CONSTELLATION, 2023/2024", ano: "2023" }
     ];
 
     let usuarioLogado = null;
@@ -764,7 +697,6 @@
     const horaChegada = document.getElementById("horaChegada");
     const usuario = document.getElementById("usuario");
     const observacoes = document.getElementById("observacoes");
-    const vtrHeader = document.getElementById("vtrHeader");
     const kmInfo = document.getElementById("kmInfo");
     const busca = document.getElementById("busca");
     const listaRegistros = document.getElementById("listaRegistros");
@@ -778,6 +710,11 @@
     const resumoKmHoje = document.getElementById("resumoKmHoje");
     const resumoViaturas = document.getElementById("resumoViaturas");
     const resumoTotal = document.getElementById("resumoTotal");
+
+    const vtrHeaderWrap = document.getElementById("vtrHeaderWrap");
+    const btnToggleVtrInfo = document.getElementById("btnToggleVtrInfo");
+    const vtrContent = document.getElementById("vtrContent");
+    const toggleText = document.getElementById("toggleText");
 
     function hojeISO() {
       const d = new Date();
@@ -855,7 +792,7 @@
       ativas.forEach(vtr => {
         const opt = document.createElement("option");
         opt.value = vtr.prefixo;
-        opt.textContent = `${vtr.prefixo} • ${vtr.placa} • ${vtr.descricao}`;
+        opt.textContent = vtr.prefixo;
         vtrSelect.appendChild(opt);
       });
     }
@@ -876,17 +813,20 @@
       const vtr = buscarVtrPorPrefixo(vtrSelect.value);
 
       if (!vtr) {
-        vtrHeader.classList.add("hidden");
-        vtrHeader.innerHTML = "";
+        vtrHeaderWrap.classList.add("hidden");
+        vtrContent.innerHTML = "";
+        vtrContent.classList.remove("open");
+        toggleText.textContent = "toque para expandir";
         return;
       }
 
       const ultimo = obterUltimoRegistroDaVtr(vtr.prefixo, editId.value || null);
 
-      vtrHeader.classList.remove("hidden");
-      vtrHeader.innerHTML = `
-        <div class="vtr-header-title">🚘 ${vtr.prefixo} • ${vtr.placa}</div>
+      vtrHeaderWrap.classList.remove("hidden");
+      vtrContent.innerHTML = `
         <div class="vtr-grid">
+          <div><strong>Prefixo</strong>${vtr.prefixo}</div>
+          <div><strong>Placa</strong>${vtr.placa}</div>
           <div><strong>Tipo</strong>${vtr.tipo}</div>
           <div><strong>Status</strong>${getPillStatus(vtr.status)}</div>
           <div><strong>Descrição</strong>${vtr.descricao}</div>
@@ -934,8 +874,7 @@
       let html = "🚦 Ao selecionar a VTR, o sistema puxa o último registro e sugere o próximo preenchimento.";
 
       if (vtr) {
-        html += `<br><br><strong>VTR:</strong> ${vtr.prefixo} • ${vtr.placa}`;
-        html += `<br><strong>Descrição:</strong> ${vtr.descricao}`;
+        html += `<br><br><strong>VTR:</strong> ${vtr.prefixo}`;
       }
 
       if (ultimo) {
@@ -985,8 +924,10 @@
       tipoLancamento.value = "Saída / Retorno";
       condutor.value = usuarioLogado ? usuarioLogado.nome : "";
       orgao.value = "";
-      vtrHeader.classList.add("hidden");
-      vtrHeader.innerHTML = "";
+      vtrHeaderWrap.classList.add("hidden");
+      vtrContent.innerHTML = "";
+      vtrContent.classList.remove("open");
+      toggleText.textContent = "toque para expandir";
       kmInfo.innerHTML = "🚦 Ao selecionar a VTR, o sistema puxa o último registro e sugere o próximo preenchimento.";
       document.getElementById("btnSalvar").textContent = "💾 Salvar Registro";
     }
@@ -1217,6 +1158,13 @@
       limparFormulario();
     });
 
+    btnToggleVtrInfo.addEventListener("click", function() {
+      vtrContent.classList.toggle("open");
+      toggleText.textContent = vtrContent.classList.contains("open")
+        ? "toque para recolher"
+        : "toque para expandir";
+    });
+
     btnExportarJson.addEventListener("click", function() {
       const dados = carregar();
       const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
@@ -1234,29 +1182,11 @@
         return;
       }
 
-      const linhas = [
-        [
-          "VTR_PREFIXO",
-          "PLACA",
-          "TIPO",
-          "DESCRICAO",
-          "ANO",
-          "OBM",
-          "DATA",
-          "TIPO_LANCAMENTO",
-          "LOCAL_PARTIDA",
-          "LOCAL_DESTINO",
-          "KM_PARTIDA",
-          "KM_CHEGADA",
-          "KM_PERCORRIDO",
-          "HORA_PARTIDA",
-          "HORA_CHEGADA",
-          "CONDUTOR",
-          "ID_FUNC",
-          "USUARIO",
-          "OBSERVACOES"
-        ].join(";")
-      ];
+      const linhas = [[
+        "VTR_PREFIXO","PLACA","TIPO","DESCRICAO","ANO","OBM","DATA","TIPO_LANCAMENTO",
+        "LOCAL_PARTIDA","LOCAL_DESTINO","KM_PARTIDA","KM_CHEGADA","KM_PERCORRIDO",
+        "HORA_PARTIDA","HORA_CHEGADA","CONDUTOR","ID_FUNC","USUARIO","OBSERVACOES"
+      ].join(";")];
 
       dados.forEach(r => {
         linhas.push([
