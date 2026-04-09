@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Diário de Bordo das Viaturas</title>
-  <meta name="theme-color" content="#a11217" />
+  <meta name="theme-color" content="#b71c1c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <style>
     * {
       box-sizing: border-box;
@@ -16,85 +15,61 @@
     }
 
     :root {
-      --bg: #e9eef3;
-      --card: rgba(255,255,255,0.96);
-      --text: #18222f;
-      --muted: #64748b;
-      --primary: #b51d1d;
-      --primary-dark: #7f0f0f;
-      --blue: #123d6b;
+      --bg: #eef3f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #b71c1c;
+      --primary-dark: #8e0000;
+      --blue: #0f4c81;
       --green: #198754;
       --orange: #ff9800;
       --danger: #dc3545;
       --soft: #f8fafc;
       --border: #dbe3eb;
-      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-      --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
-      --radius: 22px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --shadow: 0 8px 22px rgba(0,0,0,0.08);
+      --radius: 18px;
     }
 
-    html {
-      background: linear-gradient(180deg, #dfe7ee 0%, #edf2f6 100%);
+    html, body {
+      margin: 0;
+      background: linear-gradient(180deg, #f2f5f8 0%, #e7edf3 100%);
+      color: var(--text);
     }
 
     body {
-      margin: 0;
-      background:
-        radial-gradient(circle at top, rgba(181,29,29,.10), transparent 32%),
-        linear-gradient(180deg, #eef3f7 0%, #e5ecf2 100%);
-      color: var(--text);
-      padding: calc(10px + var(--safe-top)) 0 calc(110px + var(--safe-bottom));
-      min-height: 100vh;
+      padding-bottom: 95px;
     }
 
     .app {
       width: 100%;
-      max-width: 860px;
+      max-width: 820px;
       margin: 0 auto;
-      padding: 12px;
+      padding: 14px;
     }
 
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 40;
+      z-index: 30;
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: #fff;
-      border-radius: 26px;
-      padding: 16px 16px 18px;
-      box-shadow: 0 14px 34px rgba(127, 15, 15, .22);
-      margin-bottom: 14px;
-      overflow: hidden;
-    }
-
-    .topbar::after {
-      content: "";
-      position: absolute;
-      right: -22px;
-      top: -22px;
-      width: 110px;
-      height: 110px;
-      background: rgba(255,255,255,.10);
-      border-radius: 50%;
+      border-radius: 0 0 26px 26px;
+      padding: 18px 16px 22px;
+      box-shadow: var(--shadow);
+      margin: 0 -14px 14px;
     }
 
     .topbar h1 {
       margin: 0;
-      font-size: 23px;
-      line-height: 1.15;
-      position: relative;
-      z-index: 1;
+      font-size: 22px;
+      line-height: 1.2;
     }
 
     .topbar p {
-      margin: 7px 0 0;
+      margin: 6px 0 0;
       font-size: 13px;
-      opacity: .95;
-      position: relative;
-      z-index: 1;
-      max-width: 620px;
+      opacity: .94;
     }
 
     .grid-cards {
@@ -106,27 +81,25 @@
 
     .mini-card {
       background: var(--card);
-      border-radius: 20px;
-      box-shadow: var(--shadow-soft);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding: 14px;
-      border: 1px solid rgba(219,227,235,.9);
-      backdrop-filter: blur(8px);
     }
 
     .mini-card .label {
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 8px;
-      line-height: 1.25;
-      min-height: 30px;
+      margin-bottom: 6px;
     }
 
     .mini-card .value {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       line-height: 1;
-      letter-spacing: -.02em;
     }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
 
     .card {
       background: var(--card);
@@ -134,12 +107,10 @@
       box-shadow: var(--shadow);
       padding: 16px;
       margin-bottom: 14px;
-      border: 1px solid rgba(219,227,235,.92);
-      backdrop-filter: blur(10px);
     }
 
     .card h2 {
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       font-size: 18px;
       color: var(--blue);
     }
@@ -147,7 +118,7 @@
     .subtitle {
       color: var(--muted);
       font-size: 13px;
-      margin-top: -2px;
+      margin-top: -4px;
       margin-bottom: 12px;
       line-height: 1.45;
     }
@@ -161,7 +132,7 @@
     .field {
       background: var(--soft);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 10px 12px;
     }
 
@@ -176,13 +147,12 @@
     input, select, textarea {
       width: 100%;
       border: 1px solid #d3dbe4;
-      border-radius: 14px;
-      padding: 13px 12px;
+      border-radius: 12px;
+      padding: 12px;
       font-size: 15px;
       outline: none;
       background: #fff;
       color: var(--text);
-      appearance: none;
     }
 
     input:focus, select:focus, textarea:focus {
@@ -192,7 +162,7 @@
 
     textarea {
       resize: vertical;
-      min-height: 88px;
+      min-height: 78px;
     }
 
     .row-2 {
@@ -210,27 +180,15 @@
 
     button {
       border: none;
-      border-radius: 16px;
-      padding: 13px 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: none;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .btn-secondary {
-      background: #eef3f8;
-      color: var(--text);
-      border: 1px solid #dde7f1;
-    }
-
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; flex: 1; min-width: 150px; }
+    .btn-secondary { background: #eef3f8; color: var(--text); }
     .btn-green { background: var(--green); color: #fff; }
     .btn-orange { background: var(--orange); color: #fff; }
     .btn-danger { background: var(--danger); color: #fff; }
@@ -247,30 +205,27 @@
     .pill-warn { background: #fff3cd; color: #8a6d3b; }
     .pill-danger { background: #fdecec; color: #9f1d1d; }
 
-    .login-box {
-      border: 1px solid #f0d2d2;
-      background: linear-gradient(180deg, #fff9f9 0%, #fff 100%);
-    }
+    .login-box { border: 1px solid #efd8d8; background: #fff8f8; }
 
     .user-ok {
       margin-top: 10px;
       background: #eef8f0;
       border: 1px solid #cfe7d5;
       padding: 12px;
-      border-radius: 16px;
+      border-radius: 14px;
       font-size: 14px;
       line-height: 1.5;
     }
 
-    .vtr-collapsible {
+    .vtr-collapsible, .vtr-item, .registro-item {
       margin-bottom: 12px;
       border: 1px solid #d9e3ec;
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
       background: linear-gradient(135deg, #f7fafc, #eef4f9);
     }
 
-    .vtr-toggle {
+    .vtr-toggle, .registro-toggle {
       width: 100%;
       text-align: left;
       background: transparent;
@@ -283,15 +238,19 @@
       border-radius: 0;
     }
 
-    .vtr-toggle span {
+    .vtr-toggle span, .registro-toggle span {
       color: var(--muted);
       font-size: 13px;
       font-weight: 600;
       margin-left: 6px;
     }
 
-    .vtr-content { padding: 0 14px 14px; display: none; }
-    .vtr-content.open { display: block; }
+    .vtr-content, .registro-content {
+      padding: 0 14px 14px;
+      display: none;
+    }
+
+    .vtr-content.open, .registro-content.open { display: block; }
 
     .vtr-grid, .registro-grid {
       display: grid;
@@ -302,9 +261,9 @@
 
     .vtr-grid div, .registro-grid div {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 8px 10px;
-      border: 1px solid #e6edf4;
+      border: 1px solid #e4ebf2;
     }
 
     .vtr-grid strong, .registro-grid strong {
@@ -317,7 +276,7 @@
     .info-box {
       background: #f8fafc;
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 12px;
       font-size: 13px;
       color: #334155;
@@ -327,49 +286,20 @@
 
     .search-box { margin-bottom: 12px; }
 
-    .registro {
-      border: 1px solid #e7edf3;
-      border-radius: 18px;
-      padding: 14px;
-      margin-bottom: 12px;
-      background: #fff;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .registro-topo {
+    .registro-top-line {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 8px;
+      gap: 8px;
     }
 
-    .registro-titulo {
+    .registro-only-vtr {
       font-size: 16px;
       font-weight: 800;
       color: var(--text);
     }
 
-    .registro-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
-      line-height: 1.4;
-    }
-
-    .km-badge {
-      background: #eef8f0;
-      color: #146c43;
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .registro-grid { margin-top: 10px; }
-
-    .registro-actions {
+    .registro-actions, .vtr-actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
@@ -382,17 +312,16 @@
       font-size: 14px;
       padding: 18px;
       border: 1px dashed #cbd5e1;
-      border-radius: 18px;
+      border-radius: 16px;
       background: #fff;
     }
 
     .footer-tools {
       margin-top: 18px;
       background: var(--card);
-      border-radius: 22px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
       padding: 10px 12px;
-      border: 1px solid rgba(219,227,235,.92);
     }
 
     .footer-tools-title {
@@ -412,8 +341,8 @@
       background: #f8fafc;
       color: var(--text);
       border: 1px solid #e3e9f0;
-      border-radius: 14px;
-      padding: 11px 12px;
+      border-radius: 12px;
+      padding: 10px 12px;
       font-size: 13px;
       font-weight: 700;
       text-align: left;
@@ -426,34 +355,6 @@
       padding: 12px 0 10px;
     }
 
-    .app-nav {
-      position: fixed;
-      left: 50%;
-      bottom: calc(12px + var(--safe-bottom));
-      transform: translateX(-50%);
-      width: min(92vw, 520px);
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(219,227,235,.96);
-      border-radius: 22px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-      padding: 8px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      backdrop-filter: blur(12px);
-      z-index: 50;
-    }
-
-    .app-nav button {
-      background: #f8fafc;
-      color: var(--text);
-      border: 1px solid #e5ebf2;
-      padding: 11px 8px;
-      font-size: 12px;
-      border-radius: 16px;
-      font-weight: 800;
-    }
-
     .hidden { display: none !important; }
 
     .small-text {
@@ -463,18 +364,57 @@
       line-height: 1.4;
     }
 
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid #d9e3ec;
+      box-shadow: 0 -4px 18px rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: #4b5563;
+      border-radius: 14px;
+      padding: 10px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.25;
+      border: 1px solid transparent;
+    }
+
+    .nav-btn.active {
+      background: #fff1f1;
+      color: var(--primary);
+      border-color: #f3caca;
+    }
+
+    .tag-admin {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #8e0000;
+      background: #fff1f1;
+      border: 1px solid #f3caca;
+      border-radius: 999px;
+      padding: 5px 10px;
+      margin-top: 10px;
+    }
+
     @media (max-width: 720px) {
       .grid-cards { grid-template-columns: 1fr 1fr; }
       .row-2, .vtr-grid, .registro-grid { grid-template-columns: 1fr; }
       .topbar h1 { font-size: 20px; }
-      .app { padding: 10px; }
-      .card { padding: 14px; }
-      .mini-card .label { min-height: auto; }
-    }
-
-    @media (max-width: 420px) {
-      .topbar { border-radius: 0 0 24px 24px; margin-left: -10px; margin-right: -10px; }
-      .app-nav { width: calc(100vw - 16px); }
     }
   </style>
 </head>
@@ -482,188 +422,210 @@
   <div class="app">
     <div class="topbar">
       <h1>🚒 Diário de Bordo das Viaturas</h1>
-      <p>CBMRS • lançamento digital com ID Func, VTR pré-cadastrada e controle automático de KM</p>
+      <p>CBMRS • lançamento digital com ID Func, VTR pré-cadastrada, consulta rápida e exportação por VTR</p>
     </div>
 
-    <div class="grid-cards">
-      <div class="mini-card">
-        <div class="label">📋 Registros hoje</div>
-        <div class="value" id="resumoHoje">0</div>
-      </div>
-      <div class="mini-card">
-        <div class="label">🛣️ KM hoje</div>
-        <div class="value" id="resumoKmHoje">0</div>
-      </div>
-      <div class="mini-card">
-        <div class="label">🚗 VTRs ativas</div>
-        <div class="value" id="resumoViaturas">0</div>
-      </div>
-      <div class="mini-card">
-        <div class="label">📦 Total registros</div>
-        <div class="value" id="resumoTotal">0</div>
-      </div>
-    </div>
-
-    <div class="card login-box">
-      <h2>🔐 Início do Lançamento</h2>
-      <div class="subtitle">
-        Digite a <strong>ID Func</strong> para identificar automaticamente o condutor e liberar o lançamento do diário de bordo.
+    <section class="screen active" id="screenInicio">
+      <div class="grid-cards">
+        <div class="mini-card">
+          <div class="label">📋 Registros hoje</div>
+          <div class="value" id="resumoHoje">0</div>
+        </div>
+        <div class="mini-card">
+          <div class="label">🛣️ KM hoje</div>
+          <div class="value" id="resumoKmHoje">0</div>
+        </div>
+        <div class="mini-card">
+          <div class="label">🚗 VTRs ativas</div>
+          <div class="value" id="resumoViaturas">0</div>
+        </div>
+        <div class="mini-card">
+          <div class="label">📦 Total registros</div>
+          <div class="value" id="resumoTotal">0</div>
+        </div>
       </div>
 
-      <div class="list-form">
-        <div class="field">
-          <label>🪪 ID Func</label>
-          <input id="loginIdFunc" type="text" inputmode="numeric" placeholder="Ex.: 3698440" />
-          <div class="small-text">Somente usuários pré-cadastrados conseguem iniciar o registro.</div>
+      <div class="card login-box">
+        <h2>🔐 Início do Lançamento</h2>
+        <div class="subtitle">
+          Digite a <strong>ID Func</strong> para identificar automaticamente o condutor e liberar o lançamento do diário de bordo.
         </div>
 
-        <div class="btn-row">
-          <button type="button" class="btn-primary" id="btnValidarUsuario">✅ Identificar Condutor</button>
-          <button type="button" class="btn-secondary" id="btnTrocarUsuario">🔄 Trocar Usuário</button>
-        </div>
-
-        <div id="usuarioAutenticadoBox" class="user-ok hidden"></div>
-      </div>
-    </div>
-
-    <div class="card hidden" id="cardRegistro">
-      <h2>➕ Novo Registro</h2>
-      <div class="subtitle">Selecione a VTR e preencha a saída em formato simples de lista.</div>
-
-      <div id="vtrHeaderWrap" class="vtr-collapsible hidden">
-        <button type="button" class="vtr-toggle" id="btnToggleVtrInfo">
-          🚘 Informações da VTR
-          <span id="toggleText">toque para expandir</span>
-        </button>
-        <div id="vtrContent" class="vtr-content"></div>
-      </div>
-
-      <form id="formRegistro" class="list-form">
-        <input type="hidden" id="editId" />
-
-        <div class="field">
-          <label>🚘 VTR / Prefixo</label>
-          <select id="vtrSelect" required>
-            <option value="">Selecione a VTR</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>👨‍🚒 Condutor (automático pela ID Func)</label>
-          <input id="condutor" type="text" readonly />
-        </div>
-
-        <div class="row-2">
+        <div class="list-form">
           <div class="field">
-            <label>📅 Data</label>
-            <input id="data" type="date" required />
+            <label>🪪 ID Func</label>
+            <input id="loginIdFunc" type="text" inputmode="numeric" placeholder="Ex.: 3698440" />
+            <div class="small-text">Somente usuários pré-cadastrados conseguem iniciar o registro.</div>
           </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn-primary" id="btnValidarUsuario">✅ Identificar Condutor</button>
+            <button type="button" class="btn-secondary" id="btnTrocarUsuario">🔄 Trocar Usuário</button>
+          </div>
+
+          <div id="usuarioAutenticadoBox" class="user-ok hidden"></div>
+          <div class="tag-admin">🔒 Senha admin para editar/excluir configurada no código</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screenLancamento">
+      <div class="card hidden" id="cardRegistro">
+        <h2>➕ Novo Registro</h2>
+        <div class="subtitle">Selecione a VTR e preencha a saída em formato simples de lista.</div>
+
+        <div id="vtrHeaderWrap" class="vtr-collapsible hidden">
+          <button type="button" class="vtr-toggle" id="btnToggleVtrInfo">
+            🚘 Informações da VTR
+            <span id="toggleText">toque para expandir</span>
+          </button>
+          <div id="vtrContent" class="vtr-content"></div>
+        </div>
+
+        <form id="formRegistro" class="list-form">
+          <input type="hidden" id="editId" />
+
           <div class="field">
-            <label>📍 Tipo de Lançamento</label>
-            <select id="tipoLancamento">
-              <option value="Saída / Retorno">Saída / Retorno</option>
-              <option value="Deslocamento Operacional">Deslocamento Operacional</option>
-              <option value="Vistoria">Vistoria</option>
-              <option value="Abastecimento">Abastecimento</option>
-              <option value="Manutenção">Manutenção</option>
-              <option value="Apoio">Apoio</option>
-              <option value="Treinamento">Treinamento</option>
-              <option value="Outro">Outro</option>
+            <label>🚘 VTR / Prefixo</label>
+            <select id="vtrSelect" required>
+              <option value="">Selecione a VTR</option>
             </select>
           </div>
-        </div>
 
-        <div class="field">
-          <label>🏢 OBM / Órgão</label>
-          <input id="orgao" type="text" readonly />
-        </div>
-
-        <div class="field">
-          <label>📍 Local de Partida</label>
-          <input id="localPartida" type="text" placeholder="Ex.: QTL / SLS / Base / COBOM" required />
-        </div>
-
-        <div class="field">
-          <label>📌 Local de Destino / Retorno</label>
-          <input id="localDestino" type="text" placeholder="Ex.: Vistoria / Hospital / Quartel / Liberado" required />
-        </div>
-
-        <div class="row-2">
           <div class="field">
-            <label>⛽ KM na Partida</label>
-            <input id="kmPartida" type="number" min="0" step="1" placeholder="Ex.: 183178" required />
+            <label>👨‍🚒 Condutor (automático pela ID Func)</label>
+            <input id="condutor" type="text" readonly />
           </div>
+
+          <div class="row-2">
+            <div class="field">
+              <label>📅 Data</label>
+              <input id="data" type="date" required />
+            </div>
+            <div class="field">
+              <label>📍 Tipo de Lançamento</label>
+              <select id="tipoLancamento">
+                <option value="Saída / Retorno">Saída / Retorno</option>
+                <option value="Deslocamento Operacional">Deslocamento Operacional</option>
+                <option value="Vistoria">Vistoria</option>
+                <option value="Abastecimento">Abastecimento</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="Apoio">Apoio</option>
+                <option value="Treinamento">Treinamento</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+
           <div class="field">
-            <label>🏁 KM na Chegada</label>
-            <input id="kmChegada" type="number" min="0" step="1" placeholder="Ex.: 183197" required />
+            <label>🏢 OBM / Órgão</label>
+            <input id="orgao" type="text" readonly />
           </div>
-        </div>
 
-        <div class="row-2">
           <div class="field">
-            <label>🕒 Hora da Partida</label>
-            <input id="horaPartida" type="time" required />
+            <label>📍 Local de Partida</label>
+            <input id="localPartida" type="text" placeholder="Ex.: QTL / SLS / Base / COBOM" required />
           </div>
+
           <div class="field">
-            <label>🕓 Hora da Chegada</label>
-            <input id="horaChegada" type="time" required />
+            <label>📌 Local de Destino / Retorno</label>
+            <input id="localDestino" type="text" placeholder="Ex.: Vistoria / Hospital / Quartel / Liberado" required />
           </div>
-        </div>
 
-        <div class="field">
-          <label>👤 Nome do Usuário / Solicitante</label>
-          <input id="usuario" type="text" placeholder="Ex.: Guarnição / Militar / Setor / Usuário atendido" />
-        </div>
+          <div class="row-2">
+            <div class="field">
+              <label>⛽ KM na Partida</label>
+              <input id="kmPartida" type="number" min="0" step="1" placeholder="Ex.: 183178" required />
+            </div>
+            <div class="field">
+              <label>🏁 KM na Chegada</label>
+              <input id="kmChegada" type="number" min="0" step="1" placeholder="Ex.: 183197" required />
+            </div>
+          </div>
 
-        <div class="field">
-          <label>📝 Observações</label>
-          <textarea id="observacoes" placeholder="Ex.: saída para vistoria, apoio, deslocamento, atendimento, manutenção, observação do turno..."></textarea>
-        </div>
+          <div class="row-2">
+            <div class="field">
+              <label>🕒 Hora da Partida</label>
+              <input id="horaPartida" type="time" required />
+            </div>
+            <div class="field">
+              <label>🕓 Hora da Chegada</label>
+              <input id="horaChegada" type="time" required />
+            </div>
+          </div>
 
-        <div class="info-box" id="kmInfo">
-          🚦 Ao selecionar a VTR, o sistema puxa o último registro e sugere o próximo preenchimento.
-        </div>
+          <div class="field">
+            <label>👤 Nome do Usuário / Solicitante</label>
+            <input id="usuario" type="text" placeholder="Ex.: Guarnição / Militar / Setor / Usuário atendido" />
+          </div>
 
-        <div class="btn-row">
-          <button type="submit" class="btn-primary" id="btnSalvar">💾 Salvar Registro</button>
-          <button type="button" class="btn-secondary" id="btnCancelarEdicao">Cancelar edição</button>
-        </div>
-      </form>
-    </div>
+          <div class="field">
+            <label>📝 Observações</label>
+            <textarea id="observacoes" placeholder="Ex.: saída para vistoria, apoio, deslocamento, atendimento, manutenção, observação do turno..."></textarea>
+          </div>
 
-    <div class="card">
-      <h2>🔎 Consulta de Registros</h2>
-      <div class="search-box">
-        <input id="busca" type="text" placeholder="Pesquisar por VTR, placa, condutor, data, local, observação..." />
+          <div class="info-box" id="kmInfo">
+            🚦 Ao selecionar a VTR, o sistema puxa o último registro e sugere o próximo preenchimento.
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-primary" id="btnSalvar">💾 Salvar Registro</button>
+            <button type="button" class="btn-secondary" id="btnCancelarEdicao">Cancelar edição</button>
+          </div>
+        </form>
       </div>
-      <div id="listaRegistros"></div>
-    </div>
 
-    <div class="footer-tools">
-      <div class="footer-tools-title">⚙️ Ferramentas</div>
-      <div class="footer-tools-list">
-        <button type="button" id="btnExportarJson">⬇️ Exportar Backup</button>
-        <button type="button" id="btnExportarCsv">📄 Exportar CSV</button>
-        <button type="button" onclick="document.getElementById('inputImportar').click()">📤 Importar Backup</button>
-        <button type="button" id="btnLimparTudo">🗑️ Limpar Tudo</button>
+      <div class="card" id="cardBloqueioLancamento">
+        <h2>📲 Lançamento</h2>
+        <div class="subtitle">Primeiro identifique o condutor na tela inicial usando a ID Func para liberar esta aba.</div>
       </div>
-      <input type="file" id="inputImportar" accept=".json" class="hidden" />
-    </div>
+    </section>
+
+    <section class="screen" id="screenConsulta">
+      <div class="card">
+        <h2>🔎 Consulta de Registros</h2>
+        <div class="subtitle">Na lista aparece apenas a VTR. Toque para expandir os dados do registro.</div>
+        <div class="search-box">
+          <input id="busca" type="text" placeholder="Pesquisar por VTR, placa, condutor, data, local, observação..." />
+        </div>
+        <div id="listaRegistros"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="screenVtrs">
+      <div class="card">
+        <h2>🚘 Relação de VTRs Cadastradas</h2>
+        <div class="subtitle">Cada VTR pode ser expandida ou recolhida. Também é possível exportar a ficha em formato pronto para impressão em PDF.</div>
+        <div id="listaVtrs"></div>
+      </div>
+
+      <div class="footer-tools">
+        <div class="footer-tools-title">⚙️ Ferramentas</div>
+        <div class="footer-tools-list">
+          <button type="button" id="btnExportarJson">⬇️ Exportar Backup</button>
+          <button type="button" id="btnExportarCsv">📄 Exportar CSV</button>
+          <button type="button" onclick="document.getElementById('inputImportar').click()">📤 Importar Backup</button>
+          <button type="button" id="btnLimparTudo">🗑️ Limpar Tudo</button>
+        </div>
+        <input type="file" id="inputImportar" accept=".json" class="hidden" />
+      </div>
+    </section>
 
     <div class="footer-note">
       Diário de Bordo Digital • GitHub Pages • preenchimento rápido no celular
     </div>
   </div>
 
-    <div class="app-nav">
-      <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">🏠 Início</button>
-      <button type="button" onclick="document.getElementById('cardRegistro').scrollIntoView({ behavior: 'smooth' })">➕ Novo</button>
-      <button type="button" onclick="document.getElementById('listaRegistros').scrollIntoView({ behavior: 'smooth' })">📋 Registros</button>
-    </div>
-
+  <nav class="bottom-nav">
+    <button type="button" class="nav-btn active" data-screen="screenInicio">🏠<br>Início</button>
+    <button type="button" class="nav-btn" data-screen="screenLancamento">➕<br>Lançar</button>
+    <button type="button" class="nav-btn" data-screen="screenConsulta">📋<br>Consulta</button>
+    <button type="button" class="nav-btn" data-screen="screenVtrs">🚘<br>VTRs</button>
+  </nav>
 
   <script>
-    const STORAGE_KEY = "diario_bordo_viaturas_v2";
+    const STORAGE_KEY = "diario_bordo_viaturas_v3";
+    const ADMIN_PASSWORD = "193cbmrs";
 
     const USUARIOS = [
       { nome: "ALESSANDRO BASTOS VICENTE", idFunc: "2614960" },
@@ -713,6 +675,7 @@
     const btnTrocarUsuario = document.getElementById("btnTrocarUsuario");
     const usuarioAutenticadoBox = document.getElementById("usuarioAutenticadoBox");
     const cardRegistro = document.getElementById("cardRegistro");
+    const cardBloqueioLancamento = document.getElementById("cardBloqueioLancamento");
 
     const vtrSelect = document.getElementById("vtrSelect");
     const condutor = document.getElementById("condutor");
@@ -730,6 +693,7 @@
     const kmInfo = document.getElementById("kmInfo");
     const busca = document.getElementById("busca");
     const listaRegistros = document.getElementById("listaRegistros");
+    const listaVtrs = document.getElementById("listaVtrs");
     const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
     const btnExportarJson = document.getElementById("btnExportarJson");
     const btnExportarCsv = document.getElementById("btnExportarCsv");
@@ -778,7 +742,10 @@
 
     function carregar() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const atual = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (Array.isArray(atual)) return atual;
+        const anterior = JSON.parse(localStorage.getItem("diario_bordo_viaturas_v2"));
+        return Array.isArray(anterior) ? anterior : [];
       } catch {
         return [];
       }
@@ -814,11 +781,21 @@
       return `<span class="pill pill-danger">${status}</span>`;
     }
 
+    function abrirTela(id) {
+      document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelector(`.nav-btn[data-screen="${id}"]`).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => abrirTela(btn.dataset.screen));
+    });
+
     function popularVtrs() {
       vtrSelect.innerHTML = `<option value="">Selecione a VTR</option>`;
-      const ativas = VTRS.filter(v => v.status === "ATIVA")
-        .sort((a, b) => a.prefixo.localeCompare(b.prefixo));
-
+      const ativas = VTRS.filter(v => v.status === "ATIVA").sort((a, b) => a.prefixo.localeCompare(b.prefixo));
       ativas.forEach(vtr => {
         const opt = document.createElement("option");
         opt.value = vtr.prefixo;
@@ -828,20 +805,17 @@
     }
 
     function obterUltimoRegistroDaVtr(prefixo, ignorarId = null) {
-      const registros = carregar()
-        .filter(r => r.vtrPrefixo === prefixo && r.id !== ignorarId)
+      const registros = carregar().filter(r => r.vtrPrefixo === prefixo && r.id !== ignorarId)
         .sort((a, b) => {
           const da = `${a.data} ${a.horaChegada || "00:00"}`;
           const db = `${b.data} ${b.horaChegada || "00:00"}`;
           return db.localeCompare(da);
         });
-
       return registros.length ? registros[0] : null;
     }
 
     function preencherHeaderVtr() {
       const vtr = buscarVtrPorPrefixo(vtrSelect.value);
-
       if (!vtr) {
         vtrHeaderWrap.classList.add("hidden");
         vtrContent.innerHTML = "";
@@ -851,7 +825,6 @@
       }
 
       const ultimo = obterUltimoRegistroDaVtr(vtr.prefixo, editId.value || null);
-
       vtrHeaderWrap.classList.remove("hidden");
       vtrContent.innerHTML = `
         <div class="vtr-grid">
@@ -874,12 +847,9 @@
         atualizarInfoKm();
         return;
       }
-
       orgao.value = vtr.obm;
-
       if (!editId.value) {
         const ultimo = obterUltimoRegistroDaVtr(vtr.prefixo);
-
         if (ultimo) {
           kmPartida.value = ultimo.kmChegada || "";
           if (!localPartida.value.trim()) {
@@ -889,7 +859,6 @@
           kmPartida.value = "";
         }
       }
-
       preencherHeaderVtr();
       atualizarInfoKm();
     }
@@ -902,35 +871,35 @@
       const kmRodado = (kmPartida.value !== "" && kmChegada.value !== "") ? (kmFim - kmIni) : null;
 
       let html = "🚦 Ao selecionar a VTR, o sistema puxa o último registro e sugere o próximo preenchimento.";
-
-      if (vtr) {
-        html += `<br><br><strong>VTR:</strong> ${vtr.prefixo}`;
-      }
-
+      if (vtr) html += `<br><br><strong>VTR:</strong> ${vtr.prefixo}`;
       if (ultimo) {
         html += `<br><strong>Último KM registrado:</strong> ${ultimo.kmChegada}`;
         html += `<br><strong>Último destino informado:</strong> ${ultimo.localDestino || "-"}`;
       }
-
       if (kmRodado !== null) {
         html += `<br><strong>KM percorridos neste lançamento:</strong> ${kmRodado >= 0 ? kmRodado : "valor inválido"} km`;
       }
-
       kmInfo.innerHTML = html;
+    }
+
+    function atualizarBloqueioLancamento() {
+      if (usuarioLogado) {
+        cardRegistro.classList.remove('hidden');
+        cardBloqueioLancamento.classList.add('hidden');
+      } else {
+        cardRegistro.classList.add('hidden');
+        cardBloqueioLancamento.classList.remove('hidden');
+      }
     }
 
     function validarUsuarioLogin() {
       const usuarioEncontrado = buscarUsuarioPorId(loginIdFunc.value);
-
       if (!usuarioEncontrado) {
         usuarioLogado = null;
         usuarioAutenticadoBox.classList.remove("hidden");
-        usuarioAutenticadoBox.innerHTML = `
-          <strong>❌ ID Func não encontrada.</strong><br>
-          Verifique o número informado.
-        `;
-        cardRegistro.classList.add("hidden");
+        usuarioAutenticadoBox.innerHTML = `<strong>❌ ID Func não encontrada.</strong><br>Verifique o número informado.`;
         condutor.value = "";
+        atualizarBloqueioLancamento();
         return;
       }
 
@@ -942,7 +911,8 @@
         <strong>Nome:</strong> ${usuarioEncontrado.nome}<br>
         <strong>ID Func:</strong> ${usuarioEncontrado.idFunc}
       `;
-      cardRegistro.classList.remove("hidden");
+      atualizarBloqueioLancamento();
+      abrirTela('screenLancamento');
     }
 
     function limparFormulario() {
@@ -967,115 +937,167 @@
         alert("Informe uma ID Func válida antes de lançar um registro.");
         return false;
       }
-
       const kmIni = Number(registro.kmPartida);
       const kmFim = Number(registro.kmChegada);
-
       if (kmFim < kmIni) {
         alert("O KM de chegada não pode ser menor que o KM de partida.");
         return false;
       }
-
       const ultimo = obterUltimoRegistroDaVtr(registro.vtrPrefixo, registro.id);
-
       if (ultimo && kmIni < Number(ultimo.kmChegada)) {
         alert(`Atenção: o KM de partida (${kmIni}) está menor que o último KM registrado (${ultimo.kmChegada}) desta VTR.`);
         return false;
       }
+      return true;
+    }
 
+    function solicitarAdmin() {
+      const senha = prompt('Digite a senha admin para continuar:');
+      if (senha === null) return false;
+      if (senha !== ADMIN_PASSWORD) {
+        alert('Senha admin incorreta.');
+        return false;
+      }
       return true;
     }
 
     function renderizar() {
       const registros = ordenarRegistros(carregar());
       const termo = normalizarTexto(busca.value);
-
       const filtrados = registros.filter(r => {
         const alvo = normalizarTexto([
           r.vtrPrefixo, r.vtrPlaca, r.vtrDescricao, r.vtrTipo, r.condutor, r.idFunc,
           r.data, r.localPartida, r.localDestino, r.usuario, r.observacoes, r.tipoLancamento
-        ].join(" "));
+        ].join(' '));
         return alvo.includes(termo);
       });
 
-      listaRegistros.innerHTML = "";
-
+      listaRegistros.innerHTML = '';
       if (!filtrados.length) {
         listaRegistros.innerHTML = `<div class="empty">📭 Nenhum registro encontrado.</div>`;
       } else {
-        filtrados.forEach(registro => {
+        filtrados.forEach((registro, idx) => {
           const kmPercorrido = calcularKmPercorrido(registro.kmPartida, registro.kmChegada);
-          const vtr = buscarVtrPorPrefixo(registro.vtrPrefixo);
-
-          const div = document.createElement("div");
-          div.className = "registro";
+          const div = document.createElement('div');
+          div.className = 'registro-item';
           div.innerHTML = `
-            <div class="registro-topo">
-              <div>
-                <div class="registro-titulo">🚘 ${registro.vtrPrefixo} • ${registro.vtrPlaca}</div>
-                <div class="registro-sub">
-                  📅 ${formatarDataBR(registro.data)} • 👨‍🚒 ${registro.condutor}<br>
-                  ${registro.vtrDescricao || ""} ${vtr ? "• " + vtr.obm : ""}
-                </div>
+            <button type="button" class="registro-toggle" data-target="registro-content-${idx}">
+              <div class="registro-top-line">
+                <div class="registro-only-vtr">🚘 ${registro.vtrPrefixo}</div>
+                <span>toque para expandir</span>
               </div>
-              <div class="km-badge">🛣️ ${kmPercorrido} km</div>
-            </div>
-
-            <div class="registro-grid">
-              <div><strong>Tipo de Lançamento</strong>${registro.tipoLancamento || "-"}</div>
-              <div><strong>ID Func</strong>${registro.idFunc || "-"}</div>
-              <div><strong>Local de Partida</strong>${registro.localPartida || "-"}</div>
-              <div><strong>Local de Destino / Retorno</strong>${registro.localDestino || "-"}</div>
-              <div><strong>KM Partida</strong>${registro.kmPartida}</div>
-              <div><strong>KM Chegada</strong>${registro.kmChegada}</div>
-              <div><strong>Hora da Partida</strong>${registro.horaPartida || "-"}</div>
-              <div><strong>Hora da Chegada</strong>${registro.horaChegada || "-"}</div>
-              <div><strong>Usuário / Solicitante</strong>${registro.usuario || "-"}</div>
-              <div><strong>OBM</strong>${registro.orgao || "-"}</div>
-              <div style="grid-column: 1 / -1;"><strong>Observações</strong>${registro.observacoes || "-"}</div>
-            </div>
-
-            <div class="registro-actions">
-              <button class="btn-secondary" onclick="editarRegistro('${registro.id}')">✏️ Editar</button>
-              <button class="btn-danger" onclick="excluirRegistro('${registro.id}')">🗑️ Excluir</button>
+            </button>
+            <div class="registro-content" id="registro-content-${idx}">
+              <div class="registro-grid">
+                <div><strong>Placa</strong>${registro.vtrPlaca || '-'}</div>
+                <div><strong>Data</strong>${formatarDataBR(registro.data)}</div>
+                <div><strong>Condutor</strong>${registro.condutor || '-'}</div>
+                <div><strong>ID Func</strong>${registro.idFunc || '-'}</div>
+                <div><strong>Tipo de Lançamento</strong>${registro.tipoLancamento || '-'}</div>
+                <div><strong>KM Percorrido</strong>${kmPercorrido} km</div>
+                <div><strong>Local de Partida</strong>${registro.localPartida || '-'}</div>
+                <div><strong>Local de Destino / Retorno</strong>${registro.localDestino || '-'}</div>
+                <div><strong>KM Partida</strong>${registro.kmPartida}</div>
+                <div><strong>KM Chegada</strong>${registro.kmChegada}</div>
+                <div><strong>Hora da Partida</strong>${registro.horaPartida || '-'}</div>
+                <div><strong>Hora da Chegada</strong>${registro.horaChegada || '-'}</div>
+                <div><strong>Usuário / Solicitante</strong>${registro.usuario || '-'}</div>
+                <div><strong>OBM</strong>${registro.orgao || '-'}</div>
+                <div style="grid-column: 1 / -1;"><strong>Observações</strong>${registro.observacoes || '-'}</div>
+              </div>
+              <div class="registro-actions">
+                <button class="btn-secondary" onclick="editarRegistro('${registro.id}')">✏️ Editar</button>
+                <button class="btn-danger" onclick="excluirRegistro('${registro.id}')">🗑️ Excluir</button>
+              </div>
             </div>
           `;
           listaRegistros.appendChild(div);
         });
       }
 
+      document.querySelectorAll('.registro-toggle').forEach(btn => {
+        btn.onclick = function() {
+          const target = document.getElementById(this.dataset.target);
+          const span = this.querySelector('span');
+          target.classList.toggle('open');
+          span.textContent = target.classList.contains('open') ? 'toque para recolher' : 'toque para expandir';
+        };
+      });
+
       atualizarResumo(registros);
+      renderizarListaVtrs();
     }
 
     function atualizarResumo(registros) {
       const hoje = hojeISO();
       const registrosHoje = registros.filter(r => r.data === hoje);
       const kmHoje = registrosHoje.reduce((acc, r) => acc + calcularKmPercorrido(r.kmPartida, r.kmChegada), 0);
-      const vtrsAtivas = VTRS.filter(v => v.status === "ATIVA").length;
-
+      const vtrsAtivas = VTRS.filter(v => v.status === 'ATIVA').length;
       resumoHoje.textContent = registrosHoje.length;
       resumoKmHoje.textContent = kmHoje;
       resumoViaturas.textContent = vtrsAtivas;
       resumoTotal.textContent = registros.length;
     }
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
+    function renderizarListaVtrs() {
+      const registros = carregar();
+      listaVtrs.innerHTML = '';
+      const listaOrdenada = [...VTRS].sort((a, b) => a.prefixo.localeCompare(b.prefixo));
+      listaOrdenada.forEach((vtr, idx) => {
+        const registrosVtr = ordenarRegistros(registros.filter(r => r.vtrPrefixo === vtr.prefixo));
+        const ultimo = registrosVtr[0] || null;
+        const kmTotal = registrosVtr.reduce((acc, r) => acc + calcularKmPercorrido(r.kmPartida, r.kmChegada), 0);
+        const item = document.createElement('div');
+        item.className = 'vtr-item';
+        item.innerHTML = `
+          <button type="button" class="vtr-toggle" data-target="vtr-content-${idx}">
+            🚘 ${vtr.prefixo}
+            <span>${vtr.placa} • ${registrosVtr.length} registro(s)</span>
+          </button>
+          <div class="vtr-content" id="vtr-content-${idx}">
+            <div class="vtr-grid">
+              <div><strong>Prefixo</strong>${vtr.prefixo}</div>
+              <div><strong>Placa</strong>${vtr.placa}</div>
+              <div><strong>Tipo</strong>${vtr.tipo}</div>
+              <div><strong>Status</strong>${getPillStatus(vtr.status)}</div>
+              <div><strong>Descrição</strong>${vtr.descricao}</div>
+              <div><strong>Ano</strong>${vtr.ano || '-'}</div>
+              <div><strong>OBM</strong>${vtr.obm}</div>
+              <div><strong>Último Registro</strong>${ultimo ? `${formatarDataBR(ultimo.data)} • KM ${ultimo.kmChegada}` : 'Sem registros'}</div>
+              <div><strong>Total de Registros</strong>${registrosVtr.length}</div>
+              <div><strong>Total de KM Lançado</strong>${kmTotal} km</div>
+            </div>
+            <div class="vtr-actions">
+              <button type="button" class="btn-green" onclick="exportarFichaVtr('${vtr.prefixo}')">🖨️ Exportar ficha VTR (PDF)</button>
+            </div>
+          </div>
+        `;
+        listaVtrs.appendChild(item);
+      });
 
+      document.querySelectorAll('#listaVtrs .vtr-toggle').forEach(btn => {
+        btn.onclick = function() {
+          const target = document.getElementById(this.dataset.target);
+          const span = this.querySelector('span');
+          target.classList.toggle('open');
+          span.textContent = target.classList.contains('open') ? 'toque para recolher' : span.textContent.replace('toque para recolher', '').trim() || 'toque para expandir';
+        };
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
       if (!usuarioLogado) {
-        alert("Informe uma ID Func válida antes de salvar.");
+        alert('Informe uma ID Func válida antes de salvar.');
         return;
       }
-
       const vtr = buscarVtrPorPrefixo(vtrSelect.value);
-
       if (!vtr) {
-        alert("Selecione uma VTR válida.");
+        alert('Selecione uma VTR válida.');
         return;
       }
 
       const dados = carregar();
-
       const registro = {
         id: editId.value || Date.now().toString(),
         vtrPrefixo: vtr.prefixo,
@@ -1099,21 +1121,17 @@
       };
 
       if (!validarRegistro(registro)) return;
-
       const index = dados.findIndex(r => r.id === registro.id);
-      if (index >= 0) {
-        dados[index] = registro;
-      } else {
-        dados.push(registro);
-      }
-
+      if (index >= 0) dados[index] = registro; else dados.push(registro);
       salvar(dados);
       limparFormulario();
       renderizar();
-      alert("Registro salvo com sucesso.");
+      alert('Registro salvo com sucesso.');
+      abrirTela('screenConsulta');
     });
 
     window.editarRegistro = function(id) {
+      if (!solicitarAdmin()) return;
       const dados = carregar();
       const r = dados.find(item => item.id === id);
       if (!r) return;
@@ -1122,191 +1140,247 @@
       if (usuarioRegistro) {
         usuarioLogado = usuarioRegistro;
         loginIdFunc.value = usuarioRegistro.idFunc;
-        usuarioAutenticadoBox.classList.remove("hidden");
+        usuarioAutenticadoBox.classList.remove('hidden');
         usuarioAutenticadoBox.innerHTML = `
           <strong>✅ Condutor identificado</strong><br>
           <strong>Nome:</strong> ${usuarioRegistro.nome}<br>
           <strong>ID Func:</strong> ${usuarioRegistro.idFunc}
         `;
-        cardRegistro.classList.remove("hidden");
       }
 
+      atualizarBloqueioLancamento();
       editId.value = r.id;
-      vtrSelect.value = r.vtrPrefixo || "";
-      condutor.value = r.condutor || "";
-      data.value = r.data || "";
-      tipoLancamento.value = r.tipoLancamento || "Saída / Retorno";
-      orgao.value = r.orgao || "";
-      localPartida.value = r.localPartida || "";
-      localDestino.value = r.localDestino || "";
-      kmPartida.value = r.kmPartida ?? "";
-      kmChegada.value = r.kmChegada ?? "";
-      horaPartida.value = r.horaPartida || "";
-      horaChegada.value = r.horaChegada || "";
-      usuario.value = r.usuario || "";
-      observacoes.value = r.observacoes || "";
-
+      vtrSelect.value = r.vtrPrefixo || '';
+      condutor.value = r.condutor || '';
+      data.value = r.data || '';
+      tipoLancamento.value = r.tipoLancamento || 'Saída / Retorno';
+      orgao.value = r.orgao || '';
+      localPartida.value = r.localPartida || '';
+      localDestino.value = r.localDestino || '';
+      kmPartida.value = r.kmPartida ?? '';
+      kmChegada.value = r.kmChegada ?? '';
+      horaPartida.value = r.horaPartida || '';
+      horaChegada.value = r.horaChegada || '';
+      usuario.value = r.usuario || '';
+      observacoes.value = r.observacoes || '';
       preencherHeaderVtr();
       atualizarInfoKm();
-      document.getElementById("btnSalvar").textContent = "✅ Atualizar Registro";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById('btnSalvar').textContent = '✅ Atualizar Registro';
+      abrirTela('screenLancamento');
     };
 
     window.excluirRegistro = function(id) {
-      if (!confirm("Deseja realmente excluir este registro do diário de bordo?")) return;
+      if (!solicitarAdmin()) return;
+      if (!confirm('Deseja realmente excluir este registro do diário de bordo?')) return;
       const dados = carregar().filter(r => r.id !== id);
       salvar(dados);
       renderizar();
-      alert("Registro excluído com sucesso.");
+      alert('Registro excluído com sucesso.');
     };
 
-    btnValidarUsuario.addEventListener("click", validarUsuarioLogin);
+    window.exportarFichaVtr = function(prefixo) {
+      const vtr = buscarVtrPorPrefixo(prefixo);
+      const registros = ordenarRegistros(carregar().filter(r => r.vtrPrefixo === prefixo));
+      if (!vtr) return;
+      if (!registros.length) {
+        alert('Esta VTR ainda não possui registros para exportação.');
+        return;
+      }
 
-    loginIdFunc.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") {
+      const linhas = registros.map(r => `
+        <tr>
+          <td>${formatarDataBR(r.data)}</td>
+          <td>${r.localPartida || ''}</td>
+          <td>${r.kmPartida ?? ''}</td>
+          <td>${r.horaPartida || ''}</td>
+          <td>${r.kmChegada ?? ''}</td>
+          <td>${r.horaChegada || ''}</td>
+          <td>${r.condutor || ''}</td>
+          <td>${r.usuario || ''}</td>
+          <td>${r.observacoes || ''}</td>
+        </tr>
+      `).join('');
+
+      const html = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Ficha ${vtr.prefixo}</title>
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; margin: 18px; color: #000; }
+            .head { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 2px solid #000; border-bottom: none; }
+            .head > div { padding: 8px 10px; border-right: 1px solid #000; min-height: 58px; }
+            .head > div:last-child { border-right: none; }
+            .title { text-align: center; font-weight: 800; font-size: 18px; border: 2px solid #000; border-top: none; padding: 10px; }
+            .sub { font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px; }
+            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            th, td { border: 1px solid #000; padding: 6px 4px; font-size: 11px; vertical-align: top; word-wrap: break-word; }
+            th { text-transform: uppercase; }
+            .small { font-size: 10px; }
+            .note { margin-top: 8px; font-size: 11px; color: #333; }
+            @media print { body { margin: 8px; } }
+          </style>
+        </head>
+        <body>
+          <div class="head">
+            <div><span class="sub">PLACA</span>${vtr.placa}</div>
+            <div><span class="sub">MARCA/MODELO</span>${vtr.descricao}</div>
+            <div><span class="sub">ÓRGÃO/ENTIDADE</span>CBMRS</div>
+          </div>
+          <div class="title">DIÁRIO DE BORDO FÍSICO</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Local de Partida</th>
+                <th>KM na Partida</th>
+                <th>Hora da Partida</th>
+                <th>KM no Destino</th>
+                <th>Hora da Chegada</th>
+                <th>Nome Condutor</th>
+                <th>Nome Usuário</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>${linhas}</tbody>
+          </table>
+          <div class="note">VTR: <strong>${vtr.prefixo}</strong> • Tipo: ${vtr.tipo} • OBM: ${vtr.obm}<br>Esta exportação gera uma ficha pronta para impressão ou salvar em PDF no navegador. Se você me enviar o PDF oficial em branco, depois eu posso ajustar para encaixe ainda mais fiel ao documento original.</div>
+          <script>
+            window.onload = () => { window.print(); };
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      const novaJanela = window.open('', '_blank');
+      novaJanela.document.write(html);
+      novaJanela.document.close();
+    };
+
+    btnValidarUsuario.addEventListener('click', validarUsuarioLogin);
+    loginIdFunc.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
         e.preventDefault();
         validarUsuarioLogin();
       }
     });
 
-    btnTrocarUsuario.addEventListener("click", function() {
+    btnTrocarUsuario.addEventListener('click', function() {
       usuarioLogado = null;
-      loginIdFunc.value = "";
-      usuarioAutenticadoBox.classList.add("hidden");
-      usuarioAutenticadoBox.innerHTML = "";
-      cardRegistro.classList.add("hidden");
-      condutor.value = "";
+      loginIdFunc.value = '';
+      usuarioAutenticadoBox.classList.add('hidden');
+      usuarioAutenticadoBox.innerHTML = '';
+      condutor.value = '';
       limparFormulario();
+      atualizarBloqueioLancamento();
+      abrirTela('screenInicio');
     });
 
-    vtrSelect.addEventListener("change", aplicarSugestaoUltimoRegistro);
-    kmPartida.addEventListener("input", atualizarInfoKm);
-    kmChegada.addEventListener("input", atualizarInfoKm);
-    busca.addEventListener("input", renderizar);
+    vtrSelect.addEventListener('change', aplicarSugestaoUltimoRegistro);
+    kmPartida.addEventListener('input', atualizarInfoKm);
+    kmChegada.addEventListener('input', atualizarInfoKm);
+    busca.addEventListener('input', renderizar);
 
-    btnCancelarEdicao.addEventListener("click", function() {
-      limparFormulario();
+    btnCancelarEdicao.addEventListener('click', function() { limparFormulario(); });
+
+    btnToggleVtrInfo.addEventListener('click', function() {
+      vtrContent.classList.toggle('open');
+      toggleText.textContent = vtrContent.classList.contains('open') ? 'toque para recolher' : 'toque para expandir';
     });
 
-    btnToggleVtrInfo.addEventListener("click", function() {
-      vtrContent.classList.toggle("open");
-      toggleText.textContent = vtrContent.classList.contains("open")
-        ? "toque para recolher"
-        : "toque para expandir";
-    });
-
-    btnExportarJson.addEventListener("click", function() {
+    btnExportarJson.addEventListener('click', function() {
       const dados = carregar();
-      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = "diario-bordo-backup.json";
+      a.download = 'diario-bordo-backup.json';
       a.click();
     });
 
-    btnExportarCsv.addEventListener("click", function() {
+    btnExportarCsv.addEventListener('click', function() {
       const dados = ordenarRegistros(carregar());
-
       if (!dados.length) {
-        alert("Não há registros para exportar.");
+        alert('Não há registros para exportar.');
         return;
       }
-
       const linhas = [[
-        "VTR_PREFIXO","PLACA","TIPO","DESCRICAO","ANO","OBM","DATA","TIPO_LANCAMENTO",
-        "LOCAL_PARTIDA","LOCAL_DESTINO","KM_PARTIDA","KM_CHEGADA","KM_PERCORRIDO",
-        "HORA_PARTIDA","HORA_CHEGADA","CONDUTOR","ID_FUNC","USUARIO","OBSERVACOES"
-      ].join(";")];
-
+        'VTR_PREFIXO','PLACA','TIPO','DESCRICAO','ANO','OBM','DATA','TIPO_LANCAMENTO',
+        'LOCAL_PARTIDA','LOCAL_DESTINO','KM_PARTIDA','KM_CHEGADA','KM_PERCORRIDO',
+        'HORA_PARTIDA','HORA_CHEGADA','CONDUTOR','ID_FUNC','USUARIO','OBSERVACOES'
+      ].join(';')];
       dados.forEach(r => {
         linhas.push([
-          r.vtrPrefixo,
-          r.vtrPlaca,
-          `"${(r.vtrTipo || "").replace(/"/g, '""')}"`,
-          `"${(r.vtrDescricao || "").replace(/"/g, '""')}"`,
-          r.vtrAno || "",
-          `"${(r.orgao || "").replace(/"/g, '""')}"`,
-          r.data,
-          `"${(r.tipoLancamento || "").replace(/"/g, '""')}"`,
-          `"${(r.localPartida || "").replace(/"/g, '""')}"`,
-          `"${(r.localDestino || "").replace(/"/g, '""')}"`,
-          r.kmPartida,
-          r.kmChegada,
-          calcularKmPercorrido(r.kmPartida, r.kmChegada),
-          r.horaPartida,
-          r.horaChegada,
-          `"${(r.condutor || "").replace(/"/g, '""')}"`,
-          r.idFunc || "",
-          `"${(r.usuario || "").replace(/"/g, '""')}"`,
-          `"${(r.observacoes || "").replace(/"/g, '""')}"`
-        ].join(";"));
+          r.vtrPrefixo, r.vtrPlaca, `"${(r.vtrTipo || '').replace(/"/g, '""')}"`, `"${(r.vtrDescricao || '').replace(/"/g, '""')}"`,
+          r.vtrAno || '', `"${(r.orgao || '').replace(/"/g, '""')}"`, r.data, `"${(r.tipoLancamento || '').replace(/"/g, '""')}"`,
+          `"${(r.localPartida || '').replace(/"/g, '""')}"`, `"${(r.localDestino || '').replace(/"/g, '""')}"`,
+          r.kmPartida, r.kmChegada, calcularKmPercorrido(r.kmPartida, r.kmChegada), r.horaPartida, r.horaChegada,
+          `"${(r.condutor || '').replace(/"/g, '""')}"`, r.idFunc || '', `"${(r.usuario || '').replace(/"/g, '""')}"`, `"${(r.observacoes || '').replace(/"/g, '""')}"`
+        ].join(';'));
       });
-
-      const blob = new Blob(["\uFEFF" + linhas.join("\n")], { type: "text/csv;charset=utf-8;" });
-      const a = document.createElement("a");
+      const blob = new Blob(["\uFEFF" + linhas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = "diario-bordo.csv";
+      a.download = 'diario-bordo.csv';
       a.click();
     });
 
-    inputImportar.addEventListener("change", function(e) {
+    inputImportar.addEventListener('change', function(e) {
       const arquivo = e.target.files[0];
       if (!arquivo) return;
-
       const reader = new FileReader();
       reader.onload = function(evt) {
         try {
           const dadosImportados = JSON.parse(evt.target.result);
           if (!Array.isArray(dadosImportados)) {
-            alert("Arquivo inválido.");
+            alert('Arquivo inválido.');
             return;
           }
           salvar(dadosImportados);
           renderizar();
-          alert("Backup importado com sucesso.");
+          alert('Backup importado com sucesso.');
         } catch {
-          alert("Falha ao importar o backup.");
+          alert('Falha ao importar o backup.');
         }
       };
       reader.readAsText(arquivo);
-      e.target.value = "";
+      e.target.value = '';
     });
 
-    btnLimparTudo.addEventListener("click", function() {
-      if (!confirm("Tem certeza que deseja apagar todos os registros?")) return;
-      if (!confirm("Confirma novamente? Esta ação limpa todo o histórico salvo neste navegador.")) return;
+    btnLimparTudo.addEventListener('click', function() {
+      if (!solicitarAdmin()) return;
+      if (!confirm('Tem certeza que deseja apagar todos os registros?')) return;
+      if (!confirm('Confirma novamente? Esta ação limpa todo o histórico salvo neste navegador.')) return;
       localStorage.removeItem(STORAGE_KEY);
       limparFormulario();
       renderizar();
-      alert("Todos os registros foram removidos.");
+      alert('Todos os registros foram removidos.');
     });
 
     function preloadExemplo() {
       const dados = carregar();
       if (dados.length) return;
-
       const exemplo = [{
-        id: "1",
-        vtrPrefixo: "ATP-9316",
-        vtrPlaca: "IUW6520",
-        vtrTipo: "AUTO TRANSPORTE DE PESSOAL",
-        vtrDescricao: "RENAULT DUSTER - 4P - VERMELHA",
-        vtrAno: "2013",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        id: '1',
+        vtrPrefixo: 'ATP-9316',
+        vtrPlaca: 'IUW6520',
+        vtrTipo: 'AUTO TRANSPORTE DE PESSOAL',
+        vtrDescricao: 'RENAULT DUSTER - 4P - VERMELHA',
+        vtrAno: '2013',
+        orgao: '6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL',
         data: hojeISO(),
-        tipoLancamento: "Saída / Retorno",
-        localPartida: "QTL/GBM",
-        localDestino: "QTL",
+        tipoLancamento: 'Saída / Retorno',
+        localPartida: 'QTL/GBM',
+        localDestino: 'QTL',
         kmPartida: 183178,
         kmChegada: 183197,
-        horaPartida: "12:40",
-        horaChegada: "13:00",
-        condutor: "RAFAEL LISCANO",
-        idFunc: "3698530",
-        usuario: "Guarnição",
-        observacoes: "Registro inicial de exemplo"
+        horaPartida: '12:40',
+        horaChegada: '13:00',
+        condutor: 'RAFAEL LISCANO',
+        idFunc: '3698530',
+        usuario: 'Guarnição',
+        observacoes: 'Registro inicial de exemplo'
       }];
-
       salvar(exemplo);
     }
 
@@ -1315,6 +1389,7 @@
       preloadExemplo();
       limparFormulario();
       renderizar();
+      atualizarBloqueioLancamento();
       data.value = hojeISO();
       horaPartida.value = agoraHora();
       horaChegada.value = agoraHora();
