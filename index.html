@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Diário de Bordo das Viaturas</title>
+  <meta name="theme-color" content="#b71c1c" />
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #b71c1c;
+      --primary-dark: #8e0000;
+      --blue: #0f4c81;
+      --green: #198754;
+      --orange: #ff9800;
+      --danger: #dc3545;
+      --shadow: 0 8px 22px rgba(0,0,0,0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f2f5f8 0%, #e9eef3 100%);
+      color: var(--text);
+      padding-bottom: 120px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border-radius: 0 0 24px 24px;
+      padding: 18px 16px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: .92;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .mini-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .mini-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .mini-card .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: var(--blue);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: -4px;
+      margin-bottom: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d6dde5;
+      border-radius: 12px;
+      padding: 12px 12px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(15, 76, 129, .10);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .btn-secondary {
+      background: #eef3f8;
+      color: var(--text);
+      min-width: 120px;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 13px;
+      color: #334155;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #fdecec;
+      color: var(--primary-dark);
+    }
+
+    .search-box {
+      margin-bottom: 12px;
+    }
+
+    .registro {
+      border: 1px solid #eceff3;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #fff;
+    }
+
+    .registro-topo {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .registro-titulo {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .registro-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .km-badge {
+      background: #eef8f0;
+      color: #146c43;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .registro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .registro-grid div {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .registro-grid strong {
+      display: block;
+      color: #475569;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .registro-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .registro-actions button {
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 18px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 8px 0 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .row-2, .row-3, .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .registro-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="topbar">
+      <h1>🚒 Diário de Bordo das Viaturas</h1>
+      <p>Controle de saídas, retornos e quilometragem • formato app • pronto para GitHub Pages</p>
+    </div>
+
+    <div class="grid-cards">
+      <div class="mini-card">
+        <div class="label">📋 Registros hoje</div>
+        <div class="value" id="resumoHoje">0</div>
+      </div>
+      <div class="mini-card">
+        <div class="label">🛣️ KM hoje</div>
+        <div class="value" id="resumoKmHoje">0</div>
+      </div>
+      <div class="mini-card">
+        <div class="label">🚗 Viaturas cadastradas</div>
+        <div class="value" id="resumoViaturas">0</div>
+      </div>
+      <div class="mini-card">
+        <div class="label">📦 Total registros</div>
+        <div class="value" id="resumoTotal">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>➕ Novo Registro</h2>
+      <div class="subtitle">Preencha conforme o diário de bordo físico da viatura</div>
+
+      <form id="formRegistro" class="form-grid">
+        <input type="hidden" id="editId" />
+
+        <div class="row-2">
+          <div>
+            <label>🚘 Placa</label>
+            <input id="placa" type="text" placeholder="Ex.: IUW6520" required />
+          </div>
+          <div>
+            <label>🏷️ Marca / Modelo</label>
+            <input id="modelo" type="text" placeholder="Ex.: Duster" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label>🏢 Órgão / Entidade</label>
+            <input id="orgao" type="text" value="CBMRS" />
+          </div>
+          <div>
+            <label>📅 Data</label>
+            <input id="data" type="date" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label>📍 Local de Partida</label>
+            <input id="localPartida" type="text" placeholder="Ex.: QTL / GBM / Vistoria" required />
+          </div>
+          <div>
+            <label>📌 Local de Destino / Retorno</label>
+            <input id="localDestino" type="text" placeholder="Ex.: Vistoria / Liberado / QTL" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label>⛽ KM na Partida</label>
+            <input id="kmPartida" type="number" step="1" min="0" placeholder="Ex.: 183178" required />
+          </div>
+          <div>
+            <label>🏁 KM na Chegada</label>
+            <input id="kmChegada" type="number" step="1" min="0" placeholder="Ex.: 183197" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label>🕒 Hora da Partida</label>
+            <input id="horaPartida" type="time" required />
+          </div>
+          <div>
+            <label>🕓 Hora da Chegada</label>
+            <input id="horaChegada" type="time" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label>👨‍🚒 Nome do Condutor</label>
+            <input id="condutor" type="text" placeholder="Ex.: SD BORGES" required />
+          </div>
+          <div>
+            <label>👤 Nome do Usuário</label>
+            <input id="usuario" type="text" placeholder="Ex.: Equipe / Militar / Setor" />
+          </div>
+        </div>
+
+        <div>
+          <label>📝 Observações</label>
+          <textarea id="observacoes" placeholder="Ex.: Vistoria, deslocamento, apoio, abastecimento, manutenção..."></textarea>
+        </div>
+
+        <div class="info-box" id="kmInfo">
+          🚦 O sistema irá calcular automaticamente a quilometragem percorrida e conferir o último KM registrado da viatura.
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn-primary" id="btnSalvar">💾 Salvar Registro</button>
+          <button type="button" class="btn-secondary" id="btnCancelarEdicao">Cancelar edição</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>🧰 Ferramentas</h2>
+      <div class="toolbar">
+        <button class="btn-green" id="btnExportarJson">⬇️ Exportar Backup</button>
+        <button class="btn-orange" id="btnExportarCsv">📄 Exportar CSV</button>
+        <button class="btn-secondary" onclick="document.getElementById('inputImportar').click()">📤 Importar Backup</button>
+        <button class="btn-danger" id="btnLimparTudo">🗑️ Limpar Tudo</button>
+      </div>
+      <input type="file" id="inputImportar" accept=".json" class="hidden" />
+    </div>
+
+    <div class="card">
+      <h2>🔎 Consulta de Registros</h2>
+      <div class="search-box">
+        <input id="busca" type="text" placeholder="Pesquisar por placa, condutor, data, modelo, local..." />
+      </div>
+      <div id="listaRegistros"></div>
+    </div>
+
+    <div class="footer-note">
+      Diário de Bordo Digital • pronto para uso local ou publicação no GitHub Pages
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "diario_bordo_viaturas_v1";
+
+    const form = document.getElementById("formRegistro");
+    const editId = document.getElementById("editId");
+    const placa = document.getElementById("placa");
+    const modelo = document.getElementById("modelo");
+    const orgao = document.getElementById("orgao");
+    const data = document.getElementById("data");
+    const localPartida = document.getElementById("localPartida");
+    const localDestino = document.getElementById("localDestino");
+    const kmPartida = document.getElementById("kmPartida");
+    const kmChegada = document.getElementById("kmChegada");
+    const horaPartida = document.getElementById("horaPartida");
+    const horaChegada = document.getElementById("horaChegada");
+    const condutor = document.getElementById("condutor");
+    const usuario = document.getElementById("usuario");
+    const observacoes = document.getElementById("observacoes");
+    const kmInfo = document.getElementById("kmInfo");
+    const listaRegistros = document.getElementById("listaRegistros");
+    const busca = document.getElementById("busca");
+
+    const resumoHoje = document.getElementById("resumoHoje");
+    const resumoKmHoje = document.getElementById("resumoKmHoje");
+    const resumoViaturas = document.getElementById("resumoViaturas");
+    const resumoTotal = document.getElementById("resumoTotal");
+
+    const btnCancelarEdicao = document.getElementById("btnCancelarEdicao");
+    const btnExportarJson = document.getElementById("btnExportarJson");
+    const btnExportarCsv = document.getElementById("btnExportarCsv");
+    const btnLimparTudo = document.getElementById("btnLimparTudo");
+    const inputImportar = document.getElementById("inputImportar");
+
+    function hojeISO() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function agoraHora() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, "0");
+      const m = String(d.getMinutes()).padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    function carregar() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function salvar(dados) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    }
+
+    function normalizarTexto(txt) {
+      return (txt || "")
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
+    function formatarDataBR(dataIso) {
+      if (!dataIso) return "";
+      const [ano, mes, dia] = dataIso.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function ordenarRegistros(lista) {
+      return lista.sort((a, b) => {
+        const da = `${a.data} ${a.horaPartida || "00:00"}`;
+        const db = `${b.data} ${b.horaPartida || "00:00"}`;
+        return db.localeCompare(da);
+      });
+    }
+
+    function calcularKmPercorrido(kmIni, kmFim) {
+      const ini = Number(kmIni || 0);
+      const fim = Number(kmFim || 0);
+      return fim - ini;
+    }
+
+    function obterUltimoKmDaViatura(placaAtual, ignorarId = null) {
+      const registros = carregar()
+        .filter(r => normalizarTexto(r.placa) === normalizarTexto(placaAtual) && r.id !== ignorarId)
+        .sort((a, b) => {
+          const da = `${a.data} ${a.horaChegada || "00:00"}`;
+          const db = `${b.data} ${b.horaChegada || "00:00"}`;
+          return db.localeCompare(da);
+        });
+
+      return registros.length ? Number(registros[0].kmChegada) : null;
+    }
+
+    function atualizarInfoKm() {
+      const placaAtual = placa.value.trim();
+      const kmIni = Number(kmPartida.value || 0);
+      const kmFim = Number(kmChegada.value || 0);
+      const kmRodado = kmFim && kmIni ? (kmFim - kmIni) : 0;
+      const ultimoKm = placaAtual ? obterUltimoKmDaViatura(placaAtual, editId.value || null) : null;
+
+      let html = "🚦 O sistema irá calcular automaticamente a quilometragem percorrida e conferir o último KM registrado da viatura.";
+
+      if (placaAtual) {
+        html += `<br><br><strong>Viatura:</strong> ${placaAtual.toUpperCase()}`;
+      }
+
+      if (ultimoKm !== null) {
+        html += `<br><strong>Último KM registrado:</strong> ${ultimoKm}`;
+      }
+
+      if (kmPartida.value && kmChegada.value) {
+        html += `<br><strong>KM percorridos neste registro:</strong> ${kmRodado >= 0 ? kmRodado : "valor inválido"} km`;
+      }
+
+      kmInfo.innerHTML = html;
+    }
+
+    function limparFormulario() {
+      form.reset();
+      editId.value = "";
+      data.value = hojeISO();
+      horaPartida.value = agoraHora();
+      horaChegada.value = agoraHora();
+      orgao.value = "CBMRS";
+      kmInfo.innerHTML = "🚦 O sistema irá calcular automaticamente a quilometragem percorrida e conferir o último KM registrado da viatura.";
+      document.getElementById("btnSalvar").textContent = "💾 Salvar Registro";
+    }
+
+    function validarRegistro(registro) {
+      const kmIni = Number(registro.kmPartida);
+      const kmFim = Number(registro.kmChegada);
+
+      if (kmFim < kmIni) {
+        alert("O KM de chegada não pode ser menor que o KM de partida.");
+        return false;
+      }
+
+      const ultimoKm = obterUltimoKmDaViatura(registro.placa, registro.id);
+
+      if (ultimoKm !== null && kmIni < ultimoKm) {
+        alert(`Atenção: o KM de partida (${kmIni}) está menor que o último KM registrado da viatura (${ultimoKm}). Verifique a planilha.`);
+        return false;
+      }
+
+      return true;
+    }
+
+    function renderizar() {
+      const registros = ordenarRegistros(carregar());
+      const termo = normalizarTexto(busca.value);
+
+      const filtrados = registros.filter(r => {
+        const alvo = normalizarTexto([
+          r.placa, r.modelo, r.orgao, r.data, r.localPartida, r.localDestino,
+          r.condutor, r.usuario, r.observacoes
+        ].join(" "));
+        return alvo.includes(termo);
+      });
+
+      listaRegistros.innerHTML = "";
+
+      if (!filtrados.length) {
+        listaRegistros.innerHTML = `<div class="empty">📭 Nenhum registro encontrado.</div>`;
+      } else {
+        filtrados.forEach(registro => {
+          const kmPercorrido = calcularKmPercorrido(registro.kmPartida, registro.kmChegada);
+
+          const div = document.createElement("div");
+          div.className = "registro";
+          div.innerHTML = `
+            <div class="registro-topo">
+              <div>
+                <div class="registro-titulo">🚘 ${registro.placa} • ${registro.modelo}</div>
+                <div class="registro-sub">📅 ${formatarDataBR(registro.data)} • 👨‍🚒 ${registro.condutor}</div>
+              </div>
+              <div class="km-badge">🛣️ ${kmPercorrido} km</div>
+            </div>
+
+            <div class="registro-grid">
+              <div><strong>Local de Partida</strong>${registro.localPartida || "-"}</div>
+              <div><strong>Local de Destino / Retorno</strong>${registro.localDestino || "-"}</div>
+              <div><strong>KM Partida</strong>${registro.kmPartida}</div>
+              <div><strong>KM Chegada</strong>${registro.kmChegada}</div>
+              <div><strong>Hora da Partida</strong>${registro.horaPartida || "-"}</div>
+              <div><strong>Hora da Chegada</strong>${registro.horaChegada || "-"}</div>
+              <div><strong>Usuário</strong>${registro.usuario || "-"}</div>
+              <div><strong>Órgão</strong>${registro.orgao || "-"}</div>
+              <div style="grid-column: 1 / -1;"><strong>Observações</strong>${registro.observacoes || "-"}</div>
+            </div>
+
+            <div class="registro-actions">
+              <button class="btn-secondary" onclick="editarRegistro('${registro.id}')">✏️ Editar</button>
+              <button class="btn-danger" onclick="excluirRegistro('${registro.id}')">🗑️ Excluir</button>
+            </div>
+          `;
+          listaRegistros.appendChild(div);
+        });
+      }
+
+      atualizarResumo(registros);
+    }
+
+    function atualizarResumo(registros) {
+      const hoje = hojeISO();
+      const registrosHoje = registros.filter(r => r.data === hoje);
+      const kmHoje = registrosHoje.reduce((acc, r) => acc + calcularKmPercorrido(r.kmPartida, r.kmChegada), 0);
+      const viaturas = [...new Set(registros.map(r => normalizarTexto(r.placa)).filter(Boolean))];
+
+      resumoHoje.textContent = registrosHoje.length;
+      resumoKmHoje.textContent = kmHoje;
+      resumoViaturas.textContent = viaturas.length;
+      resumoTotal.textContent = registros.length;
+    }
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const dados = carregar();
+
+      const registro = {
+        id: editId.value || Date.now().toString(),
+        placa: placa.value.trim().toUpperCase(),
+        modelo: modelo.value.trim(),
+        orgao: orgao.value.trim() || "CBMRS",
+        data: data.value,
+        localPartida: localPartida.value.trim(),
+        localDestino: localDestino.value.trim(),
+        kmPartida: Number(kmPartida.value),
+        kmChegada: Number(kmChegada.value),
+        horaPartida: horaPartida.value,
+        horaChegada: horaChegada.value,
+        condutor: condutor.value.trim().toUpperCase(),
+        usuario: usuario.value.trim(),
+        observacoes: observacoes.value.trim()
+      };
+
+      if (!validarRegistro(registro)) return;
+
+      const index = dados.findIndex(r => r.id === registro.id);
+
+      if (index >= 0) {
+        dados[index] = registro;
+      } else {
+        dados.push(registro);
+      }
+
+      salvar(dados);
+      limparFormulario();
+      renderizar();
+      alert("Registro salvo com sucesso.");
+    });
+
+    window.editarRegistro = function(id) {
+      const dados = carregar();
+      const r = dados.find(item => item.id === id);
+      if (!r) return;
+
+      editId.value = r.id;
+      placa.value = r.placa || "";
+      modelo.value = r.modelo || "";
+      orgao.value = r.orgao || "CBMRS";
+      data.value = r.data || "";
+      localPartida.value = r.localPartida || "";
+      localDestino.value = r.localDestino || "";
+      kmPartida.value = r.kmPartida ?? "";
+      kmChegada.value = r.kmChegada ?? "";
+      horaPartida.value = r.horaPartida || "";
+      horaChegada.value = r.horaChegada || "";
+      condutor.value = r.condutor || "";
+      usuario.value = r.usuario || "";
+      observacoes.value = r.observacoes || "";
+
+      document.getElementById("btnSalvar").textContent = "✅ Atualizar Registro";
+      atualizarInfoKm();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.excluirRegistro = function(id) {
+      if (!confirm("Deseja realmente excluir este registro do diário de bordo?")) return;
+
+      const dados = carregar().filter(r => r.id !== id);
+      salvar(dados);
+      renderizar();
+      alert("Registro excluído com sucesso.");
+    };
+
+    btnCancelarEdicao.addEventListener("click", function() {
+      limparFormulario();
+    });
+
+    busca.addEventListener("input", renderizar);
+
+    [placa, kmPartida, kmChegada].forEach(el => {
+      el.addEventListener("input", atualizarInfoKm);
+    });
+
+    btnExportarJson.addEventListener("click", function() {
+      const dados = carregar();
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "diario-bordo-backup.json";
+      a.click();
+    });
+
+    btnExportarCsv.addEventListener("click", function() {
+      const dados = ordenarRegistros(carregar());
+
+      if (!dados.length) {
+        alert("Não há registros para exportar.");
+        return;
+      }
+
+      const linhas = [
+        [
+          "PLACA",
+          "MODELO",
+          "ORGAO",
+          "DATA",
+          "LOCAL_PARTIDA",
+          "LOCAL_DESTINO",
+          "KM_PARTIDA",
+          "KM_CHEGADA",
+          "KM_PERCORRIDO",
+          "HORA_PARTIDA",
+          "HORA_CHEGADA",
+          "CONDUTOR",
+          "USUARIO",
+          "OBSERVACOES"
+        ].join(";")
+      ];
+
+      dados.forEach(r => {
+        const linha = [
+          r.placa,
+          r.modelo,
+          r.orgao,
+          r.data,
+          `"${(r.localPartida || "").replace(/"/g, '""')}"`,
+          `"${(r.localDestino || "").replace(/"/g, '""')}"`,
+          r.kmPartida,
+          r.kmChegada,
+          calcularKmPercorrido(r.kmPartida, r.kmChegada),
+          r.horaPartida,
+          r.horaChegada,
+          `"${(r.condutor || "").replace(/"/g, '""')}"`,
+          `"${(r.usuario || "").replace(/"/g, '""')}"`,
+          `"${(r.observacoes || "").replace(/"/g, '""')}"`
+        ].join(";");
+        linhas.push(linha);
+      });
+
+      const blob = new Blob(["\uFEFF" + linhas.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "diario-bordo.csv";
+      a.click();
+    });
+
+    inputImportar.addEventListener("change", function(e) {
+      const arquivo = e.target.files[0];
+      if (!arquivo) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const dadosImportados = JSON.parse(evt.target.result);
+
+          if (!Array.isArray(dadosImportados)) {
+            alert("Arquivo inválido.");
+            return;
+          }
+
+          salvar(dadosImportados);
+          renderizar();
+          alert("Backup importado com sucesso.");
+        } catch {
+          alert("Falha ao importar o backup.");
+        }
+      };
+      reader.readAsText(arquivo);
+      e.target.value = "";
+    });
+
+    btnLimparTudo.addEventListener("click", function() {
+      if (!confirm("Tem certeza que deseja apagar todos os registros do diário de bordo?")) return;
+      if (!confirm("Confirma novamente? Esta ação limpa todo o histórico salvo neste navegador.")) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      limparFormulario();
+      renderizar();
+      alert("Todos os registros foram removidos.");
+    });
+
+    function preloadExemplo() {
+      const dados = carregar();
+      if (dados.length) return;
+
+      const exemplo = [
+        {
+          id: "1",
+          placa: "IUW6520",
+          modelo: "Duster",
+          orgao: "CBMRS",
+          data: hojeISO(),
+          localPartida: "QTL/GBM",
+          localDestino: "QTL",
+          kmPartida: 183178,
+          kmChegada: 183197,
+          horaPartida: "12:40",
+          horaChegada: "13:00",
+          condutor: "LISCANO",
+          usuario: "",
+          observacoes: "Saída de serviço / deslocamento"
+        }
+      ];
+
+      salvar(exemplo);
+    }
+
+    preloadExemplo();
+    limparFormulario();
+    renderizar();
+  </script>
+</body>
+</html>
