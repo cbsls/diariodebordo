@@ -3,68 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diário de Bordo CBMRS</title>
+<title>Diário de Bordo</title>
 
 <style>
-body{
-  font-family: Arial;
-  background:#eef3f8;
-  margin:0;
-  padding:10px;
-}
-
-h1{
-  background:#b71c1c;
-  color:#fff;
-  padding:12px;
-  border-radius:10px;
-  text-align:center;
-}
-
-.card{
-  background:#fff;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-input,select{
-  width:100%;
-  padding:10px;
-  margin-top:5px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.btn{
-  background:#b71c1c;
-  color:#fff;
-  width:100%;
-}
-
-.btn-sec{
-  background:#ccc;
-}
-
-.registro{
-  border:1px solid #ddd;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
+body{font-family:Arial;background:#eef3f8;margin:0;padding:10px;}
+h1{background:#b71c1c;color:#fff;padding:12px;border-radius:10px;text-align:center;}
+.card{background:#fff;padding:12px;border-radius:10px;margin-bottom:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+input,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc;}
+button{padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:5px;}
+.btn{background:#b71c1c;color:#fff;width:100%;}
+.registro{border:1px solid #ddd;padding:10px;border-radius:10px;margin-bottom:10px;}
 .hidden{display:none;}
-
 </style>
 </head>
 
@@ -75,9 +24,7 @@ button{
 <div class="card">
 <label>ID Func</label>
 <input id="idFunc">
-
 <button class="btn" onclick="login()">Entrar</button>
-
 <div id="userOk"></div>
 </div>
 
@@ -112,7 +59,7 @@ button{
 <input type="time" id="horaFim">
 
 <label>Condutor</label>
-<input id="condutor">
+<input id="condutor" readonly>
 
 <label>Usuário</label>
 <input id="usuario">
@@ -128,40 +75,71 @@ button{
 
 <script>
 
-const ADMIN = "193cbmrs";
-let logado = false;
-let editando = null;
+const ADMIN="193cbmrs";
+let logado=null;
+let editando=null;
+
+const USUARIOS=[
+{guerra:"1º SGT VICENTE",id:"2614960"},
+{guerra:"2º SGT ANDERSON",id:"2882930"},
+{guerra:"SD MOTTA",id:"4626338"},
+{guerra:"1º SGT DIEFERSON",id:"2972719"},
+{guerra:"SD CAMACHO",id:"3698696"},
+{guerra:"1º SGT BATISTA",id:"2692449"},
+{guerra:"SD LARSSON",id:"4490380"},
+{guerra:"SD TOMASCHEWSKI",id:"3218627"},
+{guerra:"1º TEN MARCELO",id:"2423286"},
+{guerra:"SD ISQUIERDO",id:"3697665"},
+{guerra:"SD MAX",id:"3084620"},
+{guerra:"2º SGT LISCANO",id:"3698530"},
+{guerra:"SD BORGES",id:"3698440"},
+{guerra:"SD SOARES",id:"4625595"},
+{guerra:"SD PEGLOW",id:"4783069"},
+{guerra:"SD BATISTA",id:"3702847"},
+{guerra:"2º SGT VINICIUS",id:"2910233"},
+{guerra:"SD WILLIAM",id:"4355504"}
+];
 
 function login(){
-  const id = document.getElementById("idFunc").value;
-  if(id.length < 3){
-    alert("ID inválida");
-    return;
-  }
-  logado = true;
-  document.getElementById("userOk").innerHTML = "✅ Acesso liberado";
-  document.getElementById("formBox").classList.remove("hidden");
+  const id=idFunc.value.trim();
+  const user=USUARIOS.find(u=>u.id===id);
+  
+  if(!user) return alert("ID não cadastrada");
+
+  logado=user;
+  condutor.value=user.guerra;
+  userOk.innerHTML="✅ "+user.guerra;
+  formBox.classList.remove("hidden");
 }
 
 function salvar(){
-  let dados = JSON.parse(localStorage.getItem("db")||"[]");
+  let dados=JSON.parse(localStorage.getItem("db")||"[]");
 
-  const obj = {
-    id: editando || Date.now(),
-    vtr: vtr.value,
-    data: data.value,
-    partida: partida.value,
-    kmIni: kmIni.value,
-    horaIni: horaIni.value,
-    kmFim: kmFim.value,
-    horaFim: horaFim.value,
-    condutor: condutor.value,
-    usuario: usuario.value
+  if(Number(kmFim.value)<Number(kmIni.value)){
+    return alert("KM inválido!");
+  }
+
+  const ultimo=dados.filter(r=>r.vtr===vtr.value).slice(-1)[0];
+  if(ultimo && Number(kmIni.value)<Number(ultimo.kmFim)){
+    return alert("KM menor que último registrado!");
+  }
+
+  const obj={
+    id:editando||Date.now(),
+    vtr:vtr.value,
+    data:data.value,
+    partida:partida.value,
+    kmIni:kmIni.value,
+    horaIni:horaIni.value,
+    kmFim:kmFim.value,
+    horaFim:horaFim.value,
+    condutor:condutor.value,
+    usuario:usuario.value
   };
 
   if(editando){
-    dados = dados.map(r=> r.id==editando?obj:r);
-    editando = null;
+    dados=dados.map(r=>r.id==editando?obj:r);
+    editando=null;
   }else{
     dados.push(obj);
   }
@@ -172,58 +150,87 @@ function salvar(){
 }
 
 function limpar(){
-  document.querySelectorAll("input").forEach(i=>i.value="");
+  document.querySelectorAll("#formBox input").forEach(i=>i.value="");
+  condutor.value=logado.guerra;
 }
 
 function render(){
-  const dados = JSON.parse(localStorage.getItem("db")||"[]");
+  const dados=JSON.parse(localStorage.getItem("db")||"[]");
   lista.innerHTML="";
 
   dados.reverse().forEach(r=>{
-    lista.innerHTML += `
+    lista.innerHTML+=`
     <div class="registro">
-      <b>${r.vtr}</b> - ${r.data}
-      <br>
+      <b>${r.vtr}</b> - ${r.data}<br>
       KM: ${r.kmIni} → ${r.kmFim}
-
       <div>
         <button onclick="editar(${r.id})">✏️</button>
         <button onclick="excluir(${r.id})">🗑️</button>
+        <button onclick="pdf(${r.id})">📄 PDF</button>
       </div>
-    </div>
-    `;
+    </div>`;
   });
 }
 
 function editar(id){
-  const senha = prompt("Senha admin:");
+  const senha=prompt("Senha admin:");
   if(senha!==ADMIN) return alert("Senha incorreta");
 
-  const dados = JSON.parse(localStorage.getItem("db"));
-  const r = dados.find(x=>x.id==id);
+  const dados=JSON.parse(localStorage.getItem("db"));
+  const r=dados.find(x=>x.id==id);
 
-  vtr.value = r.vtr;
-  data.value = r.data;
-  partida.value = r.partida;
-  kmIni.value = r.kmIni;
-  horaIni.value = r.horaIni;
-  kmFim.value = r.kmFim;
-  horaFim.value = r.horaFim;
-  condutor.value = r.condutor;
-  usuario.value = r.usuario;
+  vtr.value=r.vtr;
+  data.value=r.data;
+  partida.value=r.partida;
+  kmIni.value=r.kmIni;
+  horaIni.value=r.horaIni;
+  kmFim.value=r.kmFim;
+  horaFim.value=r.horaFim;
+  usuario.value=r.usuario;
 
-  editando = id;
+  editando=id;
 }
 
 function excluir(id){
-  const senha = prompt("Senha admin:");
+  const senha=prompt("Senha admin:");
   if(senha!==ADMIN) return alert("Senha incorreta");
 
-  let dados = JSON.parse(localStorage.getItem("db"));
-  dados = dados.filter(r=>r.id!=id);
-
+  let dados=JSON.parse(localStorage.getItem("db"));
+  dados=dados.filter(r=>r.id!=id);
   localStorage.setItem("db",JSON.stringify(dados));
   render();
+}
+
+function pdf(id){
+  const dados=JSON.parse(localStorage.getItem("db"));
+  const r=dados.find(x=>x.id==id);
+
+  const w=window.open();
+
+  w.document.write(`
+  <h2>DIÁRIO DE BORDO</h2>
+  <p><b>PLACA:</b> ${r.vtr}</p>
+
+  <table border=1 width=100%>
+  <tr>
+  <th>DATA</th><th>PARTIDA</th><th>KM INI</th><th>HORA INI</th>
+  <th>KM FIM</th><th>HORA FIM</th><th>CONDUTOR</th><th>USUÁRIO</th>
+  </tr>
+
+  <tr>
+  <td>${r.data}</td>
+  <td>${r.partida}</td>
+  <td>${r.kmIni}</td>
+  <td>${r.horaIni}</td>
+  <td>${r.kmFim}</td>
+  <td>${r.horaFim}</td>
+  <td>${r.condutor}</td>
+  <td>${r.usuario}</td>
+  </tr>
+  </table>
+
+  <script>window.print()</script>
+  `);
 }
 
 render();
