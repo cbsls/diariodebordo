@@ -24,7 +24,6 @@
       --border:#d8dde4;
       --tab-bg:#ffffffee;
       --shadow:0 4px 14px rgba(0,0,0,.08);
-      --radius:18px;
     }
 
     html, body {
@@ -493,7 +492,7 @@
         <input id="senhaLogin" type="password" placeholder="Digite sua senha" />
 
         <button type="button" id="btnEntrar">Entrar</button>
-        <div class="muted">Senha inicial: a própria ID Func.</div>
+        <div class="muted">No primeiro acesso, use sua própria ID como senha. Depois cadastre uma nova.</div>
         <div id="userOk"></div>
       </div>
 
@@ -696,26 +695,27 @@
   <script>
     const ADMIN_SENHA = "123456";
     const RASCUNHO_KEY = "diario_rascunho_lancamento";
+    const TABELA_AUTH = "diario_usuarios_auth";
 
     const USUARIOS = [
-      { guerra: "1º SGT VICENTE", id: "2614960", senha: "2614960" },
-      { guerra: "2º SGT ANDERSON", id: "2882930", senha: "2882930" },
-      { guerra: "SD MOTTA", id: "4626338", senha: "4626338" },
-      { guerra: "1º SGT DIEFERSON", id: "2972719", senha: "2972719" },
-      { guerra: "SD CAMACHO", id: "3698696", senha: "3698696" },
-      { guerra: "1º SGT BATISTA", id: "2692449", senha: "2692449" },
-      { guerra: "SD LARSSON", id: "4490380", senha: "4490380" },
-      { guerra: "SD TOMASCHEWSKI", id: "3218627", senha: "3218627" },
-      { guerra: "1º TEN MARCELO", id: "2423286", senha: "2423286" },
-      { guerra: "SD ISQUIERDO", id: "3697665", senha: "3697665" },
-      { guerra: "SD MAX", id: "3084620", senha: "3084620" },
-      { guerra: "2º SGT LISCANO", id: "3698530", senha: "3698530" },
-      { guerra: "SD BORGES", id: "3698440", senha: "3698440" },
-      { guerra: "SD SOARES", id: "4625595", senha: "4625595" },
-      { guerra: "SD PEGLOW", id: "4783069", senha: "4783069" },
-      { guerra: "SD BATISTA", id: "3702847", senha: "3702847" },
-      { guerra: "2º SGT VINICIUS", id: "2910233", senha: "2910233" },
-      { guerra: "SD WILLIAM", id: "4355504", senha: "4355504" }
+      { guerra: "1º SGT VICENTE", id: "2614960" },
+      { guerra: "2º SGT ANDERSON", id: "2882930" },
+      { guerra: "SD MOTTA", id: "4626338" },
+      { guerra: "1º SGT DIEFERSON", id: "2972719" },
+      { guerra: "SD CAMACHO", id: "3698696" },
+      { guerra: "1º SGT BATISTA", id: "2692449" },
+      { guerra: "SD LARSSON", id: "4490380" },
+      { guerra: "SD TOMASCHEWSKI", id: "3218627" },
+      { guerra: "1º TEN MARCELO", id: "2423286" },
+      { guerra: "SD ISQUIERDO", id: "3697665" },
+      { guerra: "SD MAX", id: "3084620" },
+      { guerra: "2º SGT LISCANO", id: "3698530" },
+      { guerra: "SD BORGES", id: "3698440" },
+      { guerra: "SD SOARES", id: "4625595" },
+      { guerra: "SD PEGLOW", id: "4783069" },
+      { guerra: "SD BATISTA", id: "3702847" },
+      { guerra: "2º SGT VINICIUS", id: "2910233" },
+      { guerra: "SD WILLIAM", id: "4355504" }
     ];
 
     const VTRS_INICIAIS = {
@@ -1060,35 +1060,122 @@
       if (!campo.value) campo.value = horaAtual();
     }
 
-    function login() {
-      const id = elIdFunc.value.trim();
-      const senha = elSenhaLogin.value.trim();
+    async function buscarSenhaNoSupabase(idFunc) {
+      const { data, error } = await supabaseClient
+        .from(TABELA_AUTH)
+        .select("id_func, nome_guerra, senha")
+        .eq("id_func", idFunc)
+        .maybeSingle();
 
-      if (!id || !senha) {
+      if (error) throw error;
+      return data;
+    }
+
+    async function salvarNovaSenhaNoSupabase(user, senhaNova) {
+      const { error } = await supabaseClient
+        .from(TABELA_AUTH)
+        .upsert([{
+          id_func: user.id,
+          nome_guerra: user.guerra,
+          senha: senhaNova,
+          updated_at: new Date().toISOString()
+        }], { onConflict: "id_func" });
+
+      if (error) throw error;
+    }
+
+    async function cadastrarNovaSenhaPrimeiroAcesso(user) {
+      const nova1 = prompt(`Primeiro acesso de ${user.guerra}.\nCadastre sua nova senha:`);
+
+      if (nova1 === null) return false;
+
+      const senha1 = String(nova1).trim();
+      if (senha1.length < 4) {
+        alert("A nova senha deve ter pelo menos 4 caracteres.");
+        return false;
+      }
+
+      const nova2 = prompt("Confirme a nova senha:");
+      if (nova2 === null) return false;
+
+      const senha2 = String(nova2).trim();
+
+      if (senha1 !== senha2) {
+        alert("As senhas não conferem.");
+        return false;
+      }
+
+      await salvarNovaSenhaNoSupabase(user, senha1);
+      alert("Senha cadastrada com sucesso.");
+      return true;
+    }
+
+    async function login() {
+      const id = elIdFunc.value.trim();
+      const senhaInformada = elSenhaLogin.value.trim();
+
+      if (!id || !senhaInformada) {
         msgErro(elUserOk, "❌ Informe ID Func e senha.");
         elFormBox.classList.add("hidden");
         return;
       }
 
-      const user = USUARIOS.find(u => u.id === id && u.senha === senha);
+      const user = USUARIOS.find(u => u.id === id);
 
       if (!user) {
-        msgErro(elUserOk, "❌ ID ou senha inválidos.");
+        msgErro(elUserOk, "❌ ID não cadastrada.");
         elFormBox.classList.add("hidden");
         return;
       }
 
-      logado = user;
-      elCondutor.value = user.guerra;
-      msgOk(elUserOk, `✅ ${user.guerra}`);
-      elFormBox.classList.remove("hidden");
+      elBtnEntrar.disabled = true;
+      msgMuted(elUserOk, "Validando acesso...");
 
-      if (!elData.value) {
-        elData.value = hojeISO();
+      try {
+        const auth = await buscarSenhaNoSupabase(user.id);
+
+        if (!auth) {
+          if (senhaInformada !== user.id) {
+            msgErro(elUserOk, "❌ No primeiro acesso, use sua própria ID como senha.");
+            elFormBox.classList.add("hidden");
+            return;
+          }
+
+          const cadastrou = await cadastrarNovaSenhaPrimeiroAcesso(user);
+          if (!cadastrou) {
+            msgErro(elUserOk, "❌ Cadastro da nova senha cancelado.");
+            elFormBox.classList.add("hidden");
+            return;
+          }
+        } else {
+          if (senhaInformada !== String(auth.senha)) {
+            msgErro(elUserOk, "❌ Senha inválida.");
+            elFormBox.classList.add("hidden");
+            return;
+          }
+        }
+
+        logado = user;
+        elCondutor.value = user.guerra;
+        msgOk(elUserOk, `✅ ${user.guerra}`);
+        elFormBox.classList.remove("hidden");
+
+        if (!elData.value) {
+          elData.value = hojeISO();
+        }
+
+        elSenhaLogin.value = "";
+
+        atualizarInfoVtr();
+        await atualizarKmBaseDaVtr();
+        carregarRascunho();
+      } catch (e) {
+        console.error(e);
+        msgErro(elUserOk, "❌ Erro ao validar login no Supabase.");
+        elFormBox.classList.add("hidden");
+      } finally {
+        elBtnEntrar.disabled = false;
       }
-
-      atualizarInfoVtr();
-      atualizarKmBaseDaVtr().then(() => carregarRascunho());
     }
 
     async function obterUltimoRegistroDaVtr(vtr) {
