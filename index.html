@@ -33,7 +33,7 @@
       font-weight:bold;
       margin:8px 0 6px;
     }
-    input, select {
+    input, select, textarea {
       width:100%;
       padding:16px;
       border-radius:14px;
@@ -85,9 +85,11 @@
       display:flex;
       gap:10px;
       margin-bottom:18px;
+      flex-wrap:wrap;
     }
     .tab-btn {
       flex:1;
+      min-width:120px;
       font-size:18px;
       padding:14px;
       border-radius:14px;
@@ -101,29 +103,87 @@
       background:#d51313;
       color:#fff;
     }
-    .registro {
+    .subtitulo-box {
+      margin-top:0;
+      margin-bottom:12px;
+      font-size:22px;
+      color:#24303f;
+    }
+    .registro, .vtr-item {
       border:1px solid #ddd;
       border-radius:14px;
       padding:14px;
       margin-bottom:10px;
       background:#fafafa;
     }
-    .registro b {
+    .registro b, .vtr-item b {
       font-size:18px;
     }
     .linha-acoes {
       margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
     }
     .btn-pdf {
       background:#0f4c81;
       font-size:16px;
       padding:12px;
     }
-    .subtitulo-box {
-      margin-top:0;
+    .btn-admin {
+      background:#455a64;
+      font-size:16px;
+      padding:12px;
+      margin-top:6px;
+    }
+    .btn-edit {
+      background:#6d4c41;
+      font-size:16px;
+      padding:12px;
+    }
+    .btn-save {
+      background:#2e7d32;
+      font-size:16px;
+      padding:12px;
+    }
+    .btn-cancel {
+      background:#757575;
+      font-size:16px;
+      padding:12px;
+    }
+    .odometro-box {
+      background:#111;
+      color:#19ff63;
+      border-radius:14px;
+      padding:14px;
       margin-bottom:12px;
-      font-size:22px;
-      color:#24303f;
+      border:2px solid #333;
+    }
+    .odometro-titulo {
+      font-size:14px;
+      color:#b8ffcd;
+      margin-bottom:6px;
+    }
+    .odometro-valor {
+      font-family: "Courier New", Courier, monospace;
+      font-size:30px;
+      font-weight:bold;
+      letter-spacing:2px;
+    }
+    .grid-2 {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .grid-3 {
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 700px) {
+      .grid-2, .grid-3 {
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -134,6 +194,7 @@
   <div class="tabs">
     <button type="button" class="tab-btn active" id="tabLancamentoBtn">Lançamento</button>
     <button type="button" class="tab-btn" id="tabExportarBtn">Exportar por VTR</button>
+    <button type="button" class="tab-btn" id="tabCadastroBtn">Cadastro de VTR</button>
   </div>
 
   <div id="abaLancamento">
@@ -146,52 +207,64 @@
 
     <div class="card hidden" id="formBox">
       <label for="vtr">VTR</label>
-      <select id="vtr">
-        <option value="ABT-0535">ABT-0535</option>
-        <option value="ABT-7992">ABT-7992</option>
-        <option value="AR-426">AR-426</option>
-        <option value="ATP-1225">ATP-1225</option>
-        <option value="ATP-9316">ATP-9316</option>
-      </select>
+      <select id="vtr"></select>
 
       <div class="info-vtr" id="infoVtr"></div>
+
+      <div class="odometro-box">
+        <div class="odometro-titulo">KM ATUAL DA VTR</div>
+        <div class="odometro-valor" id="odometroValor">000000</div>
+      </div>
+
+      <button type="button" class="btn-admin" id="btnEditarOdometro">🔐 Atualizar KM atual da VTR (Admin)</button>
+      <div id="statusOdometro" class="muted"></div>
 
       <label for="data">Data</label>
       <input id="data" type="date" />
 
       <label for="saida">Saída</label>
-      <select id="saida">
-        <option value="">Selecione a saída</option>
-        <option value="QTL / J4">QTL / J4</option>
-        <option value="QTL / 44">QTL / 44</option>
-        <option value="QTL / CENTRO">QTL / CENTRO</option>
-        <option value="QTL / VISTORIA">QTL / VISTORIA</option>
-        <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
-        <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
-      </select>
+      <input id="saida" list="listaSaida" placeholder="Selecione ou digite a saída" />
+      <datalist id="listaSaida">
+        <option value="QTL / J4"></option>
+        <option value="QTL / 44"></option>
+        <option value="QTL / CENTRO"></option>
+        <option value="QTL / VISTORIA"></option>
+        <option value="QTL / TRANSPORTE"></option>
+        <option value="QTL / PREFEITURA"></option>
+      </datalist>
 
       <label for="retorno">Retorno</label>
-      <select id="retorno">
-        <option value="">Selecione o retorno</option>
-        <option value="J4 / QTL">J4 / QTL</option>
-        <option value="44 / QTL">44 / QTL</option>
-        <option value="CENTRO / QTL">CENTRO / QTL</option>
-        <option value="VISTORIA / QTL">VISTORIA / QTL</option>
-        <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
-        <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
-      </select>
+      <input id="retorno" list="listaRetorno" placeholder="Selecione ou digite o retorno" />
+      <datalist id="listaRetorno">
+        <option value="J4 / QTL"></option>
+        <option value="44 / QTL"></option>
+        <option value="CENTRO / QTL"></option>
+        <option value="VISTORIA / QTL"></option>
+        <option value="TRANSPORTE / QTL"></option>
+        <option value="PREFEITURA / QTL"></option>
+      </datalist>
 
-      <label for="kmIni">KM Inicial</label>
-      <input id="kmIni" type="number" inputmode="numeric" />
+      <div class="grid-2">
+        <div>
+          <label for="kmIni">KM Inicial</label>
+          <input id="kmIni" type="number" inputmode="numeric" />
+        </div>
+        <div>
+          <label for="horaPartida">Hora da Partida</label>
+          <input id="horaPartida" type="time" />
+        </div>
+      </div>
 
-      <label for="horaPartida">Hora da Partida</label>
-      <input id="horaPartida" type="time" />
-
-      <label for="kmFim">KM Final</label>
-      <input id="kmFim" type="number" inputmode="numeric" />
-
-      <label for="horaChegada">Hora da Chegada</label>
-      <input id="horaChegada" type="time" />
+      <div class="grid-2">
+        <div>
+          <label for="kmFim">KM Final</label>
+          <input id="kmFim" type="number" inputmode="numeric" />
+        </div>
+        <div>
+          <label for="horaChegada">Hora da Chegada</label>
+          <input id="horaChegada" type="time" />
+        </div>
+      </div>
 
       <label for="condutor">Nome Condutor</label>
       <input id="condutor" readonly />
@@ -208,28 +281,55 @@
 
   <div id="abaExportar" class="hidden">
     <div class="card">
-      <h2 class="subtitulo-box">📄 Exportar registros por VTR</h2>
+      <h2 class="subtitulo-box">📄 Exportar por VTR</h2>
 
       <label for="filtroVtr">VTR</label>
-      <select id="filtroVtr">
-        <option value="">Selecione a VTR</option>
-        <option value="ABT-0535">ABT-0535</option>
-        <option value="ABT-7992">ABT-7992</option>
-        <option value="AR-426">AR-426</option>
-        <option value="ATP-1225">ATP-1225</option>
-        <option value="ATP-9316">ATP-9316</option>
-      </select>
+      <select id="filtroVtr"></select>
+
+      <div class="grid-2">
+        <div>
+          <label for="filtroMes">Mês</label>
+          <select id="filtroMes">
+            <option value="1">JANEIRO</option>
+            <option value="2">FEVEREIRO</option>
+            <option value="3">MARÇO</option>
+            <option value="4">ABRIL</option>
+            <option value="5">MAIO</option>
+            <option value="6">JUNHO</option>
+            <option value="7">JULHO</option>
+            <option value="8">AGOSTO</option>
+            <option value="9">SETEMBRO</option>
+            <option value="10">OUTUBRO</option>
+            <option value="11">NOVEMBRO</option>
+            <option value="12">DEZEMBRO</option>
+          </select>
+        </div>
+        <div>
+          <label for="filtroAno">Ano</label>
+          <select id="filtroAno"></select>
+        </div>
+      </div>
 
       <button type="button" id="btnBuscarVtr">Buscar registros</button>
+      <button type="button" class="btn-pdf" id="btnExportarMes">📄 Exportar mês</button>
       <div id="statusBuscaVtr" class="muted"></div>
     </div>
 
     <div class="card">
-      <div id="listaVtr" class="muted">Selecione uma VTR para listar os registros.</div>
+      <div id="listaVtr" class="muted">Selecione VTR, mês e ano para listar os registros.</div>
+    </div>
+  </div>
+
+  <div id="abaCadastro" class="hidden">
+    <div class="card">
+      <h2 class="subtitulo-box">🚒 Cadastro de VTR</h2>
+      <div id="listaCadastroVtr" class="muted">Carregando cadastro...</div>
     </div>
   </div>
 
   <script>
+    const ADMIN_SENHA = "123456";
+
     const USUARIOS = [
       { guerra: "1º SGT VICENTE", id: "2614960" },
       { guerra: "2º SGT ANDERSON", id: "2882930" },
@@ -251,31 +351,56 @@
       { guerra: "SD WILLIAM", id: "4355504" }
     ];
 
-    const VTRS = {
+    const VTRS_INICIAIS = {
       "ABT-0535": {
+        nome: "ABT-0535",
         placa: "JCO-7I27",
         marcamodelo: "ABT VOLKSWAGEN CONSTELLATION",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL"
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO BOMBA TANQUE",
+        descricao: "ABT VOLKSWAGEN, CONSTELLATION, 2023/2024",
+        ano: "2023"
       },
       "ABT-7992": {
+        nome: "ABT-7992",
         placa: "JBM-3781",
         marcamodelo: "IVECO 170 E25 - ABT 5000L",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL"
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO BOMBA TANQUE",
+        descricao: "IVECO 170 E25 - ABT 5000L, DESENCARCERADOR + APH + ALTURA + GERADOR + TORRE DE ILUMINAÇÃO",
+        ano: "2011"
       },
       "AR-426": {
+        nome: "AR-426",
         placa: "JBN7A45",
         marcamodelo: "FORD TRANSIT TCA AMBULÂNCIA",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL"
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO RESGATE",
+        descricao: "FORD TRANSIT TCA AMBULÂNCIA",
+        ano: "2022/2023"
       },
       "ATP-1225": {
+        nome: "ATP-1225",
         placa: "TQV-8D59",
         marcamodelo: "PICKUP 4X4",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL"
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO TRANSPORTE DE PESSOAL",
+        descricao: "PICKUP 4X4",
+        ano: "2025"
       },
       "ATP-9316": {
+        nome: "ATP-9316",
         placa: "IUW6520",
         marcamodelo: "RENAULT DUSTER - 4P - VERMELHA",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL"
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO TRANSPORTE DE PESSOAL",
+        descricao: "RENAULT DUSTER - 4P - VERMELHA",
+        ano: "2013"
       }
     };
 
@@ -284,6 +409,17 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let logado = null;
+    let VTRS = carregarCadastroVtrs();
+    let registrosFiltrados = [];
+
+    const MAPA_RETORNO = {
+      "QTL / J4": "J4 / QTL",
+      "QTL / 44": "44 / QTL",
+      "QTL / CENTRO": "CENTRO / QTL",
+      "QTL / VISTORIA": "VISTORIA / QTL",
+      "QTL / TRANSPORTE": "TRANSPORTE / QTL",
+      "QTL / PREFEITURA": "PREFEITURA / QTL"
+    };
 
     const elIdFunc = document.getElementById("idFunc");
     const elBtnEntrar = document.getElementById("btnEntrar");
@@ -291,6 +427,9 @@
     const elFormBox = document.getElementById("formBox");
     const elVtr = document.getElementById("vtr");
     const elInfoVtr = document.getElementById("infoVtr");
+    const elOdometroValor = document.getElementById("odometroValor");
+    const elBtnEditarOdometro = document.getElementById("btnEditarOdometro");
+    const elStatusOdometro = document.getElementById("statusOdometro");
     const elData = document.getElementById("data");
     const elSaida = document.getElementById("saida");
     const elRetorno = document.getElementById("retorno");
@@ -305,13 +444,19 @@
 
     const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
     const tabExportarBtn = document.getElementById("tabExportarBtn");
+    const tabCadastroBtn = document.getElementById("tabCadastroBtn");
     const abaLancamento = document.getElementById("abaLancamento");
     const abaExportar = document.getElementById("abaExportar");
+    const abaCadastro = document.getElementById("abaCadastro");
 
     const elFiltroVtr = document.getElementById("filtroVtr");
+    const elFiltroMes = document.getElementById("filtroMes");
+    const elFiltroAno = document.getElementById("filtroAno");
     const elBtnBuscarVtr = document.getElementById("btnBuscarVtr");
+    const elBtnExportarMes = document.getElementById("btnExportarMes");
     const elStatusBuscaVtr = document.getElementById("statusBuscaVtr");
     const elListaVtr = document.getElementById("listaVtr");
+    const elListaCadastroVtr = document.getElementById("listaCadastroVtr");
 
     function hojeISO() {
       const d = new Date();
@@ -342,36 +487,161 @@
       el.innerHTML = `<div class="muted">${texto}</div>`;
     }
 
+    function formatarOdometro(valor) {
+      const n = Number(valor || 0);
+      return String(Math.max(0, n)).padStart(6, "0");
+    }
+
+    function nomeMesNumero(numero) {
+      const nomes = [
+        "", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+        "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+      ];
+      return nomes[Number(numero)] || "";
+    }
+
+    function preencherAnos() {
+      const anoAtual = new Date().getFullYear();
+      let html = "";
+      for (let ano = anoAtual - 2; ano <= anoAtual + 2; ano++) {
+        html += `<option value="${ano}" ${ano === anoAtual ? "selected" : ""}>${ano}</option>`;
+      }
+      elFiltroAno.innerHTML = html;
+    }
+
+    function carregarCadastroVtrs() {
+      try {
+        const salvo = localStorage.getItem("diario_vtrs_cadastro");
+        if (!salvo) return JSON.parse(JSON.stringify(VTRS_INICIAIS));
+        const parsed = JSON.parse(salvo);
+        return { ...JSON.parse(JSON.stringify(VTRS_INICIAIS)), ...parsed };
+      } catch {
+        return JSON.parse(JSON.stringify(VTRS_INICIAIS));
+      }
+    }
+
+    function salvarCadastroVtrs() {
+      localStorage.setItem("diario_vtrs_cadastro", JSON.stringify(VTRS));
+    }
+
+    function chaveOdometro(vtr) {
+      return `diario_odometro_${vtr}`;
+    }
+
+    function obterOdometroManual(vtr) {
+      const valor = localStorage.getItem(chaveOdometro(vtr));
+      return valor ? Number(valor) : null;
+    }
+
+    function salvarOdometroManual(vtr, km) {
+      localStorage.setItem(chaveOdometro(vtr), String(km));
+    }
+
     function preencherUsuariosSelect() {
       elUsuario.innerHTML = `<option value="">Selecione o usuário (opcional)</option>` +
         USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
+    }
+
+    function preencherVtrsSelects() {
+      const chaves = Object.keys(VTRS).sort();
+      const options = chaves.map(ch => `<option value="${esc(ch)}">${esc(ch)}</option>`).join("");
+      elVtr.innerHTML = options;
+      elFiltroVtr.innerHTML = `<option value="">Selecione a VTR</option>${options}`;
     }
 
     function atualizarInfoVtr() {
       const dados = VTRS[elVtr.value] || {
         placa: "NÃO CADASTRADO",
         marcamodelo: "NÃO CADASTRADO",
-        orgao: "CBMRS CB SLS"
+        orgao: "CBMRS CB SLS",
+        status: "",
+        tipo: "",
+        descricao: "",
+        ano: ""
       };
 
       elInfoVtr.innerHTML = `
         <b>PLACA:</b> ${esc(dados.placa)}<br>
         <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
-        <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}
+        <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}<br>
+        <b>TIPO:</b> ${esc(dados.tipo || "")}<br>
+        <b>STATUS:</b> ${esc(dados.status || "")}<br>
+        <b>ANO:</b> ${esc(dados.ano || "")}
       `;
     }
 
+    function renderCadastroVtrs() {
+      const chaves = Object.keys(VTRS).sort();
+      elListaCadastroVtr.innerHTML = chaves.map(ch => {
+        const v = VTRS[ch];
+        const itemId = ch.replace(/[^a-zA-Z0-9]/g, "_");
+
+        return `
+          <div class="vtr-item">
+            <div id="view_${itemId}">
+              <b>${esc(ch)}</b><br>
+              Tipo: ${esc(v.tipo || "")}<br>
+              Placa: ${esc(v.placa || "")}<br>
+              Marca/Modelo: ${esc(v.marcamodelo || "")}<br>
+              Órgão: ${esc(v.orgao || "")}<br>
+              Status: ${esc(v.status || "")}<br>
+              Descrição: ${esc(v.descricao || "")}<br>
+              Ano: ${esc(v.ano || "")}
+              <div class="linha-acoes">
+                <button type="button" class="btn-edit" onclick="editarVtr('${esc(ch)}')">✏️ Editar cadastro</button>
+              </div>
+            </div>
+
+            <div id="edit_${itemId}" class="hidden">
+              <label>Tipo</label>
+              <input id="tipo_${itemId}" value="${esc(v.tipo || "")}" />
+
+              <label>Placa</label>
+              <input id="placa_${itemId}" value="${esc(v.placa || "")}" />
+
+              <label>Marca/Modelo</label>
+              <input id="marcamodelo_${itemId}" value="${esc(v.marcamodelo || "")}" />
+
+              <label>Órgão/Entidade</label>
+              <input id="orgao_${itemId}" value="${esc(v.orgao || "")}" />
+
+              <label>Status</label>
+              <input id="status_${itemId}" value="${esc(v.status || "")}" />
+
+              <label>Descrição</label>
+              <textarea id="descricao_${itemId}" rows="3">${esc(v.descricao || "")}</textarea>
+
+              <label>Ano</label>
+              <input id="ano_${itemId}" value="${esc(v.ano || "")}" />
+
+              <div class="linha-acoes">
+                <button type="button" class="btn-save" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar</button>
+                <button type="button" class="btn-cancel" onclick="cancelarEdicaoVtr('${esc(ch)}')">↩️ Cancelar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function abrirAba(nome) {
+      abaLancamento.classList.add("hidden");
+      abaExportar.classList.add("hidden");
+      abaCadastro.classList.add("hidden");
+
+      tabLancamentoBtn.classList.remove("active");
+      tabExportarBtn.classList.remove("active");
+      tabCadastroBtn.classList.remove("active");
+
       if (nome === "lancamento") {
         abaLancamento.classList.remove("hidden");
-        abaExportar.classList.add("hidden");
         tabLancamentoBtn.classList.add("active");
-        tabExportarBtn.classList.remove("active");
-      } else {
-        abaLancamento.classList.add("hidden");
+      } else if (nome === "exportar") {
         abaExportar.classList.remove("hidden");
-        tabLancamentoBtn.classList.remove("active");
         tabExportarBtn.classList.add("active");
+      } else {
+        abaCadastro.classList.remove("hidden");
+        tabCadastroBtn.classList.add("active");
       }
     }
 
@@ -395,6 +665,78 @@
       }
 
       atualizarInfoVtr();
+      atualizarKmBaseDaVtr();
+    }
+
+    async function obterUltimoRegistroDaVtr(vtr) {
+      const { data, error } = await supabaseClient
+        .from("diario")
+        .select("*")
+        .eq("vtr", vtr)
+        .order("data", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+      return data && data.length ? data[0] : null;
+    }
+
+    async function atualizarKmBaseDaVtr() {
+      const vtr = elVtr.value;
+      if (!vtr) return;
+
+      try {
+        msgMuted(elStatusOdometro, "Consultando KM atual...");
+        const ultimo = await obterUltimoRegistroDaVtr(vtr);
+        const kmManual = obterOdometroManual(vtr);
+        const kmFinalBanco = ultimo && ultimo.kmfim != null ? Number(ultimo.kmfim) : null;
+        const kmBase = kmManual != null ? kmManual : (kmFinalBanco != null ? kmFinalBanco : 0);
+
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        elKmIni.value = kmBase || "";
+        msgMuted(elStatusOdometro, "KM atual carregada.");
+      } catch (e) {
+        console.error(e);
+        elOdometroValor.textContent = "000000";
+        msgErro(elStatusOdometro, "❌ Não foi possível consultar a KM atual.");
+      }
+    }
+
+    async function editarOdometroAdmin() {
+      const vtr = elVtr.value;
+      if (!vtr) {
+        msgErro(elStatusOdometro, "❌ Selecione uma VTR.");
+        return;
+      }
+
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        msgErro(elStatusOdometro, "❌ Senha inválida.");
+        return;
+      }
+
+      const atual = elOdometroValor.textContent.replace(/\D/g, "") || "0";
+      const novo = prompt(`Informe a KM atual da ${vtr}:`, String(Number(atual)));
+      if (novo === null) return;
+
+      const km = Number(novo);
+      if (Number.isNaN(km) || km < 0) {
+        msgErro(elStatusOdometro, "❌ KM inválida.");
+        return;
+      }
+
+      salvarOdometroManual(vtr, km);
+      elOdometroValor.textContent = formatarOdometro(km);
+      elKmIni.value = km;
+      msgOk(elStatusOdometro, "✅ KM atualizada pelo admin.");
+    }
+
+    function atualizarRetornoAutomatico() {
+      const saida = elSaida.value.trim().toUpperCase();
+      const retorno = MAPA_RETORNO[saida];
+      if (retorno) {
+        elRetorno.value = retorno;
+      }
     }
 
     async function salvar() {
@@ -481,14 +823,17 @@
           return;
         }
 
+        salvarOdometroManual(elVtr.value, kmFimValor);
+
         msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
         elSaida.value = "";
         elRetorno.value = "";
-        elKmIni.value = "";
+        elKmIni.value = kmFimValor;
         elHoraPartida.value = "";
         elKmFim.value = "";
         elHoraChegada.value = "";
         elUsuario.value = "";
+        elOdometroValor.textContent = formatarOdometro(kmFimValor);
       } catch (e) {
         console.error(e);
         msgErro(elStatusSalvar, "❌ Falha inesperada ao salvar");
@@ -499,12 +844,18 @@
 
     async function buscarRegistrosPorVtr() {
       const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
 
       if (!vtr) {
         msgErro(elStatusBuscaVtr, "❌ Selecione uma VTR");
-        msgMuted(elListaVtr, "Selecione uma VTR para listar os registros.");
+        msgMuted(elListaVtr, "Selecione VTR, mês e ano para listar os registros.");
         return;
       }
+
+      const inicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
+      const ultimoDia = new Date(ano, mes, 0).getDate();
+      const fim = `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
 
       msgMuted(elStatusBuscaVtr, "Buscando...");
       msgMuted(elListaVtr, "Carregando registros...");
@@ -514,7 +865,10 @@
           .from("diario")
           .select("*")
           .eq("vtr", vtr)
-          .order("id", { ascending: false });
+          .gte("data", inicio)
+          .lte("data", fim)
+          .order("data", { ascending: true })
+          .order("id", { ascending: true });
 
         if (error) {
           msgErro(elStatusBuscaVtr, `❌ Erro ao buscar: ${error.message}`);
@@ -522,14 +876,17 @@
           return;
         }
 
-        msgOk(elStatusBuscaVtr, `✅ ${data.length} registro(s) encontrado(s)`);
+        registrosFiltrados = data || [];
+        const referencia = `${nomeMesNumero(mes)} ${ano}`;
 
-        if (!data || data.length === 0) {
-          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR.");
+        msgOk(elStatusBuscaVtr, `✅ ${registrosFiltrados.length} registro(s) encontrado(s) em ${referencia}`);
+
+        if (!registrosFiltrados.length) {
+          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR neste mês.");
           return;
         }
 
-        elListaVtr.innerHTML = data.map(r => `
+        elListaVtr.innerHTML = registrosFiltrados.map(r => `
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
             Data: ${esc(r.data)}<br>
@@ -539,9 +896,6 @@
             Hora: ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
             Condutor: ${esc(r.condutor)}<br>
             Usuário: ${esc(r.usuario || "")}
-            <div class="linha-acoes">
-              <button class="btn-pdf" type="button" onclick="gerarPDF(${Number(r.id)})">📄 PDF</button>
-            </div>
           </div>
         `).join("");
       } catch (e) {
@@ -551,198 +905,276 @@
       }
     }
 
-    async function gerarPDF(id) {
-      try {
-        const { data, error } = await supabaseClient
-          .from("diario")
-          .select("*")
-          .eq("id", id)
-          .single();
-
-        if (error || !data) {
-          alert("Erro ao buscar registro.");
-          return;
-        }
-
-        const w = window.open("", "_blank");
-        if (!w) {
-          alert("Não foi possível abrir a janela do PDF.");
-          return;
-        }
-
-        function linhaVazia() {
-          return `
-            <tr class="linha-dados">
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          `;
-        }
-
-        const linhasExtras = Array.from({ length: 13 }, linhaVazia).join("");
-
-        w.document.write(`
-          <!DOCTYPE html>
-          <html lang="pt-BR">
-          <head>
-            <meta charset="UTF-8">
-            <title>DIÁRIO DE BORDO FÍSICO</title>
-            <style>
-              @page {
-                size: A4 landscape;
-                margin: 10mm;
-              }
-
-              html, body {
-                margin: 0;
-                padding: 0;
-                background: #fff;
-                font-family: Arial, Helvetica, sans-serif;
-                color: #000;
-              }
-
-              .folha {
-                width: 100%;
-                padding: 0;
-              }
-
-              table {
-                width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
-              }
-
-              td, th {
-                border: 1px solid #000;
-                font-size: 11px;
-                padding: 4px 4px;
-                text-align: center;
-                vertical-align: middle;
-                word-break: break-word;
-              }
-
-              .titulo td {
-                font-weight: bold;
-                font-size: 16px;
-                height: 34px;
-                letter-spacing: 0.2px;
-              }
-
-              .identificacao td {
-                font-size: 11px;
-                text-align: left;
-                height: 28px;
-                padding-left: 6px;
-              }
-
-              .cabecalho td {
-                font-weight: bold;
-                height: 46px;
-                line-height: 1.15;
-              }
-
-              .linha-dados td {
-                height: 34px;
-              }
-
-              .w1 { width: 5.34%; }
-              .w2 { width: 13.34%; }
-              .w3 { width: 8.89%; }
-              .w4 { width: 7.12%; }
-              .w5 { width: 8.90%; }
-              .w6 { width: 7.12%; }
-              .w7 { width: 12.45%; }
-              .w8 { width: 8.89%; }
-              .w9 { width: 10.67%; }
-              .w10 { width: 11.56%; }
-
-              .al-esq {
-                text-align: left;
-                padding-left: 6px;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="folha">
-              <table>
-                <colgroup>
-                  <col class="w1">
-                  <col class="w2">
-                  <col class="w3">
-                  <col class="w4">
-                  <col class="w5">
-                  <col class="w6">
-                  <col class="w7">
-                  <col class="w8">
-                  <col class="w9">
-                  <col class="w10">
-                </colgroup>
-
-                <tr class="titulo">
-                  <td colspan="10">DIÁRIO DE BORDO FÍSICO</td>
-                </tr>
-
-                <tr class="identificacao">
-                  <td colspan="3" class="al-esq"><b>PLACA:</b> ${esc(data.placa)}</td>
-                  <td colspan="4" class="al-esq"><b>MARCA/MODELO:</b> ${esc(data.marcamodelo)}</td>
-                  <td colspan="3" class="al-esq"><b>ÓRGÃO/ENTIDADE:</b> ${esc(data.orgao)}</td>
-                </tr>
-
-                <tr class="cabecalho">
-                  <td>DATA</td>
-                  <td>LOCAL DE PARTIDA</td>
-                  <td>KM DO VEÍC. NA PARTIDA</td>
-                  <td>HORA DA PARTIDA</td>
-                  <td>KM DO VEIC. NO DESTINO</td>
-                  <td>HORA DA CHEGADA</td>
-                  <td>NOME CONDUTOR</td>
-                  <td>ASSINATURA CONDUTOR</td>
-                  <td>NOME USUÁRIO</td>
-                  <td>ASSINATURA USUÁRIO</td>
-                </tr>
-
-                <tr class="linha-dados">
-                  <td>${esc(data.data)}</td>
-                  <td>${esc(data.localpartida)}</td>
-                  <td>${esc(data.kmini)}</td>
-                  <td>${esc(data.horapartida)}</td>
-                  <td>${esc(data.kmfim)}</td>
-                  <td>${esc(data.horachegada)}</td>
-                  <td>${esc(data.condutor)}</td>
-                  <td></td>
-                  <td>${esc(data.usuario || "")}</td>
-                  <td></td>
-                </tr>
-
-                ${linhasExtras}
-              </table>
-            </div>
-
-            <script>
-              window.onload = function () {
-                window.print();
-              };
-            <\/script>
-          </body>
-          </html>
-        `);
-
-        w.document.close();
-      } catch (e) {
-        console.error(e);
-        alert("Falha ao gerar PDF.");
+    function quebrarEmPaginas(registros, porPagina) {
+      const paginas = [];
+      for (let i = 0; i < registros.length; i += porPagina) {
+        paginas.push(registros.slice(i, i + porPagina));
       }
+      return paginas.length ? paginas : [[]];
     }
 
-    window.gerarPDF = gerarPDF;
+    function gerarLinhasTabelaPdf(registros, linhasPorPagina = 14) {
+      const linhas = registros.map(r => `
+        <tr class="linha-dados">
+          <td>${esc(r.data)}</td>
+          <td>${esc(r.localpartida)}</td>
+          <td>${esc(r.kmini)}</td>
+          <td>${esc(r.horapartida)}</td>
+          <td>${esc(r.kmfim)}</td>
+          <td>${esc(r.horachegada)}</td>
+          <td>${esc(r.condutor)}</td>
+          <td></td>
+          <td>${esc(r.usuario || "")}</td>
+          <td></td>
+        </tr>
+      `).join("");
+
+      const faltantes = Math.max(0, linhasPorPagina - registros.length);
+      const vazias = Array.from({ length: faltantes }, () => `
+        <tr class="linha-dados">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      `).join("");
+
+      return linhas + vazias;
+    }
+
+    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, registrosPagina, numeroPagina, totalPaginas) {
+      const linhasTabela = gerarLinhasTabelaPdf(registrosPagina, 14);
+
+      return `
+        <div class="folha ${numeroPagina < totalPaginas ? 'quebra-pagina' : ''}">
+          <table>
+            <colgroup>
+              <col class="w1">
+              <col class="w2">
+              <col class="w3">
+              <col class="w4">
+              <col class="w5">
+              <col class="w6">
+              <col class="w7">
+              <col class="w8">
+              <col class="w9">
+              <col class="w10">
+            </colgroup>
+
+            <tr class="titulo">
+              <td colspan="10">DIÁRIO DE BORDO FÍSICO</td>
+            </tr>
+
+            <tr class="subref">
+              <td colspan="10">${esc(vtr)} - ${esc(referencia)} - PÁGINA ${numeroPagina}/${totalPaginas}</td>
+            </tr>
+
+            <tr class="identificacao">
+              <td colspan="3" class="al-esq"><b>PLACA:</b> ${esc(dadosVtr.placa || "")}</td>
+              <td colspan="4" class="al-esq"><b>MARCA/MODELO:</b> ${esc(dadosVtr.marcamodelo || "")}</td>
+              <td colspan="3" class="al-esq"><b>ÓRGÃO/ENTIDADE:</b> ${esc(dadosVtr.orgao || "")}</td>
+            </tr>
+
+            <tr class="cabecalho">
+              <td>DATA</td>
+              <td>LOCAL DE PARTIDA</td>
+              <td>KM DO VEÍC. NA PARTIDA</td>
+              <td>HORA DA PARTIDA</td>
+              <td>KM DO VEIC. NO DESTINO</td>
+              <td>HORA DA CHEGADA</td>
+              <td>NOME CONDUTOR</td>
+              <td>ASSINATURA CONDUTOR</td>
+              <td>NOME USUÁRIO</td>
+              <td>ASSINATURA USUÁRIO</td>
+            </tr>
+
+            ${linhasTabela}
+          </table>
+        </div>
+      `;
+    }
+
+    function exportarMes() {
+      if (!registrosFiltrados.length) {
+        alert("Nenhum registro carregado para exportar.");
+        return;
+      }
+
+      const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
+      const referencia = `${nomeMesNumero(mes)} ${ano}`;
+      const dadosVtr = VTRS[vtr] || {};
+      const paginas = quebrarEmPaginas(registrosFiltrados, 14);
+
+      const htmlPaginas = paginas.map((pagina, index) =>
+        gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, pagina, index + 1, paginas.length)
+      ).join("");
+
+      const w = window.open("", "_blank");
+      if (!w) {
+        alert("Não foi possível abrir a janela do PDF.");
+        return;
+      }
+
+      w.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>DIÁRIO DE BORDO FÍSICO - ${esc(vtr)} - ${esc(referencia)}</title>
+          <style>
+            @page {
+              size: A4 landscape;
+              margin: 10mm;
+            }
+
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              font-family: Arial, Helvetica, sans-serif;
+              color: #000;
+            }
+
+            .folha {
+              width: 100%;
+              padding: 0;
+            }
+
+            .quebra-pagina {
+              page-break-after: always;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              table-layout: fixed;
+            }
+
+            td, th {
+              border: 1px solid #000;
+              font-size: 10px;
+              padding: 4px 4px;
+              text-align: center;
+              vertical-align: middle;
+              word-break: break-word;
+            }
+
+            .titulo td {
+              font-weight: bold;
+              font-size: 16px;
+              height: 32px;
+              letter-spacing: 0.2px;
+            }
+
+            .subref td {
+              font-weight: bold;
+              font-size: 12px;
+              height: 24px;
+            }
+
+            .identificacao td {
+              font-size: 11px;
+              text-align: left;
+              height: 28px;
+              padding-left: 6px;
+            }
+
+            .cabecalho td {
+              font-weight: bold;
+              height: 44px;
+              line-height: 1.1;
+            }
+
+            .linha-dados td {
+              height: 28px;
+            }
+
+            .w1 { width: 5.34%; }
+            .w2 { width: 13.34%; }
+            .w3 { width: 8.89%; }
+            .w4 { width: 7.12%; }
+            .w5 { width: 8.90%; }
+            .w6 { width: 7.12%; }
+            .w7 { width: 12.45%; }
+            .w8 { width: 8.89%; }
+            .w9 { width: 10.67%; }
+            .w10 { width: 11.56%; }
+
+            .al-esq {
+              text-align: left;
+              padding-left: 6px;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlPaginas}
+          <script>
+            window.onload = function () {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+
+      w.document.close();
+    }
+
+    function editarVtr(chave) {
+      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
+      const view = document.getElementById(`view_${itemId}`);
+      const edit = document.getElementById(`edit_${itemId}`);
+      if (view) view.classList.add("hidden");
+      if (edit) edit.classList.remove("hidden");
+    }
+
+    function cancelarEdicaoVtr(chave) {
+      renderCadastroVtrs();
+    }
+
+    function salvarEdicaoVtr(chave) {
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        alert("Senha inválida.");
+        return;
+      }
+
+      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
+
+      VTRS[chave] = {
+        ...VTRS[chave],
+        nome: chave,
+        tipo: document.getElementById(`tipo_${itemId}`).value.trim(),
+        placa: document.getElementById(`placa_${itemId}`).value.trim(),
+        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim(),
+        orgao: document.getElementById(`orgao_${itemId}`).value.trim(),
+        status: document.getElementById(`status_${itemId}`).value.trim(),
+        descricao: document.getElementById(`descricao_${itemId}`).value.trim(),
+        ano: document.getElementById(`ano_${itemId}`).value.trim()
+      };
+
+      salvarCadastroVtrs();
+      preencherVtrsSelects();
+      renderCadastroVtrs();
+
+      if (elVtr.value === chave) {
+        atualizarInfoVtr();
+      }
+
+      alert("Cadastro de VTR atualizado com sucesso.");
+    }
+
+    window.editarVtr = editarVtr;
+    window.cancelarEdicaoVtr = cancelarEdicaoVtr;
+    window.salvarEdicaoVtr = salvarEdicaoVtr;
 
     tabLancamentoBtn.addEventListener("click", function() {
       abrirAba("lancamento");
@@ -752,10 +1184,23 @@
       abrirAba("exportar");
     });
 
+    tabCadastroBtn.addEventListener("click", function() {
+      abrirAba("cadastro");
+    });
+
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvar.addEventListener("click", salvar);
-    elVtr.addEventListener("change", atualizarInfoVtr);
     elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
+    elBtnExportarMes.addEventListener("click", exportarMes);
+    elBtnEditarOdometro.addEventListener("click", editarOdometroAdmin);
+
+    elVtr.addEventListener("change", async function() {
+      atualizarInfoVtr();
+      await atualizarKmBaseDaVtr();
+    });
+
+    elSaida.addEventListener("change", atualizarRetornoAutomatico);
+    elSaida.addEventListener("blur", atualizarRetornoAutomatico);
 
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
@@ -770,7 +1215,12 @@
     }
 
     preencherUsuariosSelect();
+    preencherVtrsSelects();
+    preencherAnos();
+    elFiltroMes.value = String(new Date().getMonth() + 1);
     atualizarInfoVtr();
+    renderCadastroVtrs();
+    abrirAba("lancamento");
   </script>
 </body>
 </html>
