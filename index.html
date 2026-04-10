@@ -463,16 +463,6 @@
       font-weight:bold;
     }
 
-    .login-info {
-      background:#f8fafc;
-      border:1px solid #d9e1ea;
-      border-radius:14px;
-      padding:12px;
-      margin-top:4px;
-      font-size:14px;
-      color:#475569;
-    }
-
     @media (max-width: 700px) {
       .grid-2,
       .linha-acoes-local {
@@ -503,11 +493,7 @@
         <input id="senhaLogin" type="password" placeholder="Digite sua senha" />
 
         <button type="button" id="btnEntrar">Entrar</button>
-
-        <div class="login-info">
-          A senha inicial está configurada como os <b>4 últimos dígitos da ID Func</b>.
-        </div>
-
+        <div class="muted">Senha inicial: a própria ID Func.</div>
         <div id="userOk"></div>
       </div>
 
@@ -711,29 +697,25 @@
     const ADMIN_SENHA = "123456";
     const RASCUNHO_KEY = "diario_rascunho_lancamento";
 
-    function gerarSenhaPadrao(id) {
-      return String(id).slice(-4);
-    }
-
     const USUARIOS = [
-      { guerra: "1º SGT VICENTE", id: "2614960", senha: gerarSenhaPadrao("2614960") },
-      { guerra: "2º SGT ANDERSON", id: "2882930", senha: gerarSenhaPadrao("2882930") },
-      { guerra: "SD MOTTA", id: "4626338", senha: gerarSenhaPadrao("4626338") },
-      { guerra: "1º SGT DIEFERSON", id: "2972719", senha: gerarSenhaPadrao("2972719") },
-      { guerra: "SD CAMACHO", id: "3698696", senha: gerarSenhaPadrao("3698696") },
-      { guerra: "1º SGT BATISTA", id: "2692449", senha: gerarSenhaPadrao("2692449") },
-      { guerra: "SD LARSSON", id: "4490380", senha: gerarSenhaPadrao("4490380") },
-      { guerra: "SD TOMASCHEWSKI", id: "3218627", senha: gerarSenhaPadrao("3218627") },
-      { guerra: "1º TEN MARCELO", id: "2423286", senha: gerarSenhaPadrao("2423286") },
-      { guerra: "SD ISQUIERDO", id: "3697665", senha: gerarSenhaPadrao("3697665") },
-      { guerra: "SD MAX", id: "3084620", senha: gerarSenhaPadrao("3084620") },
-      { guerra: "2º SGT LISCANO", id: "3698530", senha: gerarSenhaPadrao("3698530") },
-      { guerra: "SD BORGES", id: "3698440", senha: gerarSenhaPadrao("3698440") },
-      { guerra: "SD SOARES", id: "4625595", senha: gerarSenhaPadrao("4625595") },
-      { guerra: "SD PEGLOW", id: "4783069", senha: gerarSenhaPadrao("4783069") },
-      { guerra: "SD BATISTA", id: "3702847", senha: gerarSenhaPadrao("3702847") },
-      { guerra: "2º SGT VINICIUS", id: "2910233", senha: gerarSenhaPadrao("2910233") },
-      { guerra: "SD WILLIAM", id: "4355504", senha: gerarSenhaPadrao("4355504") }
+      { guerra: "1º SGT VICENTE", id: "2614960", senha: "2614960" },
+      { guerra: "2º SGT ANDERSON", id: "2882930", senha: "2882930" },
+      { guerra: "SD MOTTA", id: "4626338", senha: "4626338" },
+      { guerra: "1º SGT DIEFERSON", id: "2972719", senha: "2972719" },
+      { guerra: "SD CAMACHO", id: "3698696", senha: "3698696" },
+      { guerra: "1º SGT BATISTA", id: "2692449", senha: "2692449" },
+      { guerra: "SD LARSSON", id: "4490380", senha: "4490380" },
+      { guerra: "SD TOMASCHEWSKI", id: "3218627", senha: "3218627" },
+      { guerra: "1º TEN MARCELO", id: "2423286", senha: "2423286" },
+      { guerra: "SD ISQUIERDO", id: "3697665", senha: "3697665" },
+      { guerra: "SD MAX", id: "3084620", senha: "3084620" },
+      { guerra: "2º SGT LISCANO", id: "3698530", senha: "3698530" },
+      { guerra: "SD BORGES", id: "3698440", senha: "3698440" },
+      { guerra: "SD SOARES", id: "4625595", senha: "4625595" },
+      { guerra: "SD PEGLOW", id: "4783069", senha: "4783069" },
+      { guerra: "SD BATISTA", id: "3702847", senha: "3702847" },
+      { guerra: "2º SGT VINICIUS", id: "2910233", senha: "2910233" },
+      { guerra: "SD WILLIAM", id: "4355504", senha: "4355504" }
     ];
 
     const VTRS_INICIAIS = {
@@ -923,10 +905,7 @@
     }
 
     function nomeMesNumero(numero) {
-      const nomes = [
-        "", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
-        "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
-      ];
+      const nomes = ["", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
       return nomes[Number(numero)] || "";
     }
 
@@ -1026,22 +1005,16 @@
             <div id="edit_${itemId}" class="hidden">
               <label>Tipo</label>
               <input id="tipo_${itemId}" value="${esc(v.tipo || "")}" />
-
               <label>Placa</label>
               <input id="placa_${itemId}" value="${esc(v.placa || "")}" />
-
               <label>Marca/Modelo</label>
               <input id="marcamodelo_${itemId}" value="${esc(v.marcamodelo || "")}" />
-
               <label>Órgão/Entidade</label>
               <input id="orgao_${itemId}" value="${esc(v.orgao || "")}" />
-
               <label>Status</label>
               <input id="status_${itemId}" value="${esc(v.status || "")}" />
-
               <label>Descrição</label>
               <textarea id="descricao_${itemId}" rows="3">${esc(v.descricao || "")}</textarea>
-
               <label>Ano</label>
               <input id="ano_${itemId}" value="${esc(v.ano || "")}" />
 
@@ -1055,4 +1028,948 @@
       }).join("");
     }
 
-    function abrirAba(nome
+    function abrirAba(nome) {
+      abaLancamento.classList.remove("active");
+      abaExportar.classList.remove("active");
+      abaCadastro.classList.remove("active");
+
+      tabLancamentoBtn.classList.remove("active");
+      tabExportarBtn.classList.remove("active");
+      tabCadastroBtn.classList.remove("active");
+
+      if (nome === "lancamento") {
+        abaLancamento.classList.add("active");
+        tabLancamentoBtn.classList.add("active");
+      } else if (nome === "exportar") {
+        abaExportar.classList.add("active");
+        tabExportarBtn.classList.add("active");
+      } else {
+        abaCadastro.classList.add("active");
+        tabCadastroBtn.classList.add("active");
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function compararHoras(h1, h2) {
+      if (!h1 || !h2) return 0;
+      return h1.localeCompare(h2);
+    }
+
+    function horarioAtualSeVazio(campo) {
+      if (!campo.value) campo.value = horaAtual();
+    }
+
+    function login() {
+      const id = elIdFunc.value.trim();
+      const senha = elSenhaLogin.value.trim();
+
+      if (!id || !senha) {
+        msgErro(elUserOk, "❌ Informe ID Func e senha.");
+        elFormBox.classList.add("hidden");
+        return;
+      }
+
+      const user = USUARIOS.find(u => u.id === id && u.senha === senha);
+
+      if (!user) {
+        msgErro(elUserOk, "❌ ID ou senha inválidos.");
+        elFormBox.classList.add("hidden");
+        return;
+      }
+
+      logado = user;
+      elCondutor.value = user.guerra;
+      msgOk(elUserOk, `✅ ${user.guerra}`);
+      elFormBox.classList.remove("hidden");
+
+      if (!elData.value) {
+        elData.value = hojeISO();
+      }
+
+      atualizarInfoVtr();
+      atualizarKmBaseDaVtr().then(() => carregarRascunho());
+    }
+
+    async function obterUltimoRegistroDaVtr(vtr) {
+      const { data, error } = await supabaseClient
+        .from("diario")
+        .select("*")
+        .eq("vtr", vtr)
+        .order("data", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+      return data && data.length ? data[0] : null;
+    }
+
+    async function atualizarKmBaseDaVtr() {
+      const vtr = elVtr.value;
+      if (!vtr) return;
+
+      try {
+        msgMuted(elStatusOdometro, "Consultando KM atual...");
+        const ultimo = await obterUltimoRegistroDaVtr(vtr);
+        const kmManual = obterOdometroManual(vtr);
+
+        let kmBase = 0;
+        if (ultimo) {
+          if (ultimo.kmfimretorno != null && ultimo.kmfimretorno !== "") {
+            kmBase = Number(ultimo.kmfimretorno);
+          } else if (ultimo.kmfim != null && ultimo.kmfim !== "") {
+            kmBase = Number(ultimo.kmfim);
+          }
+        } else if (kmManual != null) {
+          kmBase = kmManual;
+        }
+
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        if (!elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarResumoAutomatico();
+        msgMuted(elStatusOdometro, "KM atual carregada.");
+      } catch (e) {
+        console.error(e);
+        const kmManual = obterOdometroManual(vtr);
+        const kmBase = kmManual != null ? kmManual : 0;
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        if (!elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarResumoAutomatico();
+        msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
+      }
+    }
+
+    async function editarOdometroAdmin() {
+      const vtr = elVtr.value;
+      if (!vtr) {
+        msgErro(elStatusOdometro, "❌ Selecione uma VTR.");
+        return;
+      }
+
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        msgErro(elStatusOdometro, "❌ Senha inválida.");
+        return;
+      }
+
+      const atual = elOdometroValor.textContent.replace(/\D/g, "") || "0";
+      const novo = prompt(`Informe a KM atual da ${vtr}:`, String(Number(atual)));
+      if (novo === null) return;
+
+      const km = Number(novo);
+      if (Number.isNaN(km) || km < 0) {
+        msgErro(elStatusOdometro, "❌ KM inválida.");
+        return;
+      }
+
+      salvarOdometroManual(vtr, km);
+      elOdometroValor.textContent = formatarOdometro(km);
+      if (!linha1Salva) elKmIni.value = km;
+      elKmIniRetorno.value = "";
+      salvarRascunho();
+      atualizarResumoAutomatico();
+      msgOk(elStatusOdometro, "✅ KM atualizada.");
+    }
+
+    function controlarCamposSaida() {
+      if (elSaidaSelect.value === "OUTRO") {
+        elSaidaOutro.classList.remove("hidden");
+      } else {
+        elSaidaOutro.classList.add("hidden");
+        elSaidaOutro.value = "";
+      }
+    }
+
+    function controlarCamposRetorno() {
+      if (elRetornoSelect.value === "OUTRO") {
+        elRetornoOutro.classList.remove("hidden");
+      } else {
+        elRetornoOutro.classList.add("hidden");
+        elRetornoOutro.value = "";
+      }
+    }
+
+    function aplicarRetornoAutomatico() {
+      controlarCamposSaida();
+
+      if (elSaidaSelect.value && elSaidaSelect.value !== "OUTRO") {
+        const retorno = MAPA_RETORNO[elSaidaSelect.value];
+        if (retorno) {
+          elRetornoSelect.value = retorno;
+          controlarCamposRetorno();
+        }
+      }
+      salvarRascunho();
+      atualizarResumoAutomatico();
+    }
+
+    function atualizarKmInicialRetorno() {
+      const kmIda = Number(elKmFim.value);
+      if (!Number.isNaN(kmIda) && kmIda >= 0) {
+        elKmIniRetorno.value = kmIda;
+      } else {
+        elKmIniRetorno.value = "";
+      }
+      salvarRascunho();
+      atualizarResumoAutomatico();
+      atualizarEstadoFinal();
+    }
+
+    function obterSaidaFinal() {
+      return elSaidaSelect.value === "OUTRO" ? elSaidaOutro.value.trim() : elSaidaSelect.value.trim();
+    }
+
+    function obterRetornoFinal() {
+      return elRetornoSelect.value === "OUTRO" ? elRetornoOutro.value.trim() : elRetornoSelect.value.trim();
+    }
+
+    function validarLinha1() {
+      const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
+      const kmIniValor = Number(elKmIni.value);
+      const kmFimValor = Number(elKmFim.value);
+
+      if (!elData.value) return false;
+      if (!saidaFinal) return false;
+      if (!retornoFinal) return false;
+      if (elKmIni.value === "" || elKmFim.value === "") return false;
+      if (!elHoraPartida.value || !elHoraChegada.value) return false;
+      if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmFimValor < kmIniValor) return false;
+      if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
+      if (!elCondutor.value.trim()) return false;
+      return true;
+    }
+
+    function validarLinha2() {
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
+      const kmFimValor = Number(elKmFim.value);
+
+      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") return false;
+      if (!elHoraSaidaRetorno.value || !elHoraChegadaRetorno.value) return false;
+      if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmIniRetornoValor !== kmFimValor) return false;
+      if (kmFimRetornoValor < kmIniRetornoValor) return false;
+      if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
+      if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
+      return true;
+    }
+
+    function travarCamposLinha1(travar) {
+      elSaidaSelect.disabled = travar;
+      elSaidaOutro.readOnly = travar;
+      elRetornoSelect.disabled = travar;
+      elRetornoOutro.readOnly = travar;
+      elKmIni.readOnly = travar;
+      elHoraPartida.readOnly = travar;
+      elKmFim.readOnly = travar;
+      elHoraChegada.readOnly = travar;
+    }
+
+    function travarCamposLinha2(travar) {
+      elHoraSaidaRetorno.readOnly = travar;
+      elKmFimRetorno.readOnly = travar;
+      elHoraChegadaRetorno.readOnly = travar;
+    }
+
+    function atualizarBadges() {
+      if (linha1Salva) {
+        elBadgeLinha1.textContent = "1ª LINHA SALVA";
+        elBadgeLinha1.className = "badge-linha badge-ok";
+        elBtnSalvarLinha1.textContent = "✅ Salvo 1ª Linha";
+        elBtnSalvarLinha1.classList.add("btn-linha-ok");
+        elBtnEditarLinha1.classList.remove("hidden");
+      } else {
+        elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
+        elBadgeLinha1.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha1.textContent = "Salvar 1ª Linha";
+        elBtnSalvarLinha1.classList.remove("btn-linha-ok");
+        elBtnEditarLinha1.classList.add("hidden");
+      }
+
+      if (linha2Salva) {
+        elBadgeLinha2.textContent = "2ª LINHA SALVA";
+        elBadgeLinha2.className = "badge-linha badge-ok";
+        elBtnSalvarLinha2.textContent = "✅ Salvo 2ª Linha";
+        elBtnSalvarLinha2.classList.add("btn-linha-ok");
+        elBtnEditarLinha2.classList.remove("hidden");
+      } else {
+        elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
+        elBadgeLinha2.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha2.textContent = "Salvar 2ª Linha";
+        elBtnSalvarLinha2.classList.remove("btn-linha-ok");
+        elBtnEditarLinha2.classList.add("hidden");
+      }
+    }
+
+    function atualizarResumoAutomatico() {
+      const kmIni = Number(elKmIni.value || 0);
+      const kmFinal = Number(elKmFimRetorno.value || elKmFim.value || 0);
+      let rodado = 0;
+      if (!Number.isNaN(kmIni) && !Number.isNaN(kmFinal) && kmFinal >= kmIni) rodado = kmFinal - kmIni;
+      elKmRodadoTotal.textContent = rodado;
+
+      if (linha1Salva && linha2Salva && validarLinha1() && validarLinha2()) {
+        elSituacaoResumo.textContent = "Pronto para finalizar";
+      } else if (linha1Salva || linha2Salva) {
+        elSituacaoResumo.textContent = "Salvo parcialmente";
+      } else {
+        elSituacaoResumo.textContent = "Aguardando preenchimento";
+      }
+    }
+
+    function atualizarEstadoFinal() {
+      atualizarBadges();
+      atualizarResumoAutomatico();
+
+      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      travarCamposLinha1(linha1Salva);
+      travarCamposLinha2(linha2Salva);
+
+      if (pronto) {
+        elBtnFinal.textContent = "Finalizar";
+        elBtnFinal.classList.add("btn-finalizar");
+        elBtnFinal.classList.remove("btn-salvar-parcial");
+        elAlertaOperacional.classList.add("hidden");
+      } else {
+        elBtnFinal.textContent = "Salvar parcial";
+        elBtnFinal.classList.remove("btn-finalizar");
+        elBtnFinal.classList.add("btn-salvar-parcial");
+        elAlertaOperacional.classList.remove("hidden");
+      }
+    }
+
+    function coletarRascunho() {
+      return {
+        vtr: elVtr.value,
+        data: elData.value,
+        saidaSelect: elSaidaSelect.value,
+        saidaOutro: elSaidaOutro.value,
+        retornoSelect: elRetornoSelect.value,
+        retornoOutro: elRetornoOutro.value,
+        kmIni: elKmIni.value,
+        horaPartida: elHoraPartida.value,
+        kmFim: elKmFim.value,
+        horaChegada: elHoraChegada.value,
+        kmIniRetorno: elKmIniRetorno.value,
+        horaSaidaRetorno: elHoraSaidaRetorno.value,
+        kmFimRetorno: elKmFimRetorno.value,
+        horaChegadaRetorno: elHoraChegadaRetorno.value,
+        usuario: elUsuario.value,
+        linha1Salva,
+        linha2Salva
+      };
+    }
+
+    function salvarRascunho() {
+      try {
+        localStorage.setItem(RASCUNHO_KEY, JSON.stringify(coletarRascunho()));
+      } catch {}
+    }
+
+    function carregarRascunho() {
+      try {
+        const bruto = localStorage.getItem(RASCUNHO_KEY);
+        if (!bruto) {
+          linha1Salva = false;
+          linha2Salva = false;
+          preencherHorarioPadrao();
+          atualizarEstadoFinal();
+          return;
+        }
+
+        const r = JSON.parse(bruto);
+        if (r.vtr && elVtr.value && r.vtr !== elVtr.value) {
+          linha1Salva = false;
+          linha2Salva = false;
+          preencherHorarioPadrao();
+          atualizarEstadoFinal();
+          return;
+        }
+
+        if (r.data) elData.value = r.data;
+        if (r.saidaSelect) elSaidaSelect.value = r.saidaSelect;
+        if (r.saidaOutro) elSaidaOutro.value = r.saidaOutro;
+        if (r.retornoSelect) elRetornoSelect.value = r.retornoSelect;
+        if (r.retornoOutro) elRetornoOutro.value = r.retornoOutro;
+        if (r.kmIni) elKmIni.value = r.kmIni;
+        if (r.horaPartida) elHoraPartida.value = r.horaPartida;
+        if (r.kmFim) elKmFim.value = r.kmFim;
+        if (r.horaChegada) elHoraChegada.value = r.horaChegada;
+        if (r.kmIniRetorno) elKmIniRetorno.value = r.kmIniRetorno;
+        if (r.horaSaidaRetorno) elHoraSaidaRetorno.value = r.horaSaidaRetorno;
+        if (r.kmFimRetorno) elKmFimRetorno.value = r.kmFimRetorno;
+        if (r.horaChegadaRetorno) elHoraChegadaRetorno.value = r.horaChegadaRetorno;
+        if (r.usuario) elUsuario.value = r.usuario;
+
+        controlarCamposSaida();
+        controlarCamposRetorno();
+
+        linha1Salva = Boolean(r.linha1Salva);
+        linha2Salva = Boolean(r.linha2Salva);
+
+        preencherHorarioPadrao();
+        atualizarEstadoFinal();
+      } catch {
+        linha1Salva = false;
+        linha2Salva = false;
+        preencherHorarioPadrao();
+        atualizarEstadoFinal();
+      }
+    }
+
+    function limparRascunho() {
+      localStorage.removeItem(RASCUNHO_KEY);
+      linha1Salva = false;
+      linha2Salva = false;
+    }
+
+    function preencherHorarioPadrao() {
+      horarioAtualSeVazio(elHoraPartida);
+      horarioAtualSeVazio(elHoraChegada);
+      horarioAtualSeVazio(elHoraSaidaRetorno);
+      horarioAtualSeVazio(elHoraChegadaRetorno);
+    }
+
+    function salvarLinha1() {
+      preencherHorarioPadrao();
+
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente.");
+        return;
+      }
+
+      linha1Salva = true;
+      atualizarKmInicialRetorno();
+      if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgOk(elStatusSalvar, "✅ 1ª linha salva parcialmente.");
+    }
+
+    function salvarLinha2() {
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Salve primeiro a 1ª linha corretamente.");
+        return;
+      }
+
+      preencherHorarioPadrao();
+
+      if (!validarLinha2()) {
+        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
+        return;
+      }
+
+      linha2Salva = true;
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgOk(elStatusSalvar, "✅ 2ª linha salva parcialmente.");
+    }
+
+    function editarLinha1() {
+      linha1Salva = false;
+      linha2Salva = false;
+      travarCamposLinha1(false);
+      travarCamposLinha2(false);
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois, se necessário.");
+    }
+
+    function editarLinha2() {
+      linha2Salva = false;
+      travarCamposLinha2(false);
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
+    }
+
+    async function finalizarOuSalvarParcial() {
+      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      if (!pronto) {
+        salvarRascunho();
+        atualizarEstadoFinal();
+        msgMuted(elStatusSalvar, "Rascunho salvo. Complete as duas linhas para finalizar.");
+        return;
+      }
+
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro");
+        return;
+      }
+
+      const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
+
+      const kmIniValor = Number(elKmIni.value);
+      const kmFimValor = Number(elKmFim.value);
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
+
+      const dadosVtr = VTRS[elVtr.value] || {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      };
+
+      elBtnFinal.disabled = true;
+      msgMuted(elStatusSalvar, "Finalizando...");
+
+      try {
+        const { error } = await supabaseClient
+          .from("diario")
+          .insert([{
+            vtr: elVtr.value,
+            placa: dadosVtr.placa,
+            marcamodelo: dadosVtr.marcamodelo,
+            orgao: dadosVtr.orgao,
+            data: elData.value,
+            localpartida: saidaFinal,
+            localretorno: retornoFinal,
+            kmini: kmIniValor,
+            horapartida: elHoraPartida.value,
+            kmfim: kmFimValor,
+            horachegada: elHoraChegada.value,
+            kminiretorno: kmIniRetornoValor,
+            horasaidaretorno: elHoraSaidaRetorno.value,
+            kmfimretorno: kmFimRetornoValor,
+            horachegadaretorno: elHoraChegadaRetorno.value,
+            condutor: elCondutor.value,
+            usuario: elUsuario.value.trim(),
+            assinaturacondutor: "",
+            assinaturausuario: ""
+          }]);
+
+        if (error) {
+          msgErro(elStatusSalvar, `❌ Erro ao finalizar: ${error.message}`);
+          return;
+        }
+
+        salvarOdometroManual(elVtr.value, kmFimRetornoValor);
+        limparRascunho();
+        msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
+        resetarFormularioAposFinalizacao(kmFimRetornoValor);
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
+      } finally {
+        elBtnFinal.disabled = false;
+      }
+    }
+
+    function resetarFormularioAposFinalizacao(kmBaseNovo) {
+      elSaidaSelect.value = "";
+      elSaidaOutro.value = "";
+      elSaidaOutro.classList.add("hidden");
+
+      elRetornoSelect.value = "";
+      elRetornoOutro.value = "";
+      elRetornoOutro.classList.add("hidden");
+
+      elKmIni.value = kmBaseNovo;
+      elHoraPartida.value = horaAtual();
+      elKmFim.value = "";
+      elHoraChegada.value = horaAtual();
+
+      elKmIniRetorno.value = "";
+      elHoraSaidaRetorno.value = horaAtual();
+      elKmFimRetorno.value = "";
+      elHoraChegadaRetorno.value = horaAtual();
+
+      elUsuario.value = "";
+      elOdometroValor.textContent = formatarOdometro(kmBaseNovo);
+
+      linha1Salva = false;
+      linha2Salva = false;
+
+      travarCamposLinha1(false);
+      travarCamposLinha2(false);
+
+      atualizarEstadoFinal();
+    }
+
+    async function buscarRegistrosPorVtr() {
+      const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
+
+      if (!vtr) {
+        msgErro(elStatusBuscaVtr, "❌ Selecione uma VTR");
+        msgMuted(elListaVtr, "Selecione VTR, mês e ano para listar os registros.");
+        return;
+      }
+
+      const inicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
+      const ultimoDia = new Date(ano, mes, 0).getDate();
+      const fim = `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+
+      msgMuted(elStatusBuscaVtr, "Buscando...");
+      msgMuted(elListaVtr, "Carregando registros...");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("diario")
+          .select("*")
+          .eq("vtr", vtr)
+          .gte("data", inicio)
+          .lte("data", fim)
+          .order("data", { ascending: true })
+          .order("id", { ascending: true });
+
+        if (error) {
+          msgErro(elStatusBuscaVtr, `❌ Erro ao buscar: ${error.message}`);
+          msgMuted(elListaVtr, "Falha ao carregar.");
+          return;
+        }
+
+        registrosFiltrados = data || [];
+        const referencia = `${nomeMesNumero(mes)} ${ano}`;
+
+        msgOk(elStatusBuscaVtr, `✅ ${registrosFiltrados.length} registro(s) encontrado(s) em ${referencia}`);
+
+        if (!registrosFiltrados.length) {
+          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR neste mês.");
+          return;
+        }
+
+        elListaVtr.innerHTML = registrosFiltrados.map(r => `
+          <div class="registro">
+            <b>${esc(r.vtr)}</b><br>
+            Data: ${esc(formatarDataBR(r.data))}<br>
+            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
+            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")}<br>
+            Condutor: ${esc(r.condutor)}<br>
+            Usuário: ${esc(r.usuario || "")}
+          </div>
+        `).join("");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusBuscaVtr, "❌ Falha inesperada ao buscar");
+        msgMuted(elListaVtr, "Falha ao carregar.");
+      }
+    }
+
+    function quebrarEmPaginas(linhas, porPagina) {
+      const paginas = [];
+      for (let i = 0; i < linhas.length; i += porPagina) paginas.push(linhas.slice(i, i + porPagina));
+      return paginas.length ? paginas : [[]];
+    }
+
+    function gerarLinhasDoRegistro(r) {
+      const kmIniRet = r.kminiretorno != null && r.kminiretorno !== "" ? r.kminiretorno : r.kmfim;
+      return [
+        {
+          data: formatarDataBR(r.data),
+          local: r.localpartida,
+          kmIni: r.kmini,
+          horaPartida: r.horapartida,
+          kmFim: r.kmfim,
+          horaChegada: r.horachegada,
+          condutor: r.condutor,
+          usuario: r.usuario || ""
+        },
+        {
+          data: formatarDataBR(r.data),
+          local: r.localretorno || "",
+          kmIni: kmIniRet ?? "",
+          horaPartida: r.horasaidaretorno || "",
+          kmFim: r.kmfimretorno ?? "",
+          horaChegada: r.horachegadaretorno || "",
+          condutor: r.condutor,
+          usuario: r.usuario || ""
+        }
+      ];
+    }
+
+    function gerarLinhasTabelaPdf(linhas, linhasPorPagina = 14) {
+      const htmlLinhas = linhas.map(r => `
+        <tr class="linha-dados">
+          <td>${esc(r.data)}</td>
+          <td>${esc(r.local)}</td>
+          <td>${esc(r.kmIni)}</td>
+          <td>${esc(r.horaPartida)}</td>
+          <td>${esc(r.kmFim)}</td>
+          <td>${esc(r.horaChegada)}</td>
+          <td>${esc(r.condutor)}</td>
+          <td></td>
+          <td>${esc(r.usuario)}</td>
+          <td></td>
+        </tr>
+      `).join("");
+
+      const faltantes = Math.max(0, linhasPorPagina - linhas.length);
+      const vazias = Array.from({ length: faltantes }, () => `
+        <tr class="linha-dados">
+          <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+      `).join("");
+
+      return htmlLinhas + vazias;
+    }
+
+    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, linhasPagina, numeroPagina, totalPaginas) {
+      const linhasTabela = gerarLinhasTabelaPdf(linhasPagina, 14);
+
+      return `
+        <div class="folha ${numeroPagina < totalPaginas ? 'quebra-pagina' : ''}">
+          <table>
+            <colgroup>
+              <col class="w1"><col class="w2"><col class="w3"><col class="w4"><col class="w5">
+              <col class="w6"><col class="w7"><col class="w8"><col class="w9"><col class="w10">
+            </colgroup>
+
+            <tr class="titulo">
+              <td colspan="10">DIÁRIO DE BORDO FÍSICO</td>
+            </tr>
+
+            <tr class="subref">
+              <td colspan="10">${esc(vtr)} - ${esc(referencia)} - PÁGINA ${numeroPagina}/${totalPaginas}</td>
+            </tr>
+
+            <tr class="identificacao">
+              <td colspan="3" class="al-esq"><b>PLACA:</b> ${esc(dadosVtr.placa || "")}</td>
+              <td colspan="4" class="al-esq"><b>MARCA/MODELO:</b> ${esc(dadosVtr.marcamodelo || "")}</td>
+              <td colspan="3" class="al-esq"><b>ÓRGÃO/ENTIDADE:</b> ${esc(dadosVtr.orgao || "")}</td>
+            </tr>
+
+            <tr class="cabecalho">
+              <td>DATA</td>
+              <td>LOCAL DE PARTIDA</td>
+              <td>KM DO VEÍC. NA PARTIDA</td>
+              <td>HORA DA PARTIDA</td>
+              <td>KM DO VEIC. NO DESTINO</td>
+              <td>HORA DA CHEGADA</td>
+              <td>NOME CONDUTOR</td>
+              <td>ASSINATURA CONDUTOR</td>
+              <td>NOME USUÁRIO</td>
+              <td>ASSINATURA USUÁRIO</td>
+            </tr>
+
+            ${linhasTabela}
+          </table>
+        </div>
+      `;
+    }
+
+    function exportarMes() {
+      if (!registrosFiltrados.length) {
+        alert("Nenhum registro carregado para exportar.");
+        return;
+      }
+
+      const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
+      const referencia = `${nomeMesNumero(mes)} ${ano}`;
+      const dadosVtr = VTRS[vtr] || {};
+
+      const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
+      const paginas = quebrarEmPaginas(linhasExpandias, 14);
+
+      const htmlPaginas = paginas.map((pagina, index) =>
+        gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, pagina, index + 1, paginas.length)
+      ).join("");
+
+      const w = window.open("", "_blank");
+      if (!w) {
+        alert("Não foi possível abrir a janela do PDF.");
+        return;
+      }
+
+      w.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>DIÁRIO DE BORDO FÍSICO - ${esc(vtr)} - ${esc(referencia)}</title>
+          <style>
+            @page { size: A4 landscape; margin: 10mm; }
+            html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }
+            .folha { width: 100%; padding: 0; }
+            .quebra-pagina { page-break-after: always; }
+            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            td, th { border: 1px solid #000; font-size: 10px; padding: 4px 4px; text-align: center; vertical-align: middle; word-break: break-word; }
+            .titulo td { font-weight: bold; font-size: 16px; height: 32px; letter-spacing: 0.2px; }
+            .subref td { font-weight: bold; font-size: 12px; height: 24px; }
+            .identificacao td { font-size: 11px; text-align: left; height: 28px; padding-left: 6px; }
+            .cabecalho td { font-weight: bold; height: 44px; line-height: 1.1; }
+            .linha-dados td { height: 28px; }
+            .w1 { width: 5.34%; } .w2 { width: 13.34%; } .w3 { width: 8.89%; } .w4 { width: 7.12%; } .w5 { width: 8.90%; }
+            .w6 { width: 7.12%; } .w7 { width: 12.45%; } .w8 { width: 8.89%; } .w9 { width: 10.67%; } .w10 { width: 11.56%; }
+            .al-esq { text-align: left; padding-left: 6px; }
+          </style>
+        </head>
+        <body>
+          ${htmlPaginas}
+          <script>
+            window.onload = function () { window.print(); };
+          <\/script>
+        </body>
+        </html>
+      `);
+
+      w.document.close();
+    }
+
+    async function resetarRegistrosVtr(chave) {
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        alert("Senha inválida.");
+        return;
+      }
+
+      const confirmar = confirm(`Confirma apagar todos os registros da ${chave}?`);
+      if (!confirmar) return;
+
+      try {
+        const { error } = await supabaseClient.from("diario").delete().eq("vtr", chave);
+
+        if (error) {
+          alert(`Erro ao apagar registros: ${error.message}`);
+          return;
+        }
+
+        alert(`Registros da ${chave} apagados com sucesso.`);
+
+        if (elVtr.value === chave) await atualizarKmBaseDaVtr();
+
+        if (elFiltroVtr.value === chave) {
+          registrosFiltrados = [];
+          msgMuted(elListaVtr, "Registros apagados. Faça nova busca.");
+          msgMuted(elStatusBuscaVtr, "Registros da VTR removidos.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Falha inesperada ao apagar registros.");
+      }
+    }
+
+    function editarVtr(chave) {
+      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
+      document.getElementById(`view_${itemId}`).classList.add("hidden");
+      document.getElementById(`edit_${itemId}`).classList.remove("hidden");
+    }
+
+    function cancelarEdicaoVtr() {
+      renderCadastroVtrs();
+    }
+
+    function salvarEdicaoVtr(chave) {
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        alert("Senha inválida.");
+        return;
+      }
+
+      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
+
+      VTRS[chave] = {
+        ...VTRS[chave],
+        nome: chave,
+        tipo: document.getElementById(`tipo_${itemId}`).value.trim(),
+        placa: document.getElementById(`placa_${itemId}`).value.trim(),
+        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim(),
+        orgao: document.getElementById(`orgao_${itemId}`).value.trim(),
+        status: document.getElementById(`status_${itemId}`).value.trim(),
+        descricao: document.getElementById(`descricao_${itemId}`).value.trim(),
+        ano: document.getElementById(`ano_${itemId}`).value.trim()
+      };
+
+      salvarCadastroVtrs();
+      preencherVtrsSelects();
+      renderCadastroVtrs();
+
+      if (elVtr.value === chave) atualizarInfoVtr();
+
+      alert("Cadastro de VTR atualizado com sucesso.");
+    }
+
+    window.editarVtr = editarVtr;
+    window.cancelarEdicaoVtr = cancelarEdicaoVtr;
+    window.salvarEdicaoVtr = salvarEdicaoVtr;
+    window.resetarRegistrosVtr = resetarRegistrosVtr;
+
+    const camposRascunho = [
+      elData, elSaidaSelect, elSaidaOutro, elRetornoSelect, elRetornoOutro,
+      elKmIni, elHoraPartida, elKmFim, elHoraChegada,
+      elKmIniRetorno, elHoraSaidaRetorno, elKmFimRetorno, elHoraChegadaRetorno,
+      elUsuario
+    ];
+
+    tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
+    tabExportarBtn.addEventListener("click", () => abrirAba("exportar"));
+    tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
+
+    elBtnEntrar.addEventListener("click", login);
+    elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
+    elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
+    elBtnEditarLinha1.addEventListener("click", editarLinha1);
+    elBtnEditarLinha2.addEventListener("click", editarLinha2);
+    elBtnFinal.addEventListener("click", finalizarOuSalvarParcial);
+    elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
+    elBtnExportarMes.addEventListener("click", exportarMes);
+    elBtnEditarOdometro.addEventListener("click", editarOdometroAdmin);
+
+    elVtr.addEventListener("change", async function() {
+      atualizarInfoVtr();
+      linha1Salva = false;
+      linha2Salva = false;
+      await atualizarKmBaseDaVtr();
+      salvarRascunho();
+      atualizarEstadoFinal();
+    });
+
+    elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
+    elSaidaSelect.addEventListener("change", controlarCamposSaida);
+    elRetornoSelect.addEventListener("change", controlarCamposRetorno);
+    elKmFim.addEventListener("input", atualizarKmInicialRetorno);
+    elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
+
+    [elHoraPartida, elHoraChegada, elHoraSaidaRetorno, elHoraChegadaRetorno].forEach(campo => {
+      campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
+    });
+
+    camposRascunho.forEach(campo => {
+      campo.addEventListener("input", () => {
+        salvarRascunho();
+        atualizarResumoAutomatico();
+        atualizarEstadoFinal();
+      });
+      campo.addEventListener("change", () => {
+        salvarRascunho();
+        atualizarResumoAutomatico();
+        atualizarEstadoFinal();
+      });
+    });
+
+    elIdFunc.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") login();
+    });
+
+    elSenhaLogin.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") login();
+    });
+
+    elHoraChegadaRetorno.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") finalizarOuSalvarParcial();
+    });
+
+    if (!elData.value) elData.value = hojeISO();
+
+    preencherUsuariosSelect();
+    preencherVtrsSelects();
+    preencherAnos();
+    elFiltroMes.value = String(new Date().getMonth() + 1);
+    atualizarInfoVtr();
+    renderCadastroVtrs();
+    preencherHorarioPadrao();
+    atualizarEstadoFinal();
+    abrirAba("lancamento");
+    atualizarRelogio();
+    setInterval(atualizarRelogio, 1000);
+  </script>
+</body>
+</html>
