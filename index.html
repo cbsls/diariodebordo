@@ -6,6 +6,8 @@
   <title>🚒 Diário de Bordo</title>
   <meta name="theme-color" content="#b71c1c" />
   <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
     body { background:#e9edf3; margin:0; padding:18px; }
@@ -115,8 +117,9 @@
     const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let logado = null;
-    let supabase = null;
 
     const elIdFunc = document.getElementById("idFunc");
     const elBtnEntrar = document.getElementById("btnEntrar");
@@ -186,11 +189,6 @@
         return;
       }
 
-      if (!supabase) {
-        msgErro(elStatusSalvar, "❌ Supabase não carregou");
-        return;
-      }
-
       if (!elData.value) {
         msgErro(elStatusSalvar, "❌ Informe a data");
         return;
@@ -218,7 +216,7 @@
       msgMuted(elStatusSalvar, "Salvando...");
 
       try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from("diario")
           .insert([{
             vtr: elVtr.value,
@@ -246,13 +244,8 @@
     }
 
     async function carregar() {
-      if (!supabase) {
-        msgErro(elLista, "❌ Supabase não carregou");
-        return;
-      }
-
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from("diario")
           .select("*")
           .order("id", { ascending: false });
@@ -285,13 +278,8 @@
     }
 
     async function gerarPDF(id) {
-      if (!supabase) {
-        alert("Supabase não carregou.");
-        return;
-      }
-
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from("diario")
           .select("*")
           .eq("id", id)
@@ -354,32 +342,6 @@
 
     window.gerarPDF = gerarPDF;
 
-    async function iniciar() {
-      if (!elData.value) {
-        elData.value = hojeISO();
-      }
-
-      try {
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-        script.onload = async function () {
-          if (window.supabase && typeof window.supabase.createClient === "function") {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            await carregar();
-          } else {
-            msgErro(elLista, "❌ Biblioteca Supabase não disponível");
-          }
-        };
-        script.onerror = function () {
-          msgErro(elLista, "❌ Não foi possível carregar a biblioteca Supabase");
-        };
-        document.head.appendChild(script);
-      } catch (e) {
-        console.error(e);
-        msgErro(elLista, "❌ Erro ao iniciar o sistema");
-      }
-    }
-
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvar.addEventListener("click", salvar);
 
@@ -391,7 +353,11 @@
       if (e.key === "Enter") salvar();
     });
 
-    iniciar();
+    if (!elData.value) {
+      elData.value = hojeISO();
+    }
+
+    carregar();
   </script>
 </body>
 </html>
