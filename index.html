@@ -90,6 +90,41 @@
       font-size:16px;
       padding:12px;
     }
+    .btn-limpar {
+      background:#666;
+      font-size:15px;
+      padding:12px;
+      margin-top:0;
+      margin-bottom:12px;
+    }
+    .info-vtr {
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+      line-height:1.5;
+      font-size:16px;
+    }
+    .assinatura-box {
+      border:1px solid #ccc;
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+      margin-bottom:8px;
+    }
+    canvas {
+      width:100%;
+      height:160px;
+      display:block;
+      touch-action:none;
+      background:#fff;
+    }
+    .assinatura-label {
+      color:#666;
+      font-size:14px;
+      margin:-4px 0 12px 0;
+    }
   </style>
 </head>
 <body>
@@ -114,17 +149,45 @@
       <option value="ATP-9316">ATP-9316</option>
     </select>
 
+    <div class="info-vtr" id="infoVtr"></div>
+
     <label for="data">Data</label>
     <input id="data" type="date" />
+
+    <label for="localPartida">Local de Partida</label>
+    <input id="localPartida" type="text" placeholder="Informe o local de partida" />
 
     <label for="kmIni">KM Inicial</label>
     <input id="kmIni" type="number" inputmode="numeric" />
 
+    <label for="horaPartida">Hora da Partida</label>
+    <input id="horaPartida" type="time" />
+
     <label for="kmFim">KM Final</label>
     <input id="kmFim" type="number" inputmode="numeric" />
 
-    <label for="condutor">Condutor</label>
+    <label for="horaChegada">Hora da Chegada</label>
+    <input id="horaChegada" type="time" />
+
+    <label for="condutor">Nome Condutor</label>
     <input id="condutor" readonly />
+
+    <label for="usuario">Nome Usuário</label>
+    <input id="usuario" type="text" placeholder="Informe o nome do usuário" />
+
+    <label>Assinatura Condutor</label>
+    <div class="assinatura-box">
+      <canvas id="assinaturaCondutor"></canvas>
+    </div>
+    <div class="assinatura-label">Assine com o dedo na área acima</div>
+    <button type="button" class="btn-limpar" id="btnLimparAssCondutor">Limpar assinatura do condutor</button>
+
+    <label>Assinatura Usuário</label>
+    <div class="assinatura-box">
+      <canvas id="assinaturaUsuario"></canvas>
+    </div>
+    <div class="assinatura-label">Assine com o dedo na área acima</div>
+    <button type="button" class="btn-limpar" id="btnLimparAssUsuario">Limpar assinatura do usuário</button>
 
     <button type="button" id="btnSalvar">Salvar</button>
     <div id="statusSalvar"></div>
@@ -157,6 +220,39 @@
       { guerra: "SD WILLIAM", id: "4355504" }
     ];
 
+    const VTRS = {
+      "AR-426": {
+        placa: "TQV 8D59",
+        marcamodelo: "L200 TRITON",
+        orgao: "CBMRS CB SLS"
+      },
+      "ABT-0535": {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      },
+      "ABT-7992": {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      },
+      "ATP-1225": {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      },
+      "ATP-370": {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      },
+      "ATP-9316": {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      }
+    };
+
     const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
 
@@ -169,13 +265,23 @@
     const elUserOk = document.getElementById("userOk");
     const elFormBox = document.getElementById("formBox");
     const elVtr = document.getElementById("vtr");
+    const elInfoVtr = document.getElementById("infoVtr");
     const elData = document.getElementById("data");
+    const elLocalPartida = document.getElementById("localPartida");
     const elKmIni = document.getElementById("kmIni");
+    const elHoraPartida = document.getElementById("horaPartida");
     const elKmFim = document.getElementById("kmFim");
+    const elHoraChegada = document.getElementById("horaChegada");
     const elCondutor = document.getElementById("condutor");
+    const elUsuario = document.getElementById("usuario");
     const elBtnSalvar = document.getElementById("btnSalvar");
     const elStatusSalvar = document.getElementById("statusSalvar");
     const elLista = document.getElementById("lista");
+
+    const canvasCondutor = document.getElementById("assinaturaCondutor");
+    const canvasUsuario = document.getElementById("assinaturaUsuario");
+    const btnLimparAssCondutor = document.getElementById("btnLimparAssCondutor");
+    const btnLimparAssUsuario = document.getElementById("btnLimparAssUsuario");
 
     function hojeISO() {
       const d = new Date();
@@ -206,6 +312,20 @@
       el.innerHTML = `<div class="muted">${texto}</div>`;
     }
 
+    function atualizarInfoVtr() {
+      const dados = VTRS[elVtr.value] || {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      };
+
+      elInfoVtr.innerHTML = `
+        <b>PLACA:</b> ${esc(dados.placa)}<br>
+        <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
+        <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}
+      `;
+    }
+
     function login() {
       const id = elIdFunc.value.trim();
       const user = USUARIOS.find(u => u.id === id);
@@ -224,6 +344,85 @@
       if (!elData.value) {
         elData.value = hojeISO();
       }
+
+      atualizarInfoVtr();
+    }
+
+    function ajustarCanvas(canvas) {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * ratio;
+      canvas.height = rect.height * ratio;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#000";
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+
+    function inicializarAssinatura(canvas) {
+      const ctx = canvas.getContext("2d");
+      let desenhando = false;
+
+      function posicao(e) {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches ? e.touches[0] : e;
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      }
+
+      function iniciar(e) {
+        desenhando = true;
+        const p = posicao(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        e.preventDefault();
+      }
+
+      function mover(e) {
+        if (!desenhando) return;
+        const p = posicao(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        e.preventDefault();
+      }
+
+      function parar() {
+        desenhando = false;
+      }
+
+      canvas.addEventListener("mousedown", iniciar);
+      canvas.addEventListener("mousemove", mover);
+      canvas.addEventListener("mouseup", parar);
+      canvas.addEventListener("mouseleave", parar);
+
+      canvas.addEventListener("touchstart", iniciar, { passive: false });
+      canvas.addEventListener("touchmove", mover, { passive: false });
+      canvas.addEventListener("touchend", parar);
+    }
+
+    function limparCanvas(canvas) {
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+
+    function assinaturaVazia(canvas) {
+      const ctx = canvas.getContext("2d");
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (!(pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255 && pixels[i + 3] === 255)) {
+          return false;
+        }
+      }
+      return true;
     }
 
     async function salvar() {
@@ -237,8 +436,28 @@
         return;
       }
 
+      if (!elLocalPartida.value.trim()) {
+        msgErro(elStatusSalvar, "❌ Informe o local de partida");
+        return;
+      }
+
       if (elKmIni.value === "" || elKmFim.value === "") {
         msgErro(elStatusSalvar, "❌ Informe KM inicial e final");
+        return;
+      }
+
+      if (!elHoraPartida.value) {
+        msgErro(elStatusSalvar, "❌ Informe a hora da partida");
+        return;
+      }
+
+      if (!elHoraChegada.value) {
+        msgErro(elStatusSalvar, "❌ Informe a hora da chegada");
+        return;
+      }
+
+      if (!elUsuario.value.trim()) {
+        msgErro(elStatusSalvar, "❌ Informe o nome do usuário");
         return;
       }
 
@@ -255,6 +474,15 @@
         return;
       }
 
+      const dadosVtr = VTRS[elVtr.value] || {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      };
+
+      const assinaturaCondutor = assinaturaVazia(canvasCondutor) ? "" : canvasCondutor.toDataURL("image/png");
+      const assinaturaUsuario = assinaturaVazia(canvasUsuario) ? "" : canvasUsuario.toDataURL("image/png");
+
       elBtnSalvar.disabled = true;
       msgMuted(elStatusSalvar, "Salvando...");
 
@@ -263,10 +491,19 @@
           .from("diario")
           .insert([{
             vtr: elVtr.value,
+            placa: dadosVtr.placa,
+            marcamodelo: dadosVtr.marcamodelo,
+            orgao: dadosVtr.orgao,
             data: elData.value,
+            localpartida: elLocalPartida.value.trim(),
             kmini: kmIniValor,
+            horapartida: elHoraPartida.value,
             kmfim: kmFimValor,
-            condutor: elCondutor.value
+            horachegada: elHoraChegada.value,
+            condutor: elCondutor.value,
+            usuario: elUsuario.value.trim(),
+            assinaturacondutor: assinaturaCondutor,
+            assinaturausuario: assinaturaUsuario
           }]);
 
         if (error) {
@@ -275,8 +512,14 @@
         }
 
         msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
+        elLocalPartida.value = "";
         elKmIni.value = "";
+        elHoraPartida.value = "";
         elKmFim.value = "";
+        elHoraChegada.value = "";
+        elUsuario.value = "";
+        limparCanvas(canvasCondutor);
+        limparCanvas(canvasUsuario);
         await carregar();
       } catch (e) {
         console.error(e);
@@ -307,8 +550,11 @@
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
             Data: ${esc(r.data)}<br>
+            Local de Partida: ${esc(r.localpartida)}<br>
             KM: ${esc(r.kmini)} → ${esc(r.kmfim)}<br>
-            Condutor: ${esc(r.condutor)}
+            Hora: ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
+            Condutor: ${esc(r.condutor)}<br>
+            Usuário: ${esc(r.usuario)}
             <div class="linha-acoes">
               <button class="btn-pdf" type="button" onclick="gerarPDF(${Number(r.id)})">📄 PDF</button>
             </div>
@@ -339,6 +585,14 @@
           return;
         }
 
+        const assinaturaCondutorHtml = data.assinaturacondutor
+          ? `<img src="${data.assinaturacondutor}" style="max-width:260px; max-height:90px;">`
+          : "Não informada";
+
+        const assinaturaUsuarioHtml = data.assinaturausuario
+          ? `<img src="${data.assinaturausuario}" style="max-width:260px; max-height:90px;">`
+          : "Não informada";
+
         w.document.write(`
           <!DOCTYPE html>
           <html lang="pt-BR">
@@ -346,30 +600,61 @@
             <meta charset="UTF-8">
             <title>PDF Diário de Bordo</title>
             <style>
-              body { font-family: Arial, Helvetica, sans-serif; padding: 40px; color: #000; }
-              h2 { text-align: center; margin-bottom: 25px; }
-              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-              th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
+              body { font-family: Arial, Helvetica, sans-serif; padding: 30px; color: #000; }
+              h2 { text-align: center; margin-bottom: 18px; }
+              .topo { margin-bottom: 16px; line-height: 1.6; }
+              table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+              th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 13px; vertical-align: middle; }
+              .assinaturas { margin-top: 18px; width: 100%; border-collapse: collapse; }
+              .assinaturas td { border: 1px solid #000; padding: 12px; text-align: center; vertical-align: top; }
+              .titulo-ass { font-weight: bold; margin-bottom: 8px; }
             </style>
           </head>
           <body>
             <h2>DIÁRIO DE BORDO</h2>
+
+            <div class="topo">
+              <b>PLACA:</b> ${esc(data.placa)}<br>
+              <b>MARCA/MODELO:</b> ${esc(data.marcamodelo)}<br>
+              <b>ÓRGÃO/ENTIDADE:</b> ${esc(data.orgao)}
+            </div>
+
             <table>
               <tr>
-                <th>VTR</th>
                 <th>DATA</th>
-                <th>KM INICIAL</th>
-                <th>KM FINAL</th>
-                <th>CONDUTOR</th>
+                <th>LOCAL DE PARTIDA</th>
+                <th>KM DO VEÍC. NA PARTIDA</th>
+                <th>HORA DA PARTIDA</th>
+                <th>KM DO VEÍC. NO DESTINO</th>
+                <th>HORA DA CHEGADA</th>
+                <th>NOME CONDUTOR</th>
+                <th>NOME USUÁRIO</th>
               </tr>
               <tr>
-                <td>${esc(data.vtr)}</td>
                 <td>${esc(data.data)}</td>
+                <td>${esc(data.localpartida)}</td>
                 <td>${esc(data.kmini)}</td>
+                <td>${esc(data.horapartida)}</td>
                 <td>${esc(data.kmfim)}</td>
+                <td>${esc(data.horachegada)}</td>
                 <td>${esc(data.condutor)}</td>
+                <td>${esc(data.usuario)}</td>
               </tr>
             </table>
+
+            <table class="assinaturas">
+              <tr>
+                <td>
+                  <div class="titulo-ass">ASSINATURA CONDUTOR</div>
+                  ${assinaturaCondutorHtml}
+                </td>
+                <td>
+                  <div class="titulo-ass">ASSINATURA USUÁRIO</div>
+                  ${assinaturaUsuarioHtml}
+                </td>
+              </tr>
+            </table>
+
             <script>
               window.onload = function(){ window.print(); };
             <\/script>
@@ -387,12 +672,21 @@
 
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvar.addEventListener("click", salvar);
+    elVtr.addEventListener("change", atualizarInfoVtr);
+
+    btnLimparAssCondutor.addEventListener("click", function() {
+      limparCanvas(canvasCondutor);
+    });
+
+    btnLimparAssUsuario.addEventListener("click", function() {
+      limparCanvas(canvasUsuario);
+    });
 
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
     });
 
-    elKmFim.addEventListener("keydown", function(e) {
+    elHoraChegada.addEventListener("keydown", function(e) {
       if (e.key === "Enter") salvar();
     });
 
@@ -400,7 +694,40 @@
       elData.value = hojeISO();
     }
 
+    ajustarCanvas(canvasCondutor);
+    ajustarCanvas(canvasUsuario);
+    inicializarAssinatura(canvasCondutor);
+    inicializarAssinatura(canvasUsuario);
+    atualizarInfoVtr();
     carregar();
+
+    window.addEventListener("resize", function() {
+      const assinaturaCondutorAtual = assinaturaVazia(canvasCondutor) ? "" : canvasCondutor.toDataURL("image/png");
+      const assinaturaUsuarioAtual = assinaturaVazia(canvasUsuario) ? "" : canvasUsuario.toDataURL("image/png");
+
+      ajustarCanvas(canvasCondutor);
+      ajustarCanvas(canvasUsuario);
+
+      if (assinaturaCondutorAtual) {
+        const img1 = new Image();
+        img1.onload = function() {
+          const ctx1 = canvasCondutor.getContext("2d");
+          const rect1 = canvasCondutor.getBoundingClientRect();
+          ctx1.drawImage(img1, 0, 0, rect1.width, rect1.height);
+        };
+        img1.src = assinaturaCondutorAtual;
+      }
+
+      if (assinaturaUsuarioAtual) {
+        const img2 = new Image();
+        img2.onload = function() {
+          const ctx2 = canvasUsuario.getContext("2d");
+          const rect2 = canvasUsuario.getBoundingClientRect();
+          ctx2.drawImage(img2, 0, 0, rect2.width, rect2.height);
+        };
+        img2.src = assinaturaUsuarioAtual;
+      }
+    });
   </script>
 </body>
 </html>
