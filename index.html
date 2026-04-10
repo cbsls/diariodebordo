@@ -128,6 +128,15 @@
       font-size:16px;
       padding:12px;
     }
+    .btn-linha {
+      background:#8e0000;
+      font-size:16px;
+      padding:12px;
+      margin-top:4px;
+    }
+    .btn-finalizar {
+      background:#2e7d32 !important;
+    }
     .odometro-box {
       background:#111;
       color:#19ff63;
@@ -202,6 +211,22 @@
       font-size:18px;
       color:#24303f;
     }
+    .badge-linha {
+      display:inline-block;
+      font-size:12px;
+      font-weight:bold;
+      padding:6px 10px;
+      border-radius:999px;
+      margin-bottom:8px;
+      color:#fff;
+      background:#6b7280;
+    }
+    .badge-ok {
+      background:#2e7d32;
+    }
+    .badge-pendente {
+      background:#8e0000;
+    }
     @media (max-width: 700px) {
       .grid-2 {
         grid-template-columns:1fr;
@@ -237,6 +262,8 @@
 
       <label for="data">Data</label>
       <input id="data" type="date" />
+
+      <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
 
       <label for="saidaSelect">Saída</label>
       <select id="saidaSelect">
@@ -286,8 +313,11 @@
         </div>
       </div>
 
+      <button type="button" class="btn-linha" id="btnSalvarLinha1">Salvar 1ª Linha</button>
+
       <div class="bloco-retorno">
         <h3>↩️ Retorno</h3>
+        <span id="badgeLinha2" class="badge-linha badge-pendente">2ª LINHA PENDENTE</span>
 
         <div class="grid-2">
           <div>
@@ -310,6 +340,8 @@
             <input id="horaChegadaRetorno" type="time" />
           </div>
         </div>
+
+        <button type="button" class="btn-linha" id="btnSalvarLinha2">Salvar 2ª Linha</button>
       </div>
 
       <label for="condutor">Nome Condutor</label>
@@ -320,7 +352,7 @@
         <option value="">Selecione o usuário (opcional)</option>
       </select>
 
-      <button type="button" id="btnSalvar">Salvar</button>
+      <button type="button" id="btnFinal">Salvar</button>
       <div id="statusSalvar"></div>
     </div>
   </div>
@@ -381,6 +413,7 @@
 
   <script>
     const ADMIN_SENHA = "123456";
+    const RASCUNHO_KEY = "diario_rascunho_lancamento";
 
     const USUARIOS = [
       { guerra: "1º SGT VICENTE", id: "2614960" },
@@ -463,6 +496,8 @@
     let logado = null;
     let VTRS = carregarCadastroVtrs();
     let registrosFiltrados = [];
+    let linha1Salva = false;
+    let linha2Salva = false;
 
     const MAPA_RETORNO = {
       "QTL / J4": "J4 / QTL",
@@ -501,7 +536,11 @@
 
     const elCondutor = document.getElementById("condutor");
     const elUsuario = document.getElementById("usuario");
-    const elBtnSalvar = document.getElementById("btnSalvar");
+    const elBtnSalvarLinha1 = document.getElementById("btnSalvarLinha1");
+    const elBtnSalvarLinha2 = document.getElementById("btnSalvarLinha2");
+    const elBtnFinal = document.getElementById("btnFinal");
+    const elBadgeLinha1 = document.getElementById("badgeLinha1");
+    const elBadgeLinha2 = document.getElementById("badgeLinha2");
     const elStatusSalvar = document.getElementById("statusSalvar");
 
     const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
@@ -736,7 +775,7 @@
       }
 
       atualizarInfoVtr();
-      atualizarKmBaseDaVtr();
+      atualizarKmBaseDaVtr().then(() => carregarRascunho());
     }
 
     async function obterUltimoRegistroDaVtr(vtr) {
@@ -773,16 +812,18 @@
         }
 
         elOdometroValor.textContent = formatarOdometro(kmBase);
-        elKmIni.value = kmBase || "";
-        elKmIniRetorno.value = "";
+        if (!elKmIni.value) {
+          elKmIni.value = kmBase || "";
+        }
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
         console.error(e);
         const kmManual = obterOdometroManual(vtr);
         const kmBase = kmManual != null ? kmManual : 0;
         elOdometroValor.textContent = formatarOdometro(kmBase);
-        elKmIni.value = kmBase || "";
-        elKmIniRetorno.value = "";
+        if (!elKmIni.value) {
+          elKmIni.value = kmBase || "";
+        }
         msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
     }
@@ -814,6 +855,7 @@
       elOdometroValor.textContent = formatarOdometro(km);
       elKmIni.value = km;
       elKmIniRetorno.value = "";
+      salvarRascunho();
       msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
@@ -845,6 +887,7 @@
           controlarCamposRetorno();
         }
       }
+      salvarRascunho();
     }
 
     function atualizarKmInicialRetorno() {
@@ -854,6 +897,8 @@
       } else {
         elKmIniRetorno.value = "";
       }
+      salvarRascunho();
+      atualizarEstadoFinal();
     }
 
     function obterSaidaFinal() {
@@ -866,7 +911,188 @@
       return elRetornoSelect.value.trim();
     }
 
-    async function salvar() {
+    function validarLinha1() {
+      const saidaFinal = obterSaidaFinal();
+      const kmIniValor = Number(elKmIni.value);
+      const kmFimValor = Number(elKmFim.value);
+
+      if (!elData.value) return false;
+      if (!saidaFinal) return false;
+      if (!obterRetornoFinal()) return false;
+      if (elKmIni.value === "" || elKmFim.value === "") return false;
+      if (!elHoraPartida.value || !elHoraChegada.value) return false;
+      if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmFimValor < kmIniValor) return false;
+      if (!elCondutor.value.trim()) return false;
+
+      return true;
+    }
+
+    function validarLinha2() {
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
+      const kmFimValor = Number(elKmFim.value);
+
+      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") return false;
+      if (!elHoraSaidaRetorno.value || !elHoraChegadaRetorno.value) return false;
+      if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmIniRetornoValor !== kmFimValor) return false;
+      if (kmFimRetornoValor < kmIniRetornoValor) return false;
+
+      return true;
+    }
+
+    function atualizarBadges() {
+      if (linha1Salva) {
+        elBadgeLinha1.textContent = "1ª LINHA SALVA";
+        elBadgeLinha1.className = "badge-linha badge-ok";
+      } else {
+        elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
+        elBadgeLinha1.className = "badge-linha badge-pendente";
+      }
+
+      if (linha2Salva) {
+        elBadgeLinha2.textContent = "2ª LINHA SALVA";
+        elBadgeLinha2.className = "badge-linha badge-ok";
+      } else {
+        elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
+        elBadgeLinha2.className = "badge-linha badge-pendente";
+      }
+    }
+
+    function atualizarEstadoFinal() {
+      atualizarBadges();
+      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      if (pronto) {
+        elBtnFinal.textContent = "Finalizar";
+        elBtnFinal.classList.add("btn-finalizar");
+      } else {
+        elBtnFinal.textContent = "Salvar";
+        elBtnFinal.classList.remove("btn-finalizar");
+      }
+    }
+
+    function coletarRascunho() {
+      return {
+        vtr: elVtr.value,
+        data: elData.value,
+        saidaSelect: elSaidaSelect.value,
+        saidaOutro: elSaidaOutro.value,
+        retornoSelect: elRetornoSelect.value,
+        retornoOutro: elRetornoOutro.value,
+        kmIni: elKmIni.value,
+        horaPartida: elHoraPartida.value,
+        kmFim: elKmFim.value,
+        horaChegada: elHoraChegada.value,
+        kmIniRetorno: elKmIniRetorno.value,
+        horaSaidaRetorno: elHoraSaidaRetorno.value,
+        kmFimRetorno: elKmFimRetorno.value,
+        horaChegadaRetorno: elHoraChegadaRetorno.value,
+        usuario: elUsuario.value,
+        linha1Salva,
+        linha2Salva
+      };
+    }
+
+    function salvarRascunho() {
+      try {
+        localStorage.setItem(RASCUNHO_KEY, JSON.stringify(coletarRascunho()));
+      } catch {}
+    }
+
+    function carregarRascunho() {
+      try {
+        const bruto = localStorage.getItem(RASCUNHO_KEY);
+        if (!bruto) {
+          linha1Salva = false;
+          linha2Salva = false;
+          atualizarEstadoFinal();
+          return;
+        }
+
+        const r = JSON.parse(bruto);
+        if (r.vtr && elVtr.value && r.vtr !== elVtr.value) {
+          linha1Salva = false;
+          linha2Salva = false;
+          atualizarEstadoFinal();
+          return;
+        }
+
+        if (r.data) elData.value = r.data;
+        if (r.saidaSelect) elSaidaSelect.value = r.saidaSelect;
+        if (r.saidaOutro) elSaidaOutro.value = r.saidaOutro;
+        if (r.retornoSelect) elRetornoSelect.value = r.retornoSelect;
+        if (r.retornoOutro) elRetornoOutro.value = r.retornoOutro;
+        if (r.kmIni) elKmIni.value = r.kmIni;
+        if (r.horaPartida) elHoraPartida.value = r.horaPartida;
+        if (r.kmFim) elKmFim.value = r.kmFim;
+        if (r.horaChegada) elHoraChegada.value = r.horaChegada;
+        if (r.kmIniRetorno) elKmIniRetorno.value = r.kmIniRetorno;
+        if (r.horaSaidaRetorno) elHoraSaidaRetorno.value = r.horaSaidaRetorno;
+        if (r.kmFimRetorno) elKmFimRetorno.value = r.kmFimRetorno;
+        if (r.horaChegadaRetorno) elHoraChegadaRetorno.value = r.horaChegadaRetorno;
+        if (r.usuario) elUsuario.value = r.usuario;
+
+        controlarCamposSaida();
+        controlarCamposRetorno();
+
+        linha1Salva = Boolean(r.linha1Salva);
+        linha2Salva = Boolean(r.linha2Salva);
+        atualizarEstadoFinal();
+      } catch {
+        linha1Salva = false;
+        linha2Salva = false;
+        atualizarEstadoFinal();
+      }
+    }
+
+    function limparRascunho() {
+      localStorage.removeItem(RASCUNHO_KEY);
+      linha1Salva = false;
+      linha2Salva = false;
+    }
+
+    function salvarLinha1() {
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Preencha corretamente os campos obrigatórios da 1ª linha.");
+        return;
+      }
+
+      linha1Salva = true;
+      atualizarKmInicialRetorno();
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgOk(elStatusSalvar, "✅ 1ª linha salva parcialmente.");
+    }
+
+    function salvarLinha2() {
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Salve primeiro a 1ª linha corretamente.");
+        return;
+      }
+
+      if (!validarLinha2()) {
+        msgErro(elStatusSalvar, "❌ Preencha corretamente os campos obrigatórios da 2ª linha.");
+        return;
+      }
+
+      linha2Salva = true;
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgOk(elStatusSalvar, "✅ 2ª linha salva parcialmente.");
+    }
+
+    async function finalizarOuSalvarParcial() {
+      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      if (!pronto) {
+        salvarRascunho();
+        atualizarEstadoFinal();
+        msgMuted(elStatusSalvar, "Rascunho salvo. Complete as duas linhas para finalizar.");
+        return;
+      }
+
       if (!logado) {
         msgErro(elStatusSalvar, "❌ Faça o login primeiro");
         return;
@@ -875,75 +1101,10 @@
       const saidaFinal = obterSaidaFinal();
       const retornoFinal = obterRetornoFinal();
 
-      if (!elData.value) {
-        msgErro(elStatusSalvar, "❌ Informe a data");
-        return;
-      }
-
-      if (!saidaFinal) {
-        msgErro(elStatusSalvar, "❌ Informe a saída");
-        return;
-      }
-
-      if (!retornoFinal) {
-        msgErro(elStatusSalvar, "❌ Informe o retorno");
-        return;
-      }
-
-      if (elKmIni.value === "" || elKmFim.value === "") {
-        msgErro(elStatusSalvar, "❌ Informe KM inicial e chegada no destino");
-        return;
-      }
-
-      if (!elHoraPartida.value) {
-        msgErro(elStatusSalvar, "❌ Informe a hora da partida");
-        return;
-      }
-
-      if (!elHoraChegada.value) {
-        msgErro(elStatusSalvar, "❌ Informe a hora da chegada no destino");
-        return;
-      }
-
-      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") {
-        msgErro(elStatusSalvar, "❌ Informe KM inicial e final do retorno");
-        return;
-      }
-
-      if (!elHoraSaidaRetorno.value) {
-        msgErro(elStatusSalvar, "❌ Informe a hora da saída do destino");
-        return;
-      }
-
-      if (!elHoraChegadaRetorno.value) {
-        msgErro(elStatusSalvar, "❌ Informe a hora final da chegada ao QTL");
-        return;
-      }
-
       const kmIniValor = Number(elKmIni.value);
       const kmFimValor = Number(elKmFim.value);
       const kmIniRetornoValor = Number(elKmIniRetorno.value);
       const kmFimRetornoValor = Number(elKmFimRetorno.value);
-
-      if ([kmIniValor, kmFimValor, kmIniRetornoValor, kmFimRetornoValor].some(v => Number.isNaN(v))) {
-        msgErro(elStatusSalvar, "❌ KM inválida");
-        return;
-      }
-
-      if (kmFimValor < kmIniValor) {
-        msgErro(elStatusSalvar, "❌ KM de chegada no destino não pode ser menor que a inicial");
-        return;
-      }
-
-      if (kmIniRetornoValor !== kmFimValor) {
-        msgErro(elStatusSalvar, "❌ KM inicial do retorno deve ser igual à KM de chegada no destino");
-        return;
-      }
-
-      if (kmFimRetornoValor < kmIniRetornoValor) {
-        msgErro(elStatusSalvar, "❌ KM final do retorno não pode ser menor que a inicial do retorno");
-        return;
-      }
 
       const dadosVtr = VTRS[elVtr.value] || {
         placa: "NÃO CADASTRADO",
@@ -951,8 +1112,8 @@
         orgao: "CBMRS CB SLS"
       };
 
-      elBtnSalvar.disabled = true;
-      msgMuted(elStatusSalvar, "Salvando...");
+      elBtnFinal.disabled = true;
+      msgMuted(elStatusSalvar, "Finalizando...");
 
       try {
         const { error } = await supabaseClient
@@ -980,13 +1141,15 @@
           }]);
 
         if (error) {
-          msgErro(elStatusSalvar, `❌ Erro ao salvar: ${error.message}`);
+          msgErro(elStatusSalvar, `❌ Erro ao finalizar: ${error.message}`);
           return;
         }
 
         salvarOdometroManual(elVtr.value, kmFimRetornoValor);
+        limparRascunho();
 
-        msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
+        msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
+
         elSaidaSelect.value = "";
         elSaidaOutro.value = "";
         elSaidaOutro.classList.add("hidden");
@@ -1007,11 +1170,13 @@
 
         elUsuario.value = "";
         elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
+
+        atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
-        msgErro(elStatusSalvar, "❌ Falha inesperada ao salvar");
+        msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
       } finally {
-        elBtnSalvar.disabled = false;
+        elBtnFinal.disabled = false;
       }
     }
 
@@ -1415,6 +1580,13 @@
     window.salvarEdicaoVtr = salvarEdicaoVtr;
     window.resetarRegistrosVtr = resetarRegistrosVtr;
 
+    const camposRascunho = [
+      elData, elSaidaSelect, elSaidaOutro, elRetornoSelect, elRetornoOutro,
+      elKmIni, elHoraPartida, elKmFim, elHoraChegada,
+      elKmIniRetorno, elHoraSaidaRetorno, elKmFimRetorno, elHoraChegadaRetorno,
+      elUsuario
+    ];
+
     tabLancamentoBtn.addEventListener("click", function() {
       abrirAba("lancamento");
     });
@@ -1428,7 +1600,9 @@
     });
 
     elBtnEntrar.addEventListener("click", login);
-    elBtnSalvar.addEventListener("click", salvar);
+    elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
+    elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
+    elBtnFinal.addEventListener("click", finalizarOuSalvarParcial);
     elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
     elBtnExportarMes.addEventListener("click", exportarMes);
     elBtnEditarOdometro.addEventListener("click", editarOdometroAdmin);
@@ -1436,6 +1610,8 @@
     elVtr.addEventListener("change", async function() {
       atualizarInfoVtr();
       await atualizarKmBaseDaVtr();
+      salvarRascunho();
+      atualizarEstadoFinal();
     });
 
     elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
@@ -1444,12 +1620,23 @@
     elKmFim.addEventListener("input", atualizarKmInicialRetorno);
     elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
 
+    camposRascunho.forEach(campo => {
+      campo.addEventListener("input", () => {
+        salvarRascunho();
+        atualizarEstadoFinal();
+      });
+      campo.addEventListener("change", () => {
+        salvarRascunho();
+        atualizarEstadoFinal();
+      });
+    });
+
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
     });
 
     elHoraChegadaRetorno.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") salvar();
+      if (e.key === "Enter") finalizarOuSalvarParcial();
     });
 
     if (!elData.value) {
@@ -1462,6 +1649,7 @@
     elFiltroMes.value = String(new Date().getMonth() + 1);
     atualizarInfoVtr();
     renderCadastroVtrs();
+    atualizarEstadoFinal();
     abrirAba("lancamento");
   </script>
 </body>
