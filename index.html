@@ -185,6 +185,18 @@
       background:#4b5563;
       margin-bottom:10px;
     }
+    .bloco-retorno {
+      border:1px dashed #d2d2d2;
+      border-radius:14px;
+      padding:14px;
+      margin:12px 0 6px 0;
+      background:#fcfcfc;
+    }
+    .bloco-retorno h3 {
+      margin:0 0 10px 0;
+      font-size:18px;
+      color:#24303f;
+    }
     @media (max-width: 700px) {
       .grid-2 {
         grid-template-columns:1fr;
@@ -260,12 +272,38 @@
 
       <div class="grid-2">
         <div>
-          <label for="kmFim">KM Final</label>
+          <label for="kmFim">KM Chegada no Destino</label>
           <input id="kmFim" type="number" inputmode="numeric" />
         </div>
         <div>
-          <label for="horaChegada">Hora da Chegada</label>
+          <label for="horaChegada">Hora da Chegada no Destino</label>
           <input id="horaChegada" type="time" />
+        </div>
+      </div>
+
+      <div class="bloco-retorno">
+        <h3>↩️ Retorno</h3>
+
+        <div class="grid-2">
+          <div>
+            <label for="kmIniRetorno">KM Inicial do Retorno</label>
+            <input id="kmIniRetorno" type="number" inputmode="numeric" readonly />
+          </div>
+          <div>
+            <label for="horaSaidaRetorno">Hora da Saída do Destino</label>
+            <input id="horaSaidaRetorno" type="time" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="kmFimRetorno">KM Final na Chegada ao QTL</label>
+            <input id="kmFimRetorno" type="number" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="horaChegadaRetorno">Hora Final da Chegada ao QTL</label>
+            <input id="horaChegadaRetorno" type="time" />
+          </div>
         </div>
       </div>
 
@@ -450,6 +488,12 @@
     const elHoraPartida = document.getElementById("horaPartida");
     const elKmFim = document.getElementById("kmFim");
     const elHoraChegada = document.getElementById("horaChegada");
+
+    const elKmIniRetorno = document.getElementById("kmIniRetorno");
+    const elHoraSaidaRetorno = document.getElementById("horaSaidaRetorno");
+    const elKmFimRetorno = document.getElementById("kmFimRetorno");
+    const elHoraChegadaRetorno = document.getElementById("horaChegadaRetorno");
+
     const elCondutor = document.getElementById("condutor");
     const elUsuario = document.getElementById("usuario");
     const elBtnSalvar = document.getElementById("btnSalvar");
@@ -710,11 +754,21 @@
         msgMuted(elStatusOdometro, "Consultando KM atual...");
         const ultimo = await obterUltimoRegistroDaVtr(vtr);
         const kmManual = obterOdometroManual(vtr);
-        const kmFinalBanco = ultimo && ultimo.kmfim != null ? Number(ultimo.kmfim) : null;
-        const kmBase = kmFinalBanco != null ? kmFinalBanco : (kmManual != null ? kmManual : 0);
+
+        let kmBase = 0;
+        if (ultimo) {
+          if (ultimo.kmfimretorno != null && ultimo.kmfimretorno !== "") {
+            kmBase = Number(ultimo.kmfimretorno);
+          } else if (ultimo.kmfim != null && ultimo.kmfim !== "") {
+            kmBase = Number(ultimo.kmfim);
+          }
+        } else if (kmManual != null) {
+          kmBase = kmManual;
+        }
 
         elOdometroValor.textContent = formatarOdometro(kmBase);
         elKmIni.value = kmBase || "";
+        elKmIniRetorno.value = "";
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
         console.error(e);
@@ -722,6 +776,7 @@
         const kmBase = kmManual != null ? kmManual : 0;
         elOdometroValor.textContent = formatarOdometro(kmBase);
         elKmIni.value = kmBase || "";
+        elKmIniRetorno.value = "";
         msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
     }
@@ -752,6 +807,7 @@
       salvarOdometroManual(vtr, km);
       elOdometroValor.textContent = formatarOdometro(km);
       elKmIni.value = km;
+      elKmIniRetorno.value = "";
       msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
@@ -782,6 +838,15 @@
           elRetornoSelect.value = retorno;
           controlarCamposRetorno();
         }
+      }
+    }
+
+    function atualizarKmInicialRetorno() {
+      const kmIda = Number(elKmFim.value);
+      if (!Number.isNaN(kmIda) && kmIda >= 0) {
+        elKmIniRetorno.value = kmIda;
+      } else {
+        elKmIniRetorno.value = "";
       }
     }
 
@@ -820,7 +885,7 @@
       }
 
       if (elKmIni.value === "" || elKmFim.value === "") {
-        msgErro(elStatusSalvar, "❌ Informe KM inicial e final");
+        msgErro(elStatusSalvar, "❌ Informe KM inicial e chegada no destino");
         return;
       }
 
@@ -830,20 +895,47 @@
       }
 
       if (!elHoraChegada.value) {
-        msgErro(elStatusSalvar, "❌ Informe a hora da chegada");
+        msgErro(elStatusSalvar, "❌ Informe a hora da chegada no destino");
+        return;
+      }
+
+      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") {
+        msgErro(elStatusSalvar, "❌ Informe KM inicial e final do retorno");
+        return;
+      }
+
+      if (!elHoraSaidaRetorno.value) {
+        msgErro(elStatusSalvar, "❌ Informe a hora da saída do destino");
+        return;
+      }
+
+      if (!elHoraChegadaRetorno.value) {
+        msgErro(elStatusSalvar, "❌ Informe a hora final da chegada ao QTL");
         return;
       }
 
       const kmIniValor = Number(elKmIni.value);
       const kmFimValor = Number(elKmFim.value);
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
 
-      if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) {
-        msgErro(elStatusSalvar, "❌ KM inválido");
+      if ([kmIniValor, kmFimValor, kmIniRetornoValor, kmFimRetornoValor].some(v => Number.isNaN(v))) {
+        msgErro(elStatusSalvar, "❌ KM inválida");
         return;
       }
 
       if (kmFimValor < kmIniValor) {
-        msgErro(elStatusSalvar, "❌ KM final não pode ser menor que o inicial");
+        msgErro(elStatusSalvar, "❌ KM de chegada no destino não pode ser menor que a inicial");
+        return;
+      }
+
+      if (kmIniRetornoValor !== kmFimValor) {
+        msgErro(elStatusSalvar, "❌ KM inicial do retorno deve ser igual à KM de chegada no destino");
+        return;
+      }
+
+      if (kmFimRetornoValor < kmIniRetornoValor) {
+        msgErro(elStatusSalvar, "❌ KM final do retorno não pode ser menor que a inicial do retorno");
         return;
       }
 
@@ -871,6 +963,10 @@
             horapartida: elHoraPartida.value,
             kmfim: kmFimValor,
             horachegada: elHoraChegada.value,
+            kminiretorno: kmIniRetornoValor,
+            horasaidaretorno: elHoraSaidaRetorno.value,
+            kmfimretorno: kmFimRetornoValor,
+            horachegadaretorno: elHoraChegadaRetorno.value,
             condutor: elCondutor.value,
             usuario: elUsuario.value.trim(),
             assinaturacondutor: "",
@@ -882,21 +978,29 @@
           return;
         }
 
-        salvarOdometroManual(elVtr.value, kmFimValor);
+        salvarOdometroManual(elVtr.value, kmFimRetornoValor);
 
         msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
         elSaidaSelect.value = "";
         elSaidaOutro.value = "";
         elSaidaOutro.classList.add("hidden");
+
         elRetornoSelect.value = "";
         elRetornoOutro.value = "";
         elRetornoOutro.classList.add("hidden");
-        elKmIni.value = kmFimValor;
+
+        elKmIni.value = kmFimRetornoValor;
         elHoraPartida.value = "";
         elKmFim.value = "";
         elHoraChegada.value = "";
+
+        elKmIniRetorno.value = "";
+        elHoraSaidaRetorno.value = "";
+        elKmFimRetorno.value = "";
+        elHoraChegadaRetorno.value = "";
+
         elUsuario.value = "";
-        elOdometroValor.textContent = formatarOdometro(kmFimValor);
+        elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
       } catch (e) {
         console.error(e);
         msgErro(elStatusSalvar, "❌ Falha inesperada ao salvar");
@@ -953,10 +1057,8 @@
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
             Data: ${esc(formatarDataBR(r.data))}<br>
-            Saída: ${esc(r.localpartida)}<br>
-            Retorno: ${esc(r.localretorno || "")}<br>
-            KM: ${esc(r.kmini)} → ${esc(r.kmfim)}<br>
-            Hora: ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
+            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
+            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")}<br>
             Condutor: ${esc(r.condutor)}<br>
             Usuário: ${esc(r.usuario || "")}
           </div>
@@ -968,31 +1070,58 @@
       }
     }
 
-    function quebrarEmPaginas(registros, porPagina) {
+    function quebrarEmPaginas(linhas, porPagina) {
       const paginas = [];
-      for (let i = 0; i < registros.length; i += porPagina) {
-        paginas.push(registros.slice(i, i + porPagina));
+      for (let i = 0; i < linhas.length; i += porPagina) {
+        paginas.push(linhas.slice(i, i + porPagina));
       }
       return paginas.length ? paginas : [[]];
     }
 
-    function gerarLinhasTabelaPdf(registros, linhasPorPagina = 14) {
-      const linhas = registros.map(r => `
+    function gerarLinhasDoRegistro(r) {
+      const kmIniRet = r.kminiretorno != null && r.kminiretorno !== "" ? r.kminiretorno : r.kmfim;
+
+      return [
+        {
+          data: formatarDataBR(r.data),
+          local: r.localpartida,
+          kmIni: r.kmini,
+          horaPartida: r.horapartida,
+          kmFim: r.kmfim,
+          horaChegada: r.horachegada,
+          condutor: r.condutor,
+          usuario: r.usuario || ""
+        },
+        {
+          data: formatarDataBR(r.data),
+          local: r.localretorno || "",
+          kmIni: kmIniRet ?? "",
+          horaPartida: r.horasaidaretorno || "",
+          kmFim: r.kmfimretorno ?? "",
+          horaChegada: r.horachegadaretorno || "",
+          condutor: r.condutor,
+          usuario: r.usuario || ""
+        }
+      ];
+    }
+
+    function gerarLinhasTabelaPdf(linhas, linhasPorPagina = 14) {
+      const htmlLinhas = linhas.map(r => `
         <tr class="linha-dados">
-          <td>${esc(formatarDataBR(r.data))}</td>
-          <td>${esc(r.localpartida)}</td>
-          <td>${esc(r.kmini)}</td>
-          <td>${esc(r.horapartida)}</td>
-          <td>${esc(r.kmfim)}</td>
-          <td>${esc(r.horachegada)}</td>
+          <td>${esc(r.data)}</td>
+          <td>${esc(r.local)}</td>
+          <td>${esc(r.kmIni)}</td>
+          <td>${esc(r.horaPartida)}</td>
+          <td>${esc(r.kmFim)}</td>
+          <td>${esc(r.horaChegada)}</td>
           <td>${esc(r.condutor)}</td>
           <td></td>
-          <td>${esc(r.usuario || "")}</td>
+          <td>${esc(r.usuario)}</td>
           <td></td>
         </tr>
       `).join("");
 
-      const faltantes = Math.max(0, linhasPorPagina - registros.length);
+      const faltantes = Math.max(0, linhasPorPagina - linhas.length);
       const vazias = Array.from({ length: faltantes }, () => `
         <tr class="linha-dados">
           <td></td>
@@ -1008,11 +1137,11 @@
         </tr>
       `).join("");
 
-      return linhas + vazias;
+      return htmlLinhas + vazias;
     }
 
-    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, registrosPagina, numeroPagina, totalPaginas) {
-      const linhasTabela = gerarLinhasTabelaPdf(registrosPagina, 14);
+    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, linhasPagina, numeroPagina, totalPaginas) {
+      const linhasTabela = gerarLinhasTabelaPdf(linhasPagina, 14);
 
       return `
         <div class="folha ${numeroPagina < totalPaginas ? 'quebra-pagina' : ''}">
@@ -1074,7 +1203,9 @@
       const ano = Number(elFiltroAno.value);
       const referencia = `${nomeMesNumero(mes)} ${ano}`;
       const dadosVtr = VTRS[vtr] || {};
-      const paginas = quebrarEmPaginas(registrosFiltrados, 14);
+
+      const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
+      const paginas = quebrarEmPaginas(linhasExpandias, 14);
 
       const htmlPaginas = paginas.map((pagina, index) =>
         gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, pagina, index + 1, paginas.length)
@@ -1199,7 +1330,7 @@
       if (edit) edit.classList.remove("hidden");
     }
 
-    function cancelarEdicaoVtr(chave) {
+    function cancelarEdicaoVtr() {
       renderCadastroVtrs();
     }
 
@@ -1265,12 +1396,14 @@
     elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
     elSaidaSelect.addEventListener("change", controlarCamposSaida);
     elRetornoSelect.addEventListener("change", controlarCamposRetorno);
+    elKmFim.addEventListener("input", atualizarKmInicialRetorno);
+    elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
 
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
     });
 
-    elHoraChegada.addEventListener("keydown", function(e) {
+    elHoraChegadaRetorno.addEventListener("keydown", function(e) {
       if (e.key === "Enter") salvar();
     });
 
