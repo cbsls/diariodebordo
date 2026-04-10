@@ -488,6 +488,14 @@
         .replaceAll("'", "&#039;");
     }
 
+    function formatarDataBR(dataISO) {
+      if (!dataISO) return "";
+      const partes = String(dataISO).split("-");
+      if (partes.length !== 3) return dataISO;
+      const [ano, mes, dia] = partes;
+      return `${dia}/${mes}/${ano.slice(2)}`;
+    }
+
     function msgOk(el, texto) {
       el.innerHTML = `<div class="ok">${texto}</div>`;
     }
@@ -944,7 +952,7 @@
         elListaVtr.innerHTML = registrosFiltrados.map(r => `
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
-            Data: ${esc(r.data)}<br>
+            Data: ${esc(formatarDataBR(r.data))}<br>
             Saída: ${esc(r.localpartida)}<br>
             Retorno: ${esc(r.localretorno || "")}<br>
             KM: ${esc(r.kmini)} → ${esc(r.kmfim)}<br>
@@ -971,7 +979,7 @@
     function gerarLinhasTabelaPdf(registros, linhasPorPagina = 14) {
       const linhas = registros.map(r => `
         <tr class="linha-dados">
-          <td>${esc(r.data)}</td>
+          <td>${esc(formatarDataBR(r.data))}</td>
           <td>${esc(r.localpartida)}</td>
           <td>${esc(r.kmini)}</td>
           <td>${esc(r.horapartida)}</td>
