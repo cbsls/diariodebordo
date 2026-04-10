@@ -4,10 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🚒 Diário de Bordo</title>
+
+  <meta name="theme-color" content="#b71c1c" />
+  <link rel="manifest" href="manifest.json" />
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-    body { background: #e9edf3; margin: 0; padding: 18px; }
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #e9edf3;
+      margin: 0;
+      padding: 18px;
+    }
+
     h1 {
       background: #c81919;
       color: #fff;
@@ -17,20 +31,24 @@
       margin: 0 0 18px 0;
       font-size: 28px;
     }
+
     .card {
       background: #fff;
       border-radius: 18px;
       padding: 20px;
       margin-bottom: 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
     }
+
     label {
       display: block;
       font-size: 18px;
       margin: 8px 0 6px;
       font-weight: bold;
     }
-    input, select {
+
+    input,
+    select {
       width: 100%;
       padding: 16px;
       border-radius: 14px;
@@ -39,6 +57,7 @@
       margin-bottom: 10px;
       background: #fff;
     }
+
     button {
       width: 100%;
       padding: 16px;
@@ -51,19 +70,35 @@
       cursor: pointer;
       margin-top: 8px;
     }
-    .hidden { display: none; }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .hidden {
+      display: none;
+    }
+
     .ok {
       margin-top: 10px;
       font-weight: bold;
       color: #0a7a28;
       font-size: 18px;
     }
+
     .erro {
       margin-top: 10px;
       font-weight: bold;
       color: #b00020;
       font-size: 16px;
     }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
     .registro {
       border: 1px solid #ddd;
       border-radius: 14px;
@@ -71,12 +106,46 @@
       margin-bottom: 10px;
       background: #fafafa;
     }
+
     .registro b {
       font-size: 18px;
     }
-    .muted {
-      color: #666;
-      font-size: 14px;
+
+    .topo-registro {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      background: #b71c1c;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .acoes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-secundario {
+      background: #555;
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    .btn-pdf {
+      background: #0f4c81;
+      font-size: 16px;
+      padding: 12px;
     }
   </style>
 </head>
@@ -86,7 +155,12 @@
 
   <div class="card">
     <label for="idFunc">ID Func</label>
-    <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
+    <input
+      id="idFunc"
+      type="text"
+      inputmode="numeric"
+      placeholder="Digite sua ID funcional"
+    />
     <button type="button" id="btnEntrar">Entrar</button>
     <div id="userOk"></div>
   </div>
@@ -106,10 +180,10 @@
     <input id="data" type="date" />
 
     <label for="kmIni">KM Inicial</label>
-    <input id="kmIni" type="number" inputmode="numeric" />
+    <input id="kmIni" type="number" inputmode="numeric" placeholder="Ex: 12500" />
 
     <label for="kmFim">KM Final</label>
-    <input id="kmFim" type="number" inputmode="numeric" />
+    <input id="kmFim" type="number" inputmode="numeric" placeholder="Ex: 12540" />
 
     <label for="condutor">Condutor</label>
     <input id="condutor" type="text" readonly />
@@ -126,7 +200,12 @@
   <script>
     const supabaseUrl = "https://nypebmbqcbrvbutamzrh.supabase.co";
     const supabaseKey = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let supabase = null;
+
+    if (window.supabase && typeof window.supabase.createClient === "function") {
+      supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    }
 
     const USUARIOS = [
       { guerra: "1º SGT VICENTE", id: "2614960" },
@@ -172,29 +251,65 @@
       return `${ano}-${mes}-${dia}`;
     }
 
-    async function login() {
+    function escapeHtml(valor) {
+      return String(valor ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function mostrarErroLogin(msg) {
+      elUserOk.innerHTML = `<div class="erro">${msg}</div>`;
+    }
+
+    function mostrarOkLogin(msg) {
+      elUserOk.innerHTML = `<div class="ok">${msg}</div>`;
+    }
+
+    function mostrarErroSalvar(msg) {
+      elStatusSalvar.innerHTML = `<div class="erro">${msg}</div>`;
+    }
+
+    function mostrarOkSalvar(msg) {
+      elStatusSalvar.innerHTML = `<div class="ok">${msg}</div>`;
+    }
+
+    function mostrarMutedSalvar(msg) {
+      elStatusSalvar.innerHTML = `<div class="muted">${msg}</div>`;
+    }
+
+    function login() {
       const id = elIdFunc.value.trim();
-      const user = USUARIOS.find(u => u.id === id);
+      const user = USUARIOS.find((u) => u.id === id);
 
       if (!user) {
-        elUserOk.innerHTML = `<div class="erro">❌ ID não cadastrada</div>`;
+        mostrarErroLogin("❌ ID não cadastrada");
         elFormBox.classList.add("hidden");
         return;
       }
 
       logado = user;
       elCondutor.value = user.guerra;
-      elUserOk.innerHTML = `<div class="ok">✅ ${user.guerra}</div>`;
+      mostrarOkLogin(`✅ ${user.guerra}`);
       elFormBox.classList.remove("hidden");
 
       if (!elData.value) {
         elData.value = hojeISO();
       }
+
+      elKmIni.focus();
     }
 
     async function salvar() {
       if (!logado) {
-        elStatusSalvar.innerHTML = `<div class="erro">❌ Faça o login primeiro</div>`;
+        mostrarErroSalvar("❌ Faça o login primeiro");
+        return;
+      }
+
+      if (!supabase) {
+        mostrarErroSalvar("❌ Supabase não carregou");
         return;
       }
 
@@ -202,75 +317,198 @@
       const kmFim = Number(elKmFim.value);
 
       if (!elData.value || !elVtr.value || !elCondutor.value) {
-        elStatusSalvar.innerHTML = `<div class="erro">❌ Preencha os campos obrigatórios</div>`;
+        mostrarErroSalvar("❌ Preencha os campos obrigatórios");
+        return;
+      }
+
+      if (elKmIni.value === "" || elKmFim.value === "") {
+        mostrarErroSalvar("❌ Informe KM inicial e final");
         return;
       }
 
       if (Number.isNaN(kmIni) || Number.isNaN(kmFim)) {
-        elStatusSalvar.innerHTML = `<div class="erro">❌ Informe KM inicial e final</div>`;
+        mostrarErroSalvar("❌ KM inválido");
         return;
       }
 
       if (kmFim < kmIni) {
-        elStatusSalvar.innerHTML = `<div class="erro">❌ KM final não pode ser menor que o inicial</div>`;
+        mostrarErroSalvar("❌ KM final não pode ser menor que o inicial");
         return;
       }
 
-      elStatusSalvar.innerHTML = `<div class="muted">Salvando...</div>`;
+      elBtnSalvar.disabled = true;
+      mostrarMutedSalvar("Salvando...");
 
-      const { error } = await supabase.from("diario").insert([{
-        vtr: elVtr.value,
-        data: elData.value,
-        kmIni: kmIni,
-        kmFim: kmFim,
-        condutor: elCondutor.value
-      }]);
+      try {
+        const { error } = await supabase
+          .from("diario")
+          .insert([
+            {
+              vtr: elVtr.value,
+              data: elData.value,
+              kmIni: kmIni,
+              kmFim: kmFim,
+              condutor: elCondutor.value
+            }
+          ]);
 
-      if (error) {
-        console.error("Erro ao salvar:", error);
-        elStatusSalvar.innerHTML = `<div class="erro">❌ Erro ao salvar: ${error.message}</div>`;
-        return;
+        if (error) {
+          console.error("Erro ao salvar:", error);
+          mostrarErroSalvar(`❌ Erro ao salvar: ${error.message}`);
+          return;
+        }
+
+        mostrarOkSalvar("☁️ Salvo com sucesso");
+        elKmIni.value = "";
+        elKmFim.value = "";
+        await carregar();
+      } catch (err) {
+        console.error(err);
+        mostrarErroSalvar("❌ Falha inesperada ao salvar");
+      } finally {
+        elBtnSalvar.disabled = false;
       }
-
-      elStatusSalvar.innerHTML = `<div class="ok">☁️ Salvo com sucesso</div>`;
-      elKmIni.value = "";
-      elKmFim.value = "";
-      await carregar();
     }
 
     async function carregar() {
-      const { data, error } = await supabase
-        .from("diario")
-        .select("*")
-        .order("id", { ascending: false });
-
-      if (error) {
-        console.error("Erro ao carregar:", error);
-        elLista.innerHTML = `<div class="erro">❌ Erro ao listar: ${error.message}</div>`;
+      if (!supabase) {
+        elLista.innerHTML = `<div class="erro">❌ Supabase não carregou</div>`;
         return;
       }
 
-      if (!data || data.length === 0) {
-        elLista.innerHTML = `<div class="muted">Nenhum registro ainda.</div>`;
-        return;
-      }
+      try {
+        const { data, error } = await supabase
+          .from("diario")
+          .select("*")
+          .order("id", { ascending: false });
 
-      elLista.innerHTML = data.map(r => `
-        <div class="registro">
-          <b>${r.vtr}</b><br>
-          Data: ${r.data}<br>
-          KM: ${r.kmIni} → ${r.kmFim}<br>
-          Condutor: ${r.condutor}
-        </div>
-      `).join("");
+        if (error) {
+          console.error("Erro ao carregar:", error);
+          elLista.innerHTML = `<div class="erro">❌ Erro ao listar: ${escapeHtml(error.message)}</div>`;
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          elLista.innerHTML = `<div class="muted">Nenhum registro ainda.</div>`;
+          return;
+        }
+
+        elLista.innerHTML = data.map((r) => `
+          <div class="registro">
+            <div class="topo-registro">
+              <b>${escapeHtml(r.vtr)}</b>
+              <span class="badge">${escapeHtml(r.data)}</span>
+            </div>
+            <div>KM: ${escapeHtml(r.kmIni)} → ${escapeHtml(r.kmFim)}</div>
+            <div>Condutor: ${escapeHtml(r.condutor)}</div>
+            <div class="acoes">
+              <button class="btn-pdf" type="button" onclick="gerarPDFPorId(${Number(r.id)})">📄 PDF</button>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error(err);
+        elLista.innerHTML = `<div class="erro">❌ Falha inesperada ao listar</div>`;
+      }
     }
+
+    async function gerarPDFPorId(id) {
+      if (!supabase) {
+        alert("Supabase não carregou.");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("diario")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error || !data) {
+          console.error(error);
+          alert("Erro ao buscar registro para PDF.");
+          return;
+        }
+
+        gerarPDF(data);
+      } catch (err) {
+        console.error(err);
+        alert("Falha ao gerar PDF.");
+      }
+    }
+
+    function gerarPDF(r) {
+      const w = window.open("", "_blank");
+
+      if (!w) {
+        alert("Não foi possível abrir a janela do PDF.");
+        return;
+      }
+
+      w.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>PDF Diário de Bordo</title>
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; padding: 40px; color: #000; }
+            h2 { text-align: center; margin-bottom: 25px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <h2>DIÁRIO DE BORDO</h2>
+          <table>
+            <tr>
+              <th>VTR</th>
+              <th>DATA</th>
+              <th>KM INICIAL</th>
+              <th>KM FINAL</th>
+              <th>CONDUTOR</th>
+            </tr>
+            <tr>
+              <td>${escapeHtml(r.vtr)}</td>
+              <td>${escapeHtml(r.data)}</td>
+              <td>${escapeHtml(r.kmIni)}</td>
+              <td>${escapeHtml(r.kmFim)}</td>
+              <td>${escapeHtml(r.condutor)}</td>
+            </tr>
+          </table>
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+
+      w.document.close();
+    }
+
+    window.gerarPDFPorId = gerarPDFPorId;
 
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvar.addEventListener("click", salvar);
 
-    elIdFunc.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
+    elIdFunc.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        login();
+      }
     });
+
+    elKmFim.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        salvar();
+      }
+    });
+
+    if (!elData.value) {
+      elData.value = hojeISO();
+    }
 
     carregar();
   </script>
