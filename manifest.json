@@ -1,0 +1,8 @@
+{
+  "name": "Diário de Bordo",
+  "short_name": "Bordo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#b71c1c",
+  "theme_color": "#b71c1c"
+}
