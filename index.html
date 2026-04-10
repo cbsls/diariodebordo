@@ -10,7 +10,7 @@
 
   <style>
     * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-    body { background:#e9edf3; margin:0; padding:18px; }
+    body { background:#e9edf3; margin:0; padding:18px 18px 90px 18px; }
     h1 {
       background:#d51313;
       color:#fff;
@@ -57,7 +57,7 @@
       opacity:.7;
       cursor:wait;
     }
-    .hidden { display:none; }
+    .hidden { display:none !important; }
     .ok {
       color:#0a7a28;
       font-weight:bold;
@@ -80,28 +80,6 @@
       margin-bottom:12px;
       line-height:1.5;
       font-size:16px;
-    }
-    .tabs {
-      display:flex;
-      gap:10px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-    .tab-btn {
-      flex:1;
-      min-width:120px;
-      font-size:18px;
-      padding:14px;
-      border-radius:14px;
-      border:none;
-      cursor:pointer;
-      background:#bfc7d1;
-      color:#24303f;
-      font-weight:bold;
-    }
-    .tab-btn.active {
-      background:#d51313;
-      color:#fff;
     }
     .subtitulo-box {
       margin-top:0;
@@ -130,12 +108,6 @@
       font-size:16px;
       padding:12px;
     }
-    .btn-admin {
-      background:#455a64;
-      font-size:16px;
-      padding:12px;
-      margin-top:6px;
-    }
     .btn-edit {
       background:#6d4c41;
       font-size:16px;
@@ -156,7 +128,7 @@
       color:#19ff63;
       border-radius:14px;
       padding:14px;
-      margin-bottom:12px;
+      margin-bottom:10px;
       border:2px solid #333;
     }
     .odometro-titulo {
@@ -175,13 +147,46 @@
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
-    .grid-3 {
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
+    .rodape-tabs {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background:#ffffffee;
+      backdrop-filter: blur(6px);
+      border-top:1px solid #d8dde4;
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      display:flex;
+      gap:10px;
+      z-index:999;
+      box-shadow:0 -2px 12px rgba(0,0,0,.08);
+    }
+    .rodape-btn {
+      flex:1;
+      border:none;
+      border-radius:12px;
+      padding:12px 10px;
+      font-size:14px;
+      font-weight:bold;
+      background:#c7d0da;
+      color:#24303f;
+      cursor:pointer;
+    }
+    .rodape-btn.active {
+      background:#d51313;
+      color:#fff;
+    }
+    .btn-odometro-discreto {
+      width:auto;
+      display:inline-block;
+      padding:8px 12px;
+      font-size:13px;
+      border-radius:10px;
+      background:#4b5563;
+      margin-bottom:10px;
     }
     @media (max-width: 700px) {
-      .grid-2, .grid-3 {
+      .grid-2 {
         grid-template-columns:1fr;
       }
     }
@@ -190,12 +195,6 @@
 <body>
 
   <h1>🚒 Diário de Bordo</h1>
-
-  <div class="tabs">
-    <button type="button" class="tab-btn active" id="tabLancamentoBtn">Lançamento</button>
-    <button type="button" class="tab-btn" id="tabExportarBtn">Exportar por VTR</button>
-    <button type="button" class="tab-btn" id="tabCadastroBtn">Cadastro de VTR</button>
-  </div>
 
   <div id="abaLancamento">
     <div class="card">
@@ -216,33 +215,37 @@
         <div class="odometro-valor" id="odometroValor">000000</div>
       </div>
 
-      <button type="button" class="btn-admin" id="btnEditarOdometro">🔐 Atualizar KM atual da VTR (Admin)</button>
+      <button type="button" class="btn-odometro-discreto" id="btnEditarOdometro">🔐 Atualizar KM</button>
       <div id="statusOdometro" class="muted"></div>
 
       <label for="data">Data</label>
       <input id="data" type="date" />
 
-      <label for="saida">Saída</label>
-      <input id="saida" list="listaSaida" placeholder="Selecione ou digite a saída" />
-      <datalist id="listaSaida">
-        <option value="QTL / J4"></option>
-        <option value="QTL / 44"></option>
-        <option value="QTL / CENTRO"></option>
-        <option value="QTL / VISTORIA"></option>
-        <option value="QTL / TRANSPORTE"></option>
-        <option value="QTL / PREFEITURA"></option>
-      </datalist>
+      <label for="saidaSelect">Saída</label>
+      <select id="saidaSelect">
+        <option value="">Selecione a saída</option>
+        <option value="QTL / J4">QTL / J4</option>
+        <option value="QTL / 44">QTL / 44</option>
+        <option value="QTL / CENTRO">QTL / CENTRO</option>
+        <option value="QTL / VISTORIA">QTL / VISTORIA</option>
+        <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
+        <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
+        <option value="OUTRO">Outro</option>
+      </select>
+      <input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
 
-      <label for="retorno">Retorno</label>
-      <input id="retorno" list="listaRetorno" placeholder="Selecione ou digite o retorno" />
-      <datalist id="listaRetorno">
-        <option value="J4 / QTL"></option>
-        <option value="44 / QTL"></option>
-        <option value="CENTRO / QTL"></option>
-        <option value="VISTORIA / QTL"></option>
-        <option value="TRANSPORTE / QTL"></option>
-        <option value="PREFEITURA / QTL"></option>
-      </datalist>
+      <label for="retornoSelect">Retorno</label>
+      <select id="retornoSelect">
+        <option value="">Selecione o retorno</option>
+        <option value="J4 / QTL">J4 / QTL</option>
+        <option value="44 / QTL">44 / QTL</option>
+        <option value="CENTRO / QTL">CENTRO / QTL</option>
+        <option value="VISTORIA / QTL">VISTORIA / QTL</option>
+        <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
+        <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
+        <option value="OUTRO">Outro</option>
+      </select>
+      <input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
 
       <div class="grid-2">
         <div>
@@ -325,6 +328,12 @@
       <h2 class="subtitulo-box">🚒 Cadastro de VTR</h2>
       <div id="listaCadastroVtr" class="muted">Carregando cadastro...</div>
     </div>
+  </div>
+
+  <div class="rodape-tabs">
+    <button type="button" class="rodape-btn active" id="tabLancamentoBtn">Lançamento</button>
+    <button type="button" class="rodape-btn" id="tabExportarBtn">Exportar PDF</button>
+    <button type="button" class="rodape-btn" id="tabCadastroBtn">Cadastro VTR</button>
   </div>
 
   <script>
@@ -431,8 +440,12 @@
     const elBtnEditarOdometro = document.getElementById("btnEditarOdometro");
     const elStatusOdometro = document.getElementById("statusOdometro");
     const elData = document.getElementById("data");
-    const elSaida = document.getElementById("saida");
-    const elRetorno = document.getElementById("retorno");
+
+    const elSaidaSelect = document.getElementById("saidaSelect");
+    const elSaidaOutro = document.getElementById("saidaOutro");
+    const elRetornoSelect = document.getElementById("retornoSelect");
+    const elRetornoOutro = document.getElementById("retornoOutro");
+
     const elKmIni = document.getElementById("kmIni");
     const elHoraPartida = document.getElementById("horaPartida");
     const elKmFim = document.getElementById("kmFim");
@@ -690,15 +703,18 @@
         const ultimo = await obterUltimoRegistroDaVtr(vtr);
         const kmManual = obterOdometroManual(vtr);
         const kmFinalBanco = ultimo && ultimo.kmfim != null ? Number(ultimo.kmfim) : null;
-        const kmBase = kmManual != null ? kmManual : (kmFinalBanco != null ? kmFinalBanco : 0);
+        const kmBase = kmFinalBanco != null ? kmFinalBanco : (kmManual != null ? kmManual : 0);
 
         elOdometroValor.textContent = formatarOdometro(kmBase);
         elKmIni.value = kmBase || "";
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
         console.error(e);
-        elOdometroValor.textContent = "000000";
-        msgErro(elStatusOdometro, "❌ Não foi possível consultar a KM atual.");
+        const kmManual = obterOdometroManual(vtr);
+        const kmBase = kmManual != null ? kmManual : 0;
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        elKmIni.value = kmBase || "";
+        msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
     }
 
@@ -728,15 +744,47 @@
       salvarOdometroManual(vtr, km);
       elOdometroValor.textContent = formatarOdometro(km);
       elKmIni.value = km;
-      msgOk(elStatusOdometro, "✅ KM atualizada pelo admin.");
+      msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
-    function atualizarRetornoAutomatico() {
-      const saida = elSaida.value.trim().toUpperCase();
-      const retorno = MAPA_RETORNO[saida];
-      if (retorno) {
-        elRetorno.value = retorno;
+    function controlarCamposSaida() {
+      if (elSaidaSelect.value === "OUTRO") {
+        elSaidaOutro.classList.remove("hidden");
+      } else {
+        elSaidaOutro.classList.add("hidden");
+        elSaidaOutro.value = "";
       }
+    }
+
+    function controlarCamposRetorno() {
+      if (elRetornoSelect.value === "OUTRO") {
+        elRetornoOutro.classList.remove("hidden");
+      } else {
+        elRetornoOutro.classList.add("hidden");
+        elRetornoOutro.value = "";
+      }
+    }
+
+    function aplicarRetornoAutomatico() {
+      controlarCamposSaida();
+
+      if (elSaidaSelect.value && elSaidaSelect.value !== "OUTRO") {
+        const retorno = MAPA_RETORNO[elSaidaSelect.value];
+        if (retorno) {
+          elRetornoSelect.value = retorno;
+          controlarCamposRetorno();
+        }
+      }
+    }
+
+    function obterSaidaFinal() {
+      if (elSaidaSelect.value === "OUTRO") return elSaidaOutro.value.trim();
+      return elSaidaSelect.value.trim();
+    }
+
+    function obterRetornoFinal() {
+      if (elRetornoSelect.value === "OUTRO") return elRetornoOutro.value.trim();
+      return elRetornoSelect.value.trim();
     }
 
     async function salvar() {
@@ -745,17 +793,20 @@
         return;
       }
 
+      const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
+
       if (!elData.value) {
         msgErro(elStatusSalvar, "❌ Informe a data");
         return;
       }
 
-      if (!elSaida.value.trim()) {
+      if (!saidaFinal) {
         msgErro(elStatusSalvar, "❌ Informe a saída");
         return;
       }
 
-      if (!elRetorno.value.trim()) {
+      if (!retornoFinal) {
         msgErro(elStatusSalvar, "❌ Informe o retorno");
         return;
       }
@@ -806,8 +857,8 @@
             marcamodelo: dadosVtr.marcamodelo,
             orgao: dadosVtr.orgao,
             data: elData.value,
-            localpartida: elSaida.value.trim(),
-            localretorno: elRetorno.value.trim(),
+            localpartida: saidaFinal,
+            localretorno: retornoFinal,
             kmini: kmIniValor,
             horapartida: elHoraPartida.value,
             kmfim: kmFimValor,
@@ -826,8 +877,12 @@
         salvarOdometroManual(elVtr.value, kmFimValor);
 
         msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
-        elSaida.value = "";
-        elRetorno.value = "";
+        elSaidaSelect.value = "";
+        elSaidaOutro.value = "";
+        elSaidaOutro.classList.add("hidden");
+        elRetornoSelect.value = "";
+        elRetornoOutro.value = "";
+        elRetornoOutro.classList.add("hidden");
         elKmIni.value = kmFimValor;
         elHoraPartida.value = "";
         elKmFim.value = "";
@@ -1199,8 +1254,9 @@
       await atualizarKmBaseDaVtr();
     });
 
-    elSaida.addEventListener("change", atualizarRetornoAutomatico);
-    elSaida.addEventListener("blur", atualizarRetornoAutomatico);
+    elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
+    elSaidaSelect.addEventListener("change", controlarCamposSaida);
+    elRetornoSelect.addEventListener("change", controlarCamposRetorno);
 
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
