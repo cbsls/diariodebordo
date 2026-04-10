@@ -42,6 +42,15 @@
       margin-bottom:12px;
       background:#fff;
     }
+    input[readonly], textarea[readonly] {
+      background:#f3f4f6;
+      color:#555;
+    }
+    select:disabled, input:disabled, textarea:disabled {
+      background:#f3f4f6;
+      color:#555;
+      opacity:1;
+    }
     button {
       width:100%;
       padding:16px;
@@ -103,6 +112,10 @@
       gap:8px;
       flex-wrap:wrap;
     }
+    .linha-acoes > button {
+      flex:1;
+      min-width:140px;
+    }
     .btn-pdf {
       background:#0f4c81;
       font-size:16px;
@@ -137,8 +150,17 @@
     .btn-linha-ok {
       background:#2e7d32 !important;
     }
+    .btn-editar-linha {
+      background:#4b5563 !important;
+      font-size:15px;
+      padding:12px;
+      margin-top:4px;
+    }
     .btn-finalizar {
       background:#2e7d32 !important;
+    }
+    .btn-salvar-parcial {
+      background:#b45309 !important;
     }
     .odometro-box {
       background:#111;
@@ -230,8 +252,56 @@
     .badge-pendente {
       background:#8e0000;
     }
+    .clock-box {
+      background:#f8fafc;
+      border:1px solid #d9e1ea;
+      border-radius:14px;
+      padding:12px 14px;
+      margin:4px 0 12px 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .clock-label {
+      font-size:13px;
+      color:#475569;
+      font-weight:bold;
+    }
+    .clock-time {
+      font-size:18px;
+      font-weight:bold;
+      color:#0f172a;
+    }
+    .linha-acoes-local {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:6px;
+    }
+    .info-extra {
+      background:#f8fafc;
+      border:1px solid #d9e1ea;
+      border-radius:14px;
+      padding:12px;
+      margin:10px 0 12px 0;
+      font-size:15px;
+      line-height:1.5;
+    }
+    .alerta-operacional {
+      background:#fff7ed;
+      border:1px solid #fdba74;
+      color:#9a3412;
+      border-radius:14px;
+      padding:12px;
+      margin-top:10px;
+      font-size:14px;
+      font-weight:bold;
+    }
     @media (max-width: 700px) {
-      .grid-2 {
+      .grid-2,
+      .linha-acoes-local {
         grid-template-columns:1fr;
       }
     }
@@ -265,6 +335,14 @@
 
       <label for="data">Data</label>
       <input id="data" type="date" />
+
+      <div class="clock-box">
+        <div>
+          <div class="clock-label">HORÁRIO ATUAL</div>
+          <div class="clock-time" id="relogioAtual">--:--:--</div>
+        </div>
+        <div class="muted">Os campos de hora podem ser preenchidos automaticamente.</div>
+      </div>
 
       <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
 
@@ -316,7 +394,10 @@
         </div>
       </div>
 
-      <button type="button" class="btn-linha" id="btnSalvarLinha1">Salvar 1ª Linha</button>
+      <div class="linha-acoes-local">
+        <button type="button" class="btn-linha" id="btnSalvarLinha1">Salvar 1ª Linha</button>
+        <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha1">✏️ Editar 1ª Linha</button>
+      </div>
 
       <div class="bloco-retorno">
         <h3>↩️ Retorno</h3>
@@ -344,7 +425,16 @@
           </div>
         </div>
 
-        <button type="button" class="btn-linha" id="btnSalvarLinha2">Salvar 2ª Linha</button>
+        <div class="linha-acoes-local">
+          <button type="button" class="btn-linha" id="btnSalvarLinha2">Salvar 2ª Linha</button>
+          <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha2">✏️ Editar 2ª Linha</button>
+        </div>
+      </div>
+
+      <div class="info-extra" id="infoResumo">
+        <b>Resumo automático</b><br>
+        KM rodado total: <span id="kmRodadoTotal">0</span><br>
+        Situação: <span id="situacaoResumo">Aguardando preenchimento</span>
       </div>
 
       <label for="condutor">Nome Condutor</label>
@@ -355,8 +445,9 @@
         <option value="">Selecione o usuário (opcional)</option>
       </select>
 
-      <button type="button" id="btnFinal">Salvar</button>
+      <button type="button" id="btnFinal">Salvar parcial</button>
       <div id="statusSalvar"></div>
+      <div id="alertaOperacional" class="alerta-operacional hidden">⚠️ ATENÇÃO OPERACIONAL: complete e salve as duas linhas para finalizar o registro.</div>
     </div>
   </div>
 
@@ -521,6 +612,7 @@
     const elBtnEditarOdometro = document.getElementById("btnEditarOdometro");
     const elStatusOdometro = document.getElementById("statusOdometro");
     const elData = document.getElementById("data");
+    const elRelogioAtual = document.getElementById("relogioAtual");
 
     const elSaidaSelect = document.getElementById("saidaSelect");
     const elSaidaOutro = document.getElementById("saidaOutro");
@@ -541,10 +633,15 @@
     const elUsuario = document.getElementById("usuario");
     const elBtnSalvarLinha1 = document.getElementById("btnSalvarLinha1");
     const elBtnSalvarLinha2 = document.getElementById("btnSalvarLinha2");
+    const elBtnEditarLinha1 = document.getElementById("btnEditarLinha1");
+    const elBtnEditarLinha2 = document.getElementById("btnEditarLinha2");
     const elBtnFinal = document.getElementById("btnFinal");
     const elBadgeLinha1 = document.getElementById("badgeLinha1");
     const elBadgeLinha2 = document.getElementById("badgeLinha2");
     const elStatusSalvar = document.getElementById("statusSalvar");
+    const elKmRodadoTotal = document.getElementById("kmRodadoTotal");
+    const elSituacaoResumo = document.getElementById("situacaoResumo");
+    const elAlertaOperacional = document.getElementById("alertaOperacional");
 
     const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
     const tabExportarBtn = document.getElementById("tabExportarBtn");
@@ -573,6 +670,15 @@
     function horaAtual() {
       const d = new Date();
       return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+
+    function horaAtualCompleta() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+    }
+
+    function atualizarRelogio() {
+      elRelogioAtual.textContent = horaAtualCompleta();
     }
 
     function esc(texto) {
@@ -832,6 +938,7 @@
         if (!elKmIni.value) {
           elKmIni.value = kmBase || "";
         }
+        atualizarResumoAutomatico();
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
         console.error(e);
@@ -841,6 +948,7 @@
         if (!elKmIni.value) {
           elKmIni.value = kmBase || "";
         }
+        atualizarResumoAutomatico();
         msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
     }
@@ -870,9 +978,12 @@
 
       salvarOdometroManual(vtr, km);
       elOdometroValor.textContent = formatarOdometro(km);
-      elKmIni.value = km;
+      if (!linha1Salva) {
+        elKmIni.value = km;
+      }
       elKmIniRetorno.value = "";
       salvarRascunho();
+      atualizarResumoAutomatico();
       msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
@@ -905,6 +1016,7 @@
         }
       }
       salvarRascunho();
+      atualizarResumoAutomatico();
     }
 
     function atualizarKmInicialRetorno() {
@@ -915,6 +1027,7 @@
         elKmIniRetorno.value = "";
       }
       salvarRascunho();
+      atualizarResumoAutomatico();
       atualizarEstadoFinal();
     }
 
@@ -930,12 +1043,13 @@
 
     function validarLinha1() {
       const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
       const kmIniValor = Number(elKmIni.value);
       const kmFimValor = Number(elKmFim.value);
 
       if (!elData.value) return false;
       if (!saidaFinal) return false;
-      if (!obterRetornoFinal()) return false;
+      if (!retornoFinal) return false;
       if (elKmIni.value === "" || elKmFim.value === "") return false;
       if (!elHoraPartida.value || !elHoraChegada.value) return false;
       if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
@@ -962,42 +1076,92 @@
       return true;
     }
 
+    function travarCamposLinha1(travar) {
+      elSaidaSelect.disabled = travar;
+      elSaidaOutro.readOnly = travar;
+      elRetornoSelect.disabled = travar;
+      elRetornoOutro.readOnly = travar;
+      elKmIni.readOnly = travar;
+      elHoraPartida.readOnly = travar;
+      elKmFim.readOnly = travar;
+      elHoraChegada.readOnly = travar;
+    }
+
+    function travarCamposLinha2(travar) {
+      elHoraSaidaRetorno.readOnly = travar;
+      elKmFimRetorno.readOnly = travar;
+      elHoraChegadaRetorno.readOnly = travar;
+    }
+
     function atualizarBadges() {
       if (linha1Salva) {
         elBadgeLinha1.textContent = "1ª LINHA SALVA";
         elBadgeLinha1.className = "badge-linha badge-ok";
-        elBtnSalvarLinha1.textContent = "1ª Linha Salva";
+        elBtnSalvarLinha1.textContent = "✅ Salvo 1ª Linha";
         elBtnSalvarLinha1.classList.add("btn-linha-ok");
+        elBtnEditarLinha1.classList.remove("hidden");
       } else {
         elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
         elBadgeLinha1.className = "badge-linha badge-pendente";
         elBtnSalvarLinha1.textContent = "Salvar 1ª Linha";
         elBtnSalvarLinha1.classList.remove("btn-linha-ok");
+        elBtnEditarLinha1.classList.add("hidden");
       }
 
       if (linha2Salva) {
         elBadgeLinha2.textContent = "2ª LINHA SALVA";
         elBadgeLinha2.className = "badge-linha badge-ok";
-        elBtnSalvarLinha2.textContent = "2ª Linha Salva";
+        elBtnSalvarLinha2.textContent = "✅ Salvo 2ª Linha";
         elBtnSalvarLinha2.classList.add("btn-linha-ok");
+        elBtnEditarLinha2.classList.remove("hidden");
       } else {
         elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
         elBadgeLinha2.className = "badge-linha badge-pendente";
         elBtnSalvarLinha2.textContent = "Salvar 2ª Linha";
         elBtnSalvarLinha2.classList.remove("btn-linha-ok");
+        elBtnEditarLinha2.classList.add("hidden");
+      }
+    }
+
+    function atualizarResumoAutomatico() {
+      const kmIni = Number(elKmIni.value || 0);
+      const kmFinal = Number(elKmFimRetorno.value || elKmFim.value || 0);
+      let rodado = 0;
+
+      if (!Number.isNaN(kmIni) && !Number.isNaN(kmFinal) && kmFinal >= kmIni) {
+        rodado = kmFinal - kmIni;
+      }
+
+      elKmRodadoTotal.textContent = rodado;
+
+      if (linha1Salva && linha2Salva && validarLinha1() && validarLinha2()) {
+        elSituacaoResumo.textContent = "Pronto para finalizar";
+      } else if (linha1Salva || linha2Salva) {
+        elSituacaoResumo.textContent = "Salvo parcialmente";
+      } else {
+        elSituacaoResumo.textContent = "Aguardando preenchimento";
       }
     }
 
     function atualizarEstadoFinal() {
       atualizarBadges();
+      atualizarResumoAutomatico();
+
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      travarCamposLinha1(linha1Salva);
+      travarCamposLinha2(linha2Salva);
 
       if (pronto) {
         elBtnFinal.textContent = "Finalizar";
         elBtnFinal.classList.add("btn-finalizar");
+        elBtnFinal.classList.remove("btn-salvar-parcial");
+        elAlertaOperacional.classList.add("hidden");
       } else {
-        elBtnFinal.textContent = "Salvar";
+        elBtnFinal.textContent = "Salvar parcial";
         elBtnFinal.classList.remove("btn-finalizar");
+        elBtnFinal.classList.add("btn-salvar-parcial");
+        elAlertaOperacional.classList.remove("hidden");
       }
     }
 
@@ -1128,6 +1292,24 @@
       msgOk(elStatusSalvar, "✅ 2ª linha salva parcialmente.");
     }
 
+    function editarLinha1() {
+      linha1Salva = false;
+      linha2Salva = false;
+      travarCamposLinha1(false);
+      travarCamposLinha2(false);
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois, se necessário.");
+    }
+
+    function editarLinha2() {
+      linha2Salva = false;
+      travarCamposLinha2(false);
+      salvarRascunho();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
+    }
+
     async function finalizarOuSalvarParcial() {
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
 
@@ -1195,34 +1377,44 @@
 
         msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
 
-        elSaidaSelect.value = "";
-        elSaidaOutro.value = "";
-        elSaidaOutro.classList.add("hidden");
-
-        elRetornoSelect.value = "";
-        elRetornoOutro.value = "";
-        elRetornoOutro.classList.add("hidden");
-
-        elKmIni.value = kmFimRetornoValor;
-        elHoraPartida.value = horaAtual();
-        elKmFim.value = "";
-        elHoraChegada.value = horaAtual();
-
-        elKmIniRetorno.value = "";
-        elHoraSaidaRetorno.value = horaAtual();
-        elKmFimRetorno.value = "";
-        elHoraChegadaRetorno.value = horaAtual();
-
-        elUsuario.value = "";
-        elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
-
-        atualizarEstadoFinal();
+        resetarFormularioAposFinalizacao(kmFimRetornoValor);
       } catch (e) {
         console.error(e);
         msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
       } finally {
         elBtnFinal.disabled = false;
       }
+    }
+
+    function resetarFormularioAposFinalizacao(kmBaseNovo) {
+      elSaidaSelect.value = "";
+      elSaidaOutro.value = "";
+      elSaidaOutro.classList.add("hidden");
+
+      elRetornoSelect.value = "";
+      elRetornoOutro.value = "";
+      elRetornoOutro.classList.add("hidden");
+
+      elKmIni.value = kmBaseNovo;
+      elHoraPartida.value = horaAtual();
+      elKmFim.value = "";
+      elHoraChegada.value = horaAtual();
+
+      elKmIniRetorno.value = "";
+      elHoraSaidaRetorno.value = horaAtual();
+      elKmFimRetorno.value = "";
+      elHoraChegadaRetorno.value = horaAtual();
+
+      elUsuario.value = "";
+      elOdometroValor.textContent = formatarOdometro(kmBaseNovo);
+
+      linha1Salva = false;
+      linha2Salva = false;
+
+      travarCamposLinha1(false);
+      travarCamposLinha2(false);
+
+      atualizarEstadoFinal();
     }
 
     async function buscarRegistrosPorVtr() {
@@ -1647,6 +1839,8 @@
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
     elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
+    elBtnEditarLinha1.addEventListener("click", editarLinha1);
+    elBtnEditarLinha2.addEventListener("click", editarLinha2);
     elBtnFinal.addEventListener("click", finalizarOuSalvarParcial);
     elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
     elBtnExportarMes.addEventListener("click", exportarMes);
@@ -1654,6 +1848,8 @@
 
     elVtr.addEventListener("change", async function() {
       atualizarInfoVtr();
+      linha1Salva = false;
+      linha2Salva = false;
       await atualizarKmBaseDaVtr();
       salvarRascunho();
       atualizarEstadoFinal();
@@ -1672,10 +1868,12 @@
     camposRascunho.forEach(campo => {
       campo.addEventListener("input", () => {
         salvarRascunho();
+        atualizarResumoAutomatico();
         atualizarEstadoFinal();
       });
       campo.addEventListener("change", () => {
         salvarRascunho();
+        atualizarResumoAutomatico();
         atualizarEstadoFinal();
       });
     });
@@ -1701,6 +1899,8 @@
     preencherHorarioPadrao();
     atualizarEstadoFinal();
     abrirAba("lancamento");
+    atualizarRelogio();
+    setInterval(atualizarRelogio, 1000);
   </script>
 </body>
 </html>
