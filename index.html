@@ -1,231 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diário de Bordo</title>
-
-<style>
-body{font-family:Arial;background:#eef3f8;margin:0;padding:10px;}
-h1{background:#b71c1c;color:#fff;padding:12px;border-radius:10px;text-align:center;}
-.card{background:#fff;padding:12px;border-radius:10px;margin-bottom:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
-input,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc;}
-button{padding:10px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:5px;}
-.btn{background:#b71c1c;color:#fff;width:100%;}
-.registro{border:1px solid #ddd;padding:10px;border-radius:10px;margin-bottom:10px;}
-.hidden{display:none;}
-</style>
-</head>
-
-<body>
-
-<h1>🚒 Diário de Bordo</h1>
-
-<div class="card">
-<label>ID Func</label>
-<input id="idFunc">
-<button class="btn" onclick="login()">Entrar</button>
-<div id="userOk"></div>
-</div>
-
-<div class="card hidden" id="formBox">
-
-<label>VTR</label>
-<select id="vtr">
-<option>AR-426</option>
-<option>ABT-0535</option>
-<option>ABT-7992</option>
-<option>ATP-1225</option>
-<option>ATP-370</option>
-<option>ATP-9316</option>
-</select>
-
-<label>Data</label>
-<input type="date" id="data">
-
-<label>Local de Partida</label>
-<input id="partida">
-
-<label>KM Partida</label>
-<input type="number" id="kmIni">
-
-<label>Hora Partida</label>
-<input type="time" id="horaIni">
-
-<label>KM Chegada</label>
-<input type="number" id="kmFim">
-
-<label>Hora Chegada</label>
-<input type="time" id="horaFim">
-
-<label>Condutor</label>
-<input id="condutor" readonly>
-
-<label>Usuário</label>
-<input id="usuario">
-
-<button class="btn" onclick="salvar()">Salvar</button>
-
-</div>
-
-<div class="card">
-<h3>Registros</h3>
-<div id="lista"></div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
 
-const ADMIN="193cbmrs";
-let logado=null;
-let editando=null;
+// 🔗 SEU SUPABASE (JÁ CONFIGURADO)
+const supabase = window.supabase.createClient(
+"https://nypebmbqcbrvbutamzrh.supabase.co",
+"sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg"
+);
 
 const USUARIOS=[
-{guerra:"1º SGT VICENTE",id:"2614960"},
-{guerra:"2º SGT ANDERSON",id:"2882930"},
-{guerra:"SD MOTTA",id:"4626338"},
-{guerra:"1º SGT DIEFERSON",id:"2972719"},
-{guerra:"SD CAMACHO",id:"3698696"},
-{guerra:"1º SGT BATISTA",id:"2692449"},
-{guerra:"SD LARSSON",id:"4490380"},
-{guerra:"SD TOMASCHEWSKI",id:"3218627"},
-{guerra:"1º TEN MARCELO",id:"2423286"},
-{guerra:"SD ISQUIERDO",id:"3697665"},
-{guerra:"SD MAX",id:"3084620"},
-{guerra:"2º SGT LISCANO",id:"3698530"},
 {guerra:"SD BORGES",id:"3698440"},
-{guerra:"SD SOARES",id:"4625595"},
-{guerra:"SD PEGLOW",id:"4783069"},
-{guerra:"SD BATISTA",id:"3702847"},
-{guerra:"2º SGT VINICIUS",id:"2910233"},
-{guerra:"SD WILLIAM",id:"4355504"}
+{guerra:"1º SGT VICENTE",id:"2614960"},
+{guerra:"2º SGT ANDERSON",id:"2882930"}
 ];
 
-function login(){
-  const id=idFunc.value.trim();
+let logado=null;
+
+async function login(){
+  const id=idFunc.value;
   const user=USUARIOS.find(u=>u.id===id);
-  
-  if(!user) return alert("ID não cadastrada");
+
+  if(!user) return alert("❌ ID não cadastrada");
 
   logado=user;
   condutor.value=user.guerra;
   userOk.innerHTML="✅ "+user.guerra;
+
   formBox.classList.remove("hidden");
 }
 
-function salvar(){
-  let dados=JSON.parse(localStorage.getItem("db")||"[]");
+// 🔥 SALVAR ONLINE
+async function salvar(){
 
   if(Number(kmFim.value)<Number(kmIni.value)){
-    return alert("KM inválido!");
+    return alert("🚫 KM inválido!");
   }
 
-  const ultimo=dados.filter(r=>r.vtr===vtr.value).slice(-1)[0];
-  if(ultimo && Number(kmIni.value)<Number(ultimo.kmFim)){
-    return alert("KM menor que último registrado!");
-  }
-
-  const obj={
-    id:editando||Date.now(),
+  const registro={
     vtr:vtr.value,
     data:data.value,
-    partida:partida.value,
     kmIni:kmIni.value,
-    horaIni:horaIni.value,
     kmFim:kmFim.value,
-    horaFim:horaFim.value,
-    condutor:condutor.value,
-    usuario:usuario.value
+    condutor:condutor.value
   };
 
-  if(editando){
-    dados=dados.map(r=>r.id==editando?obj:r);
-    editando=null;
-  }else{
-    dados.push(obj);
+  const {error} = await supabase.from("diario").insert([registro]);
+
+  if(error){
+    alert("❌ Erro ao salvar");
+    console.log(error);
+    return;
   }
 
-  localStorage.setItem("db",JSON.stringify(dados));
-  limpar();
-  render();
+  alert("☁️ Salvo com sucesso!");
+  carregar();
 }
 
-function limpar(){
-  document.querySelectorAll("#formBox input").forEach(i=>i.value="");
-  condutor.value=logado.guerra;
-}
+// 🔄 CARREGAR DADOS
+async function carregar(){
 
-function render(){
-  const dados=JSON.parse(localStorage.getItem("db")||"[]");
+  const {data,error} = await supabase
+  .from("diario")
+  .select("*")
+  .order("id",{ascending:false});
+
+  if(error){
+    console.log(error);
+    return;
+  }
+
   lista.innerHTML="";
 
-  dados.reverse().forEach(r=>{
+  data.forEach(r=>{
     lista.innerHTML+=`
     <div class="registro">
       <b>${r.vtr}</b> - ${r.data}<br>
       KM: ${r.kmIni} → ${r.kmFim}
-      <div>
-        <button onclick="editar(${r.id})">✏️</button>
-        <button onclick="excluir(${r.id})">🗑️</button>
-        <button onclick="pdf(${r.id})">📄 PDF</button>
-      </div>
+      <button onclick='pdf(${JSON.stringify(r)})'>📄 PDF</button>
     </div>`;
   });
 }
 
-function editar(id){
-  const senha=prompt("Senha admin:");
-  if(senha!==ADMIN) return alert("Senha incorreta");
-
-  const dados=JSON.parse(localStorage.getItem("db"));
-  const r=dados.find(x=>x.id==id);
-
-  vtr.value=r.vtr;
-  data.value=r.data;
-  partida.value=r.partida;
-  kmIni.value=r.kmIni;
-  horaIni.value=r.horaIni;
-  kmFim.value=r.kmFim;
-  horaFim.value=r.horaFim;
-  usuario.value=r.usuario;
-
-  editando=id;
-}
-
-function excluir(id){
-  const senha=prompt("Senha admin:");
-  if(senha!==ADMIN) return alert("Senha incorreta");
-
-  let dados=JSON.parse(localStorage.getItem("db"));
-  dados=dados.filter(r=>r.id!=id);
-  localStorage.setItem("db",JSON.stringify(dados));
-  render();
-}
-
-function pdf(id){
-  const dados=JSON.parse(localStorage.getItem("db"));
-  const r=dados.find(x=>x.id==id);
+// 📄 PDF MILIMÉTRICO
+function pdf(r){
 
   const w=window.open();
 
   w.document.write(`
-  <h2>DIÁRIO DE BORDO</h2>
-  <p><b>PLACA:</b> ${r.vtr}</p>
+  <style>
+  body{font-family:Arial;padding:40px;}
+  table{width:100%;border-collapse:collapse;}
+  td,th{border:1px solid #000;padding:6px;text-align:center;}
+  h2{text-align:center;}
+  </style>
 
-  <table border=1 width=100%>
-  <tr>
-  <th>DATA</th><th>PARTIDA</th><th>KM INI</th><th>HORA INI</th>
-  <th>KM FIM</th><th>HORA FIM</th><th>CONDUTOR</th><th>USUÁRIO</th>
-  </tr>
+  <h2>🚒 DIÁRIO DE BORDO</h2>
 
+  <table>
+  <tr><th>VTR</th><th>DATA</th><th>KM INI</th><th>KM FIM</th><th>CONDUTOR</th></tr>
   <tr>
+  <td>${r.vtr}</td>
   <td>${r.data}</td>
-  <td>${r.partida}</td>
   <td>${r.kmIni}</td>
-  <td>${r.horaIni}</td>
   <td>${r.kmFim}</td>
-  <td>${r.horaFim}</td>
   <td>${r.condutor}</td>
-  <td>${r.usuario}</td>
   </tr>
   </table>
 
@@ -233,9 +111,20 @@ function pdf(id){
   `);
 }
 
-render();
+// 📊 RELATÓRIO
+async function relatorio(){
+
+  const {data} = await supabase.from("diario").select("*");
+
+  let total=0;
+
+  data.forEach(r=>{
+    total += Number(r.kmFim) - Number(r.kmIni);
+  });
+
+  alert("📊 KM total: "+total);
+}
+
+carregar();
 
 </script>
-
-</body>
-</html>
