@@ -134,6 +134,9 @@
       padding:12px;
       margin-top:4px;
     }
+    .btn-linha-ok {
+      background:#2e7d32 !important;
+    }
     .btn-finalizar {
       background:#2e7d32 !important;
     }
@@ -567,6 +570,11 @@
       return `${ano}-${mes}-${dia}`;
     }
 
+    function horaAtual() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+
     function esc(texto) {
       return String(texto ?? "")
         .replaceAll("&", "&amp;")
@@ -755,6 +763,15 @@
       }
     }
 
+    function compararHoras(h1, h2) {
+      if (!h1 || !h2) return 0;
+      return h1.localeCompare(h2);
+    }
+
+    function horarioAtualSeVazio(campo) {
+      if (!campo.value) campo.value = horaAtual();
+    }
+
     function login() {
       const id = elIdFunc.value.trim();
       const user = USUARIOS.find(u => u.id === id);
@@ -923,6 +940,7 @@
       if (!elHoraPartida.value || !elHoraChegada.value) return false;
       if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
       if (kmFimValor < kmIniValor) return false;
+      if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
       if (!elCondutor.value.trim()) return false;
 
       return true;
@@ -938,6 +956,8 @@
       if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
       if (kmIniRetornoValor !== kmFimValor) return false;
       if (kmFimRetornoValor < kmIniRetornoValor) return false;
+      if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
+      if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
 
       return true;
     }
@@ -946,17 +966,25 @@
       if (linha1Salva) {
         elBadgeLinha1.textContent = "1ª LINHA SALVA";
         elBadgeLinha1.className = "badge-linha badge-ok";
+        elBtnSalvarLinha1.textContent = "1ª Linha Salva";
+        elBtnSalvarLinha1.classList.add("btn-linha-ok");
       } else {
         elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
         elBadgeLinha1.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha1.textContent = "Salvar 1ª Linha";
+        elBtnSalvarLinha1.classList.remove("btn-linha-ok");
       }
 
       if (linha2Salva) {
         elBadgeLinha2.textContent = "2ª LINHA SALVA";
         elBadgeLinha2.className = "badge-linha badge-ok";
+        elBtnSalvarLinha2.textContent = "2ª Linha Salva";
+        elBtnSalvarLinha2.classList.add("btn-linha-ok");
       } else {
         elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
         elBadgeLinha2.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha2.textContent = "Salvar 2ª Linha";
+        elBtnSalvarLinha2.classList.remove("btn-linha-ok");
       }
     }
 
@@ -1007,6 +1035,7 @@
         if (!bruto) {
           linha1Salva = false;
           linha2Salva = false;
+          preencherHorarioPadrao();
           atualizarEstadoFinal();
           return;
         }
@@ -1015,6 +1044,7 @@
         if (r.vtr && elVtr.value && r.vtr !== elVtr.value) {
           linha1Salva = false;
           linha2Salva = false;
+          preencherHorarioPadrao();
           atualizarEstadoFinal();
           return;
         }
@@ -1039,10 +1069,13 @@
 
         linha1Salva = Boolean(r.linha1Salva);
         linha2Salva = Boolean(r.linha2Salva);
+
+        preencherHorarioPadrao();
         atualizarEstadoFinal();
       } catch {
         linha1Salva = false;
         linha2Salva = false;
+        preencherHorarioPadrao();
         atualizarEstadoFinal();
       }
     }
@@ -1053,14 +1086,24 @@
       linha2Salva = false;
     }
 
+    function preencherHorarioPadrao() {
+      horarioAtualSeVazio(elHoraPartida);
+      horarioAtualSeVazio(elHoraChegada);
+      horarioAtualSeVazio(elHoraSaidaRetorno);
+      horarioAtualSeVazio(elHoraChegadaRetorno);
+    }
+
     function salvarLinha1() {
+      preencherHorarioPadrao();
+
       if (!validarLinha1()) {
-        msgErro(elStatusSalvar, "❌ Preencha corretamente os campos obrigatórios da 1ª linha.");
+        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente.");
         return;
       }
 
       linha1Salva = true;
       atualizarKmInicialRetorno();
+      if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
       salvarRascunho();
       atualizarEstadoFinal();
       msgOk(elStatusSalvar, "✅ 1ª linha salva parcialmente.");
@@ -1072,8 +1115,10 @@
         return;
       }
 
+      preencherHorarioPadrao();
+
       if (!validarLinha2()) {
-        msgErro(elStatusSalvar, "❌ Preencha corretamente os campos obrigatórios da 2ª linha.");
+        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
         return;
       }
 
@@ -1159,14 +1204,14 @@
         elRetornoOutro.classList.add("hidden");
 
         elKmIni.value = kmFimRetornoValor;
-        elHoraPartida.value = "";
+        elHoraPartida.value = horaAtual();
         elKmFim.value = "";
-        elHoraChegada.value = "";
+        elHoraChegada.value = horaAtual();
 
         elKmIniRetorno.value = "";
-        elHoraSaidaRetorno.value = "";
+        elHoraSaidaRetorno.value = horaAtual();
         elKmFimRetorno.value = "";
-        elHoraChegadaRetorno.value = "";
+        elHoraChegadaRetorno.value = horaAtual();
 
         elUsuario.value = "";
         elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
@@ -1620,6 +1665,10 @@
     elKmFim.addEventListener("input", atualizarKmInicialRetorno);
     elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
 
+    [elHoraPartida, elHoraChegada, elHoraSaidaRetorno, elHoraChegadaRetorno].forEach(campo => {
+      campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
+    });
+
     camposRascunho.forEach(campo => {
       campo.addEventListener("input", () => {
         salvarRascunho();
@@ -1649,6 +1698,7 @@
     elFiltroMes.value = String(new Date().getMonth() + 1);
     atualizarInfoVtr();
     renderCadastroVtrs();
+    preencherHorarioPadrao();
     atualizarEstadoFinal();
     abrirAba("lancamento");
   </script>
