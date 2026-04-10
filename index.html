@@ -123,6 +123,11 @@
       font-size:16px;
       padding:12px;
     }
+    .btn-reset {
+      background:#9b1c1c;
+      font-size:16px;
+      padding:12px;
+    }
     .odometro-box {
       background:#111;
       color:#19ff63;
@@ -654,6 +659,7 @@
               Ano: ${esc(v.ano || "")}
               <div class="linha-acoes">
                 <button type="button" class="btn-edit" onclick="editarVtr('${esc(ch)}')">✏️ Editar cadastro</button>
+                <button type="button" class="btn-reset" onclick="resetarRegistrosVtr('${esc(ch)}')">🗑️ Reset registros</button>
               </div>
             </div>
 
@@ -681,7 +687,7 @@
 
               <div class="linha-acoes">
                 <button type="button" class="btn-save" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar</button>
-                <button type="button" class="btn-cancel" onclick="cancelarEdicaoVtr('${esc(ch)}')">↩️ Cancelar</button>
+                <button type="button" class="btn-cancel" onclick="cancelarEdicaoVtr()">↩️ Cancelar</button>
               </div>
             </div>
           </div>
@@ -1322,6 +1328,44 @@
       w.document.close();
     }
 
+    async function resetarRegistrosVtr(chave) {
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        alert("Senha inválida.");
+        return;
+      }
+
+      const confirmar = confirm(`Confirma apagar todos os registros da ${chave}?`);
+      if (!confirmar) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from("diario")
+          .delete()
+          .eq("vtr", chave);
+
+        if (error) {
+          alert(`Erro ao apagar registros: ${error.message}`);
+          return;
+        }
+
+        alert(`Registros da ${chave} apagados com sucesso.`);
+
+        if (elVtr.value === chave) {
+          await atualizarKmBaseDaVtr();
+        }
+
+        if (elFiltroVtr.value === chave) {
+          registrosFiltrados = [];
+          msgMuted(elListaVtr, "Registros apagados. Faça nova busca.");
+          msgMuted(elStatusBuscaVtr, "Registros da VTR removidos.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Falha inesperada ao apagar registros.");
+      }
+    }
+
     function editarVtr(chave) {
       const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
       const view = document.getElementById(`view_${itemId}`);
@@ -1369,6 +1413,7 @@
     window.editarVtr = editarVtr;
     window.cancelarEdicaoVtr = cancelarEdicaoVtr;
     window.salvarEdicaoVtr = salvarEdicaoVtr;
+    window.resetarRegistrosVtr = resetarRegistrosVtr;
 
     tabLancamentoBtn.addEventListener("click", function() {
       abrirAba("lancamento");
