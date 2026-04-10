@@ -72,6 +72,35 @@
       color:#666;
       font-size:14px;
     }
+    .info-vtr {
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+      line-height:1.5;
+      font-size:16px;
+    }
+    .tabs {
+      display:flex;
+      gap:10px;
+      margin-bottom:18px;
+    }
+    .tab-btn {
+      flex:1;
+      font-size:18px;
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      cursor:pointer;
+      background:#bfc7d1;
+      color:#24303f;
+      font-weight:bold;
+    }
+    .tab-btn.active {
+      background:#d51313;
+      color:#fff;
+    }
     .registro {
       border:1px solid #ddd;
       border-radius:14px;
@@ -90,14 +119,11 @@
       font-size:16px;
       padding:12px;
     }
-    .info-vtr {
-      background:#fafafa;
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
+    .subtitulo-box {
+      margin-top:0;
       margin-bottom:12px;
-      line-height:1.5;
-      font-size:16px;
+      font-size:22px;
+      color:#24303f;
     }
   </style>
 </head>
@@ -105,64 +131,102 @@
 
   <h1>🚒 Diário de Bordo</h1>
 
-  <div class="card">
-    <label for="idFunc">ID Func</label>
-    <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
-    <button type="button" id="btnEntrar">Entrar</button>
-    <div id="userOk"></div>
+  <div class="tabs">
+    <button type="button" class="tab-btn active" id="tabLancamentoBtn">Lançamento</button>
+    <button type="button" class="tab-btn" id="tabExportarBtn">Exportar por VTR</button>
   </div>
 
-  <div class="card hidden" id="formBox">
-    <label for="vtr">VTR</label>
-    <select id="vtr">
-      <option value="ABT-0535">ABT-0535</option>
-      <option value="ABT-7992">ABT-7992</option>
-      <option value="AR-426">AR-426</option>
-      <option value="ATP-1225">ATP-1225</option>
-      <option value="ATP-9316">ATP-9316</option>
-    </select>
+  <div id="abaLancamento">
+    <div class="card">
+      <label for="idFunc">ID Func</label>
+      <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
+      <button type="button" id="btnEntrar">Entrar</button>
+      <div id="userOk"></div>
+    </div>
 
-    <div class="info-vtr" id="infoVtr"></div>
+    <div class="card hidden" id="formBox">
+      <label for="vtr">VTR</label>
+      <select id="vtr">
+        <option value="ABT-0535">ABT-0535</option>
+        <option value="ABT-7992">ABT-7992</option>
+        <option value="AR-426">AR-426</option>
+        <option value="ATP-1225">ATP-1225</option>
+        <option value="ATP-9316">ATP-9316</option>
+      </select>
 
-    <label for="data">Data</label>
-    <input id="data" type="date" />
+      <div class="info-vtr" id="infoVtr"></div>
 
-    <label for="localPartida">Local de Partida</label>
-    <select id="localPartida">
-      <option value="">Selecione o local de partida</option>
-      <option value="QTL / J4">QTL / J4</option>
-      <option value="QTL / 44">QTL / 44</option>
-      <option value="QTL / CENTRO">QTL / CENTRO</option>
-      <option value="QTL / VISTORIA">QTL / VISTORIA</option>
-      <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
-      <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
-    </select>
+      <label for="data">Data</label>
+      <input id="data" type="date" />
 
-    <label for="kmIni">KM Inicial</label>
-    <input id="kmIni" type="number" inputmode="numeric" />
+      <label for="saida">Saída</label>
+      <select id="saida">
+        <option value="">Selecione a saída</option>
+        <option value="QTL / J4">QTL / J4</option>
+        <option value="QTL / 44">QTL / 44</option>
+        <option value="QTL / CENTRO">QTL / CENTRO</option>
+        <option value="QTL / VISTORIA">QTL / VISTORIA</option>
+        <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
+        <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
+      </select>
 
-    <label for="horaPartida">Hora da Partida</label>
-    <input id="horaPartida" type="time" />
+      <label for="retorno">Retorno</label>
+      <select id="retorno">
+        <option value="">Selecione o retorno</option>
+        <option value="J4 / QTL">J4 / QTL</option>
+        <option value="44 / QTL">44 / QTL</option>
+        <option value="CENTRO / QTL">CENTRO / QTL</option>
+        <option value="VISTORIA / QTL">VISTORIA / QTL</option>
+        <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
+        <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
+      </select>
 
-    <label for="kmFim">KM Final</label>
-    <input id="kmFim" type="number" inputmode="numeric" />
+      <label for="kmIni">KM Inicial</label>
+      <input id="kmIni" type="number" inputmode="numeric" />
 
-    <label for="horaChegada">Hora da Chegada</label>
-    <input id="horaChegada" type="time" />
+      <label for="horaPartida">Hora da Partida</label>
+      <input id="horaPartida" type="time" />
 
-    <label for="condutor">Nome Condutor</label>
-    <input id="condutor" readonly />
+      <label for="kmFim">KM Final</label>
+      <input id="kmFim" type="number" inputmode="numeric" />
 
-    <label for="usuario">Nome Usuário</label>
-    <input id="usuario" type="text" placeholder="Informe o nome do usuário" />
+      <label for="horaChegada">Hora da Chegada</label>
+      <input id="horaChegada" type="time" />
 
-    <button type="button" id="btnSalvar">Salvar</button>
-    <div id="statusSalvar"></div>
+      <label for="condutor">Nome Condutor</label>
+      <input id="condutor" readonly />
+
+      <label for="usuario">Nome Usuário</label>
+      <select id="usuario">
+        <option value="">Selecione o usuário (opcional)</option>
+      </select>
+
+      <button type="button" id="btnSalvar">Salvar</button>
+      <div id="statusSalvar"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2 style="margin-top:0;">Registros</h2>
-    <div id="lista" class="muted">Carregando...</div>
+  <div id="abaExportar" class="hidden">
+    <div class="card">
+      <h2 class="subtitulo-box">📄 Exportar registros por VTR</h2>
+
+      <label for="filtroVtr">VTR</label>
+      <select id="filtroVtr">
+        <option value="">Selecione a VTR</option>
+        <option value="ABT-0535">ABT-0535</option>
+        <option value="ABT-7992">ABT-7992</option>
+        <option value="AR-426">AR-426</option>
+        <option value="ATP-1225">ATP-1225</option>
+        <option value="ATP-9316">ATP-9316</option>
+      </select>
+
+      <button type="button" id="btnBuscarVtr">Buscar registros</button>
+      <div id="statusBuscaVtr" class="muted"></div>
+    </div>
+
+    <div class="card">
+      <div id="listaVtr" class="muted">Selecione uma VTR para listar os registros.</div>
+    </div>
   </div>
 
   <script>
@@ -217,7 +281,6 @@
 
     const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
-
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let logado = null;
@@ -229,7 +292,8 @@
     const elVtr = document.getElementById("vtr");
     const elInfoVtr = document.getElementById("infoVtr");
     const elData = document.getElementById("data");
-    const elLocalPartida = document.getElementById("localPartida");
+    const elSaida = document.getElementById("saida");
+    const elRetorno = document.getElementById("retorno");
     const elKmIni = document.getElementById("kmIni");
     const elHoraPartida = document.getElementById("horaPartida");
     const elKmFim = document.getElementById("kmFim");
@@ -238,7 +302,16 @@
     const elUsuario = document.getElementById("usuario");
     const elBtnSalvar = document.getElementById("btnSalvar");
     const elStatusSalvar = document.getElementById("statusSalvar");
-    const elLista = document.getElementById("lista");
+
+    const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
+    const tabExportarBtn = document.getElementById("tabExportarBtn");
+    const abaLancamento = document.getElementById("abaLancamento");
+    const abaExportar = document.getElementById("abaExportar");
+
+    const elFiltroVtr = document.getElementById("filtroVtr");
+    const elBtnBuscarVtr = document.getElementById("btnBuscarVtr");
+    const elStatusBuscaVtr = document.getElementById("statusBuscaVtr");
+    const elListaVtr = document.getElementById("listaVtr");
 
     function hojeISO() {
       const d = new Date();
@@ -269,6 +342,11 @@
       el.innerHTML = `<div class="muted">${texto}</div>`;
     }
 
+    function preencherUsuariosSelect() {
+      elUsuario.innerHTML = `<option value="">Selecione o usuário (opcional)</option>` +
+        USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
+    }
+
     function atualizarInfoVtr() {
       const dados = VTRS[elVtr.value] || {
         placa: "NÃO CADASTRADO",
@@ -281,6 +359,20 @@
         <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
         <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}
       `;
+    }
+
+    function abrirAba(nome) {
+      if (nome === "lancamento") {
+        abaLancamento.classList.remove("hidden");
+        abaExportar.classList.add("hidden");
+        tabLancamentoBtn.classList.add("active");
+        tabExportarBtn.classList.remove("active");
+      } else {
+        abaLancamento.classList.add("hidden");
+        abaExportar.classList.remove("hidden");
+        tabLancamentoBtn.classList.remove("active");
+        tabExportarBtn.classList.add("active");
+      }
     }
 
     function login() {
@@ -316,8 +408,13 @@
         return;
       }
 
-      if (!elLocalPartida.value.trim()) {
-        msgErro(elStatusSalvar, "❌ Informe o local de partida");
+      if (!elSaida.value.trim()) {
+        msgErro(elStatusSalvar, "❌ Informe a saída");
+        return;
+      }
+
+      if (!elRetorno.value.trim()) {
+        msgErro(elStatusSalvar, "❌ Informe o retorno");
         return;
       }
 
@@ -333,11 +430,6 @@
 
       if (!elHoraChegada.value) {
         msgErro(elStatusSalvar, "❌ Informe a hora da chegada");
-        return;
-      }
-
-      if (!elUsuario.value.trim()) {
-        msgErro(elStatusSalvar, "❌ Informe o nome do usuário");
         return;
       }
 
@@ -372,7 +464,8 @@
             marcamodelo: dadosVtr.marcamodelo,
             orgao: dadosVtr.orgao,
             data: elData.value,
-            localpartida: elLocalPartida.value.trim(),
+            localpartida: elSaida.value.trim(),
+            localretorno: elRetorno.value.trim(),
             kmini: kmIniValor,
             horapartida: elHoraPartida.value,
             kmfim: kmFimValor,
@@ -389,13 +482,13 @@
         }
 
         msgOk(elStatusSalvar, "☁️ Salvo com sucesso");
-        elLocalPartida.value = "";
+        elSaida.value = "";
+        elRetorno.value = "";
         elKmIni.value = "";
         elHoraPartida.value = "";
         elKmFim.value = "";
         elHoraChegada.value = "";
         elUsuario.value = "";
-        await carregar();
       } catch (e) {
         console.error(e);
         msgErro(elStatusSalvar, "❌ Falha inesperada ao salvar");
@@ -404,32 +497,48 @@
       }
     }
 
-    async function carregar() {
+    async function buscarRegistrosPorVtr() {
+      const vtr = elFiltroVtr.value;
+
+      if (!vtr) {
+        msgErro(elStatusBuscaVtr, "❌ Selecione uma VTR");
+        msgMuted(elListaVtr, "Selecione uma VTR para listar os registros.");
+        return;
+      }
+
+      msgMuted(elStatusBuscaVtr, "Buscando...");
+      msgMuted(elListaVtr, "Carregando registros...");
+
       try {
         const { data, error } = await supabaseClient
           .from("diario")
           .select("*")
+          .eq("vtr", vtr)
           .order("id", { ascending: false });
 
         if (error) {
-          msgErro(elLista, `❌ Erro ao listar: ${error.message}`);
+          msgErro(elStatusBuscaVtr, `❌ Erro ao buscar: ${error.message}`);
+          msgMuted(elListaVtr, "Falha ao carregar.");
           return;
         }
+
+        msgOk(elStatusBuscaVtr, `✅ ${data.length} registro(s) encontrado(s)`);
 
         if (!data || data.length === 0) {
-          msgMuted(elLista, "Nenhum registro ainda.");
+          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR.");
           return;
         }
 
-        elLista.innerHTML = data.map(r => `
+        elListaVtr.innerHTML = data.map(r => `
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
             Data: ${esc(r.data)}<br>
-            Local de Partida: ${esc(r.localpartida)}<br>
+            Saída: ${esc(r.localpartida)}<br>
+            Retorno: ${esc(r.localretorno || "")}<br>
             KM: ${esc(r.kmini)} → ${esc(r.kmfim)}<br>
             Hora: ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
             Condutor: ${esc(r.condutor)}<br>
-            Usuário: ${esc(r.usuario)}
+            Usuário: ${esc(r.usuario || "")}
             <div class="linha-acoes">
               <button class="btn-pdf" type="button" onclick="gerarPDF(${Number(r.id)})">📄 PDF</button>
             </div>
@@ -437,7 +546,8 @@
         `).join("");
       } catch (e) {
         console.error(e);
-        msgErro(elLista, "❌ Falha inesperada ao listar");
+        msgErro(elStatusBuscaVtr, "❌ Falha inesperada ao buscar");
+        msgMuted(elListaVtr, "Falha ao carregar.");
       }
     }
 
@@ -487,8 +597,8 @@
             <title>DIÁRIO DE BORDO FÍSICO</title>
             <style>
               @page {
-                size: A4 portrait;
-                margin: 12mm;
+                size: A4 landscape;
+                margin: 10mm;
               }
 
               html, body {
@@ -608,7 +718,7 @@
                   <td>${esc(data.horachegada)}</td>
                   <td>${esc(data.condutor)}</td>
                   <td></td>
-                  <td>${esc(data.usuario)}</td>
+                  <td>${esc(data.usuario || "")}</td>
                   <td></td>
                 </tr>
 
@@ -634,9 +744,18 @@
 
     window.gerarPDF = gerarPDF;
 
+    tabLancamentoBtn.addEventListener("click", function() {
+      abrirAba("lancamento");
+    });
+
+    tabExportarBtn.addEventListener("click", function() {
+      abrirAba("exportar");
+    });
+
     elBtnEntrar.addEventListener("click", login);
     elBtnSalvar.addEventListener("click", salvar);
     elVtr.addEventListener("change", atualizarInfoVtr);
+    elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
 
     elIdFunc.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
@@ -650,8 +769,8 @@
       elData.value = hojeISO();
     }
 
+    preencherUsuariosSelect();
     atualizarInfoVtr();
-    carregar();
   </script>
 </body>
 </html>
