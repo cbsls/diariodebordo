@@ -670,6 +670,8 @@
     let registrosFiltrados = [];
     let linha1Salva = false;
     let linha2Salva = false;
+    let loginExigidoLinha2 = false;
+    let condutorLinha1Original = "";
 
     const MAPA_RETORNO = {
       "QTL / J4": "J4 / QTL",
@@ -795,6 +797,23 @@
 
     function msgMuted(el, texto) {
       el.innerHTML = `<div class="muted">${texto}</div>`;
+    }
+
+    function preencherHorarioPadrao() {
+      horarioAtualSeVazio(elHoraPartida);
+      horarioAtualSeVazio(elHoraChegada);
+      horarioAtualSeVazio(elHoraSaidaRetorno);
+      horarioAtualSeVazio(elHoraChegadaRetorno);
+    }
+
+    function mesmoUsuarioDaLinha1() {
+      if (!logado) return false;
+      const nomeLinha1 = (condutorLinha1Original || elCondutorIda.value || "").trim();
+      return !!nomeLinha1 && nomeLinha1 === String(logado.guerra || "").trim();
+    }
+
+    function deveExigirNovoLoginParaLinha2() {
+      return linha1Salva && !linha2Salva && loginExigidoLinha2 && !mesmoUsuarioDaLinha1();
     }
 
     function formatarOdometro(valor) {
@@ -952,6 +971,8 @@
       elUsuario.value = "";
       linha1Salva = false;
       linha2Salva = false;
+      loginExigidoLinha2 = false;
+      condutorLinha1Original = "";
       atualizarEstadoFinal();
     }
 
@@ -991,6 +1012,8 @@
 
       linha1Salva = Boolean(p.condutor_ida && p.localpartida && p.kmini != null && p.horapartida && p.kmfim != null && p.horachegada);
       linha2Salva = Boolean(p.condutor_retorno && p.kminiretorno != null && p.horasaidaretorno && p.kmfimretorno != null && p.horachegadaretorno);
+      condutorLinha1Original = p.condutor_ida || "";
+      loginExigidoLinha2 = linha1Salva && !linha2Salva;
 
       atualizarEstadoFinal();
     }
@@ -1050,7 +1073,7 @@
         if (pendencia) {
           aplicarPendenciaNaTela(pendencia);
 
-          if (logado && linha1Salva && !linha2Salva) {
+          if (logado && linha1Salva && !linha2Salva && !deveExigirNovoLoginParaLinha2()) {
             elCondutorRetorno.value = logado.guerra;
           }
 
@@ -1072,12 +1095,16 @@
 
     function atualizarMensagemPendencia() {
       if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
+        const avisoLogin = deveExigirNovoLoginParaLinha2()
+          ? '<br>🔐 Para assumir a 2ª linha com outro condutor, faça login com o militar que vai finalizar.'
+          : '<br>✅ Mesmo usuário da 1ª linha pode salvar a 2ª linha e finalizar sem novo login.';
+
         elPendenciaBox.classList.remove("hidden");
         elPendenciaBox.innerHTML = `
           ⚠️ REGISTRO PENDENTE DE FECHAMENTO<br>
           Condutor da 1ª linha: <b>${esc(elCondutorIda.value)}</b><br>
           Condutor da 2ª linha atual: <b>${esc(elCondutorRetorno.value || "aguardando login")}</b><br>
-          Registro carregado do Supabase. Complete o retorno e finalize.
+          Registro carregado do Supabase. Complete o retorno e finalize.${avisoLogin}
         `;
       } else {
         elPendenciaBox.classList.add("hidden");
@@ -1186,9 +1213,16 @@
 
         if (!linha1Salva) {
           elCondutorIda.value = user.guerra;
+          condutorLinha1Original = user.guerra;
         }
         if (linha1Salva && !linha2Salva) {
-          elCondutorRetorno.value = user.guerra;
+          if (mesmoUsuarioDaLinha1()) {
+            loginExigidoLinha2 = false;
+            elCondutorRetorno.value = user.guerra;
+          } else {
+            loginExigidoLinha2 = true;
+            elCondutorRetorno.value = user.guerra;
+          }
         }
 
         atualizarEstadoFinal();
@@ -1466,10 +1500,12 @@
       }
 
       linha1Salva = true;
+      condutorLinha1Original = elCondutorIda.value.trim() || logado.guerra;
+      loginExigidoLinha2 = false;
       atualizarKmInicialRetorno();
 
       if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
-      if (!elCondutorRetorno.value.trim()) elCondutorRetorno.value = logado.guerra;
+      if (!elCondutorRetorno.value.trim() || mesmoUsuarioDaLinha1()) elCondutorRetorno.value = logado.guerra;
 
       try {
         await salvarPendenciaSupabase();
@@ -1492,6 +1528,11 @@
         return;
       }
 
+      if (deveExigirNovoLoginParaLinha2()) {
+        msgErro(elStatusSalvar, "❌ Esta 2ª linha deve ser finalizada pelo militar que assumirá o retorno. Faça login com ele.");
+        return;
+      }
+
       preencherHorarioPadrao();
       elCondutorRetorno.value = logado.guerra;
 
@@ -1501,6 +1542,7 @@
       }
 
       linha2Salva = true;
+      loginExigidoLinha2 = false;
 
       try {
         await salvarPendenciaSupabase();
@@ -1515,6 +1557,8 @@
     function editarLinha1() {
       linha1Salva = false;
       linha2Salva = false;
+      loginExigidoLinha2 = false;
+      condutorLinha1Original = logado ? logado.guerra : "";
       travarCamposLinha1(false);
       travarCamposLinha2(false);
       elCondutorRetorno.value = logado ? logado.guerra : "";
@@ -1524,6 +1568,7 @@
 
     function editarLinha2() {
       linha2Salva = false;
+      loginExigidoLinha2 = linha1Salva && !mesmoUsuarioDaLinha1();
       travarCamposLinha2(false);
       if (logado) elCondutorRetorno.value = logado.guerra;
       atualizarEstadoFinal();
@@ -1532,6 +1577,11 @@
 
     async function finalizarOuSalvarParcial() {
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+
+      if (linha1Salva && !linha2Salva && deveExigirNovoLoginParaLinha2()) {
+        msgErro(elStatusSalvar, "❌ Para finalizar com outro condutor na 2ª linha, faça login com ele antes de salvar o retorno.");
+        return;
+      }
 
       if (!pronto) {
         try {
@@ -1623,6 +1673,8 @@
         elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
         linha1Salva = false;
         linha2Salva = false;
+        loginExigidoLinha2 = false;
+        condutorLinha1Original = logado ? logado.guerra : "";
         atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
