@@ -574,7 +574,7 @@
         type="password" 
         inputmode="numeric"
         pattern="[0-9]*"
-        maxlength="6"
+        maxlength="20"
         placeholder="Digite sua senha"
       />
 
@@ -1024,6 +1024,10 @@
       el.innerHTML = `<div class="muted">${texto}</div>`;
     }
 
+    function limparNumero(valor) {
+      return String(valor || "").replace(/\D/g, "").trim();
+    }
+
     function atualizarCondutorLogadoTopo() {
       const nome = logado && logado.guerra ? String(logado.guerra).trim() : "Não logado";
       const ativo = !!(logado && logado.guerra);
@@ -1400,16 +1404,17 @@
     }
 
     async function cadastrarNovaSenhaPrimeiroAcesso(user) {
-      const nova1 = prompt(`Primeiro acesso de ${user.guerra}.\nCadastre sua nova senha:`);
+      const nova1 = prompt(`Primeiro acesso de ${user.guerra}.
+Cadastre sua nova senha numérica:`);
       if (nova1 === null) return false;
-      const senha1 = String(nova1).trim();
+      const senha1 = limparNumero(nova1);
       if (senha1.length < 4) {
-        alert("A nova senha deve ter pelo menos 4 caracteres.");
+        alert("A nova senha deve conter pelo menos 4 números.");
         return false;
       }
-      const nova2 = prompt("Confirme a nova senha:");
+      const nova2 = prompt("Confirme a nova senha numérica:");
       if (nova2 === null) return false;
-      const senha2 = String(nova2).trim();
+      const senha2 = limparNumero(nova2);
       if (senha1 !== senha2) {
         alert("As senhas não conferem.");
         return false;
@@ -2307,6 +2312,10 @@
    elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
 elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
 
+elIdFunc.addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "");
+});
+
 elSenhaLogin.addEventListener("input", function () {
   this.value = this.value.replace(/\D/g, "");
 });
@@ -2333,4 +2342,4 @@ function carregarInicio() {
     carregarInicio();
   </script>
 </body>
-</html>
+  </html>
