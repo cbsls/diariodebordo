@@ -1429,7 +1429,8 @@ Cadastre sua nova senha numérica:`);
       const senhaInformada = elSenhaLogin.value.trim();
 
       if (!id || !senhaInformada) {
-        msgErro(elStatusSalvar, `⚠️ Erro ao carregar pendência: ${e.message || e}`);
+        msgErro(elUserOk, "❌ Informe a ID Func e a senha.");
+        atualizarCondutorLogadoTopo();
         elFormBox.classList.add("hidden");
         return;
       }
@@ -2250,6 +2251,7 @@ Cadastre sua nova senha numérica:`);
           <style>
             @page { size: A4 landscape; margin: 10mm; }
             html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }
+            body { padding-top: 56px; }
             .folha { width: 100%; padding: 0; }
             .quebra-pagina { page-break-after: always; }
             table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -2262,12 +2264,48 @@ Cadastre sua nova senha numérica:`);
             .w1 { width: 5.34%; } .w2 { width: 13.34%; } .w3 { width: 8.89%; } .w4 { width: 7.12%; } .w5 { width: 8.90%; }
             .w6 { width: 7.12%; } .w7 { width: 12.45%; } .w8 { width: 8.89%; } .w9 { width: 10.67%; } .w10 { width: 11.56%; }
             .al-esq { text-align: left; padding-left: 6px; }
+            #barraImpressao {
+              position: fixed;
+              top: 10px;
+              right: 10px;
+              z-index: 99999;
+              display: flex;
+              gap: 8px;
+            }
+            #btnImprimirPdf {
+              padding: 12px 18px;
+              font-size: 16px;
+              font-weight: bold;
+              border: none;
+              border-radius: 12px;
+              background: #b71c1c;
+              color: #fff;
+              box-shadow: 0 4px 12px rgba(0,0,0,.20);
+              cursor: pointer;
+            }
+            @media print {
+              body { padding-top: 0; }
+              #barraImpressao { display: none !important; }
+            }
           </style>
         </head>
         <body>
+          <div id="barraImpressao">
+            <button id="btnImprimirPdf" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+          </div>
+
           ${htmlPaginas}
+
           <script>
-            window.onload = function () { window.print(); };
+            window.addEventListener('beforeprint', function () {
+              var barra = document.getElementById('barraImpressao');
+              if (barra) barra.style.display = 'none';
+            });
+
+            window.addEventListener('afterprint', function () {
+              var barra = document.getElementById('barraImpressao');
+              if (barra) barra.style.display = 'flex';
+            });
           <\/script>
         </body>
         </html>
@@ -2342,4 +2380,4 @@ function carregarInicio() {
     carregarInicio();
   </script>
 </body>
-  </html>
+                           </html>
