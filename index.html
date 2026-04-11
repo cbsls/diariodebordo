@@ -813,7 +813,15 @@
     }
 
     function deveExigirNovoLoginParaLinha2() {
-      return linha1Salva && !linha2Salva && loginExigidoLinha2 && !mesmoUsuarioDaLinha1();
+      return false;
+    }
+
+    function assumirCondutorLinha2DoUsuarioLogado() {
+      if (!logado) return;
+      if (linha1Salva && !linha2Salva) {
+        elCondutorRetorno.value = String(logado.guerra || "").trim();
+        loginExigidoLinha2 = false;
+      }
     }
 
     function formatarOdometro(valor) {
@@ -1073,10 +1081,7 @@
         if (pendencia) {
           aplicarPendenciaNaTela(pendencia);
 
-          if (logado && linha1Salva && !linha2Salva && !deveExigirNovoLoginParaLinha2()) {
-            elCondutorRetorno.value = logado.guerra;
-          }
-
+          assumirCondutorLinha2DoUsuarioLogado();
           atualizarEstadoFinal();
           msgMuted(elStatusSalvar, "Pendência compartilhada carregada do Supabase.");
         } else {
@@ -1095,9 +1100,7 @@
 
     function atualizarMensagemPendencia() {
       if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
-        const avisoLogin = deveExigirNovoLoginParaLinha2()
-          ? '<br>🔐 Para assumir a 2ª linha com outro condutor, faça login com o militar que vai finalizar.'
-          : '<br>✅ Mesmo usuário da 1ª linha pode salvar a 2ª linha e finalizar sem novo login.';
+        const avisoLogin = '<br>✅ A 2ª linha sempre fica com o militar que estiver logado no aparelho ao assumir o retorno.';
 
         elPendenciaBox.classList.remove("hidden");
         elPendenciaBox.innerHTML = `
@@ -1215,16 +1218,7 @@
           elCondutorIda.value = user.guerra;
           condutorLinha1Original = user.guerra;
         }
-        if (linha1Salva && !linha2Salva) {
-          if (mesmoUsuarioDaLinha1()) {
-            loginExigidoLinha2 = false;
-            elCondutorRetorno.value = user.guerra;
-          } else {
-            loginExigidoLinha2 = true;
-            elCondutorRetorno.value = user.guerra;
-          }
-        }
-
+        assumirCondutorLinha2DoUsuarioLogado();
         atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
@@ -1505,7 +1499,7 @@
       atualizarKmInicialRetorno();
 
       if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
-      if (!elCondutorRetorno.value.trim() || mesmoUsuarioDaLinha1()) elCondutorRetorno.value = logado.guerra;
+      assumirCondutorLinha2DoUsuarioLogado();
 
       try {
         await salvarPendenciaSupabase();
@@ -1528,13 +1522,8 @@
         return;
       }
 
-      if (deveExigirNovoLoginParaLinha2()) {
-        msgErro(elStatusSalvar, "❌ Esta 2ª linha deve ser finalizada pelo militar que assumirá o retorno. Faça login com ele.");
-        return;
-      }
-
       preencherHorarioPadrao();
-      elCondutorRetorno.value = logado.guerra;
+      assumirCondutorLinha2DoUsuarioLogado();
 
       if (!validarLinha2()) {
         msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
@@ -1568,20 +1557,15 @@
 
     function editarLinha2() {
       linha2Salva = false;
-      loginExigidoLinha2 = linha1Salva && !mesmoUsuarioDaLinha1();
+      loginExigidoLinha2 = false;
       travarCamposLinha2(false);
-      if (logado) elCondutorRetorno.value = logado.guerra;
+      assumirCondutorLinha2DoUsuarioLogado();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
     }
 
     async function finalizarOuSalvarParcial() {
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
-
-      if (linha1Salva && !linha2Salva && deveExigirNovoLoginParaLinha2()) {
-        msgErro(elStatusSalvar, "❌ Para finalizar com outro condutor na 2ª linha, faça login com ele antes de salvar o retorno.");
-        return;
-      }
 
       if (!pronto) {
         try {
