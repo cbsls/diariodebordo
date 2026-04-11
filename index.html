@@ -2237,6 +2237,7 @@ Cadastre sua nova senha numérica:`);
       const ano = Number(elFiltroAno.value);
       const referencia = `${nomeMesNumero(mes)} ${ano}`;
       const dadosVtr = VTRS[vtr] || {};
+      const linhasPorPagina = 14;
 
       const doc = new jsPDF({
         orientation: "landscape",
@@ -2245,83 +2246,111 @@ Cadastre sua nova senha numérica:`);
       });
 
       const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
+      const paginas = [];
+      for (let i = 0; i < linhasExpandias.length; i += linhasPorPagina) {
+        paginas.push(linhasExpandias.slice(i, i + linhasPorPagina));
+      }
+      if (!paginas.length) paginas.push([]);
 
-      const body = linhasExpandias.map(r => [
-        r.data || "",
-        r.local || "",
-        r.kmIni ?? "",
-        r.horaPartida || "",
-        r.kmFim ?? "",
-        r.horaChegada || "",
-        r.condutor || "",
-        "",
-        r.usuario || "",
-        ""
-      ]);
+      const cabecalho = [[
+        "DATA",
+        "LOCAL DE PARTIDA",
+        "KM DO VEÍC. NA PARTIDA",
+        "HORA DA PARTIDA",
+        "KM DO VEÍC. NO DESTINO",
+        "HORA DA CHEGADA",
+        "NOME CONDUTOR",
+        "ASSINATURA CONDUTOR",
+        "NOME USUÁRIO",
+        "ASSINATURA USUÁRIO"
+      ]];
 
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("DIÁRIO DE BORDO FÍSICO", 148.5, 12, { align: "center" });
+      function desenharCabecalhoPagina(numeroPagina, totalPaginas) {
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.3);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("DIÁRIO DE BORDO FÍSICO", 148.5, 11.5, { align: "center" });
 
-      doc.setFontSize(9);
-      doc.text(`${vtr} - ${referencia}`, 148.5, 18, { align: "center" });
+        doc.setFontSize(9);
+        doc.text(`${vtr} - ${referencia} - PÁGINA ${numeroPagina}/${totalPaginas}`, 148.5, 17.5, { align: "center" });
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text(`PLACA: ${dadosVtr.placa || ""}`, 8, 24);
-      doc.text(`MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, 55, 24);
-      doc.text(`ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, 175, 24);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.text(`PLACA: ${dadosVtr.placa || ""}`, 6, 24);
+        doc.text(`MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, 54, 24);
+        doc.text(`ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, 174, 24);
+      }
 
-      doc.autoTable({
-        startY: 28,
-        head: [[
-          "DATA",
-          "LOCAL DE PARTIDA",
-          "KM DO VEÍC. NA PARTIDA",
-          "HORA DA PARTIDA",
-          "KM DO VEÍC. NO DESTINO",
-          "HORA DA CHEGADA",
-          "NOME CONDUTOR",
-          "ASSINATURA CONDUTOR",
-          "NOME USUÁRIO",
-          "ASSINATURA USUÁRIO"
-        ]],
-        body,
-        styles: {
-          fontSize: 7,
-          cellPadding: 1.5,
-          lineColor: [0, 0, 0],
-          lineWidth: 0.1,
-          textColor: [0, 0, 0],
-          overflow: "linebreak",
-          halign: "center",
-          valign: "middle"
-        },
-        headStyles: {
-          fillColor: [255, 255, 255],
-          textColor: [0, 0, 0],
-          fontStyle: "bold"
-        },
-        theme: "grid",
-        margin: { left: 5, right: 5 },
-        columnStyles: {
-          0: { cellWidth: 14 },
-          1: { cellWidth: 35 },
-          2: { cellWidth: 23 },
-          3: { cellWidth: 20 },
-          4: { cellWidth: 23 },
-          5: { cellWidth: 20 },
-          6: { cellWidth: 32 },
-          7: { cellWidth: 23 },
-          8: { cellWidth: 28 },
-          9: { cellWidth: 23 }
-        },
-        didDrawPage: function () {
-          const pageCount = doc.internal.getNumberOfPages();
-          const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
-          doc.setFontSize(8);
-          doc.text(`PÁGINA ${currentPage}/${pageCount}`, 287, 18, { align: "right" });
+      paginas.forEach((pagina, paginaIndex) => {
+        if (paginaIndex > 0) doc.addPage("a4", "landscape");
+
+        desenharCabecalhoPagina(paginaIndex + 1, paginas.length);
+
+        const body = pagina.map(r => [
+          r.data || "",
+          r.local || "",
+          r.kmIni ?? "",
+          r.horaPartida || "",
+          r.kmFim ?? "",
+          r.horaChegada || "",
+          r.condutor || "",
+          "",
+          r.usuario || "",
+          ""
+        ]);
+
+        while (body.length < linhasPorPagina) {
+          body.push(["", "", "", "", "", "", "", "", "", ""]);
         }
+
+        doc.autoTable({
+          startY: 28,
+          head: cabecalho,
+          body,
+          theme: "grid",
+          margin: { left: 5, right: 5 },
+          styles: {
+            font: "helvetica",
+            fontSize: 7,
+            cellPadding: 1.2,
+            lineColor: [0, 0, 0],
+            lineWidth: 0.2,
+            textColor: [0, 0, 0],
+            overflow: "linebreak",
+            halign: "center",
+            valign: "middle",
+            minCellHeight: 10.8
+          },
+          headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            fontStyle: "bold",
+            lineColor: [0, 0, 0],
+            lineWidth: 0.25,
+            minCellHeight: 12
+          },
+          columnStyles: {
+            0: { cellWidth: 14 },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 23 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 23 },
+            5: { cellWidth: 20 },
+            6: { cellWidth: 32 },
+            7: { cellWidth: 23 },
+            8: { cellWidth: 28 },
+            9: { cellWidth: 23 }
+          },
+          didParseCell: function (data) {
+            if (data.section === "body") {
+              data.cell.styles.minCellHeight = 10.8;
+            }
+            if (data.section === "head") {
+              data.cell.styles.minCellHeight = 12;
+            }
+          }
+        });
       });
 
       const nomeArquivo = `${vtr}_${nomeMesNumero(mes)}_${ano}.pdf`
