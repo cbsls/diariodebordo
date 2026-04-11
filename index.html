@@ -524,30 +524,40 @@
         <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
 
         <label for="saidaSelect">Saída</label>
-        <select id="saidaSelect">
-          <option value="">Selecione a saída</option>
-          <option value="QTL / J4">QTL / J4</option>
-          <option value="QTL / 44">QTL / 44</option>
-          <option value="QTL / CENTRO">QTL / CENTRO</option>
-          <option value="QTL / VISTORIA">QTL / VISTORIA</option>
-          <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
-          <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-        <input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
+<select id="saidaSelect">
+  <option value="">Selecione a saída</option>
+  <option value="QTL / J4">QTL / J4</option>
+  <option value="QTL / 44">QTL / 44</option>
+  <option value="QTL / CENTRO">QTL / CENTRO</option>
+  <option value="QTL / VISTORIA">QTL / VISTORIA</option>
+  <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
+  <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
+  <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
+  <option value="QTL / BAIRRO">QTL / BAIRRO</option>
+  <option value="QTL / BR116">QTL / BR116</option>
+  <option value="QTL / RS265">QTL / RS265</option>
+  <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
+  <option value="OUTRO">Outro</option>
+</select>
+<input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
 
-        <label for="retornoSelect">Retorno</label>
-        <select id="retornoSelect">
-          <option value="">Selecione o retorno</option>
-          <option value="J4 / QTL">J4 / QTL</option>
-          <option value="44 / QTL">44 / QTL</option>
-          <option value="CENTRO / QTL">CENTRO / QTL</option>
-          <option value="VISTORIA / QTL">VISTORIA / QTL</option>
-          <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
-          <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-        <input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
+<label for="retornoSelect">Retorno</label>
+<select id="retornoSelect">
+  <option value="">Selecione o retorno</option>
+  <option value="J4 / QTL">J4 / QTL</option>
+  <option value="44 / QTL">44 / QTL</option>
+  <option value="CENTRO / QTL">CENTRO / QTL</option>
+  <option value="VISTORIA / QTL">VISTORIA / QTL</option>
+  <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
+  <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
+  <option value="OCORRÊNCIA / QTL">OCORRÊNCIA / QTL</option>
+  <option value="BAIRRO / QTL">BAIRRO / QTL</option>
+  <option value="BR116 / QTL">BR116 / QTL</option>
+  <option value="RS265 / QTL">RS265 / QTL</option>
+  <option value="INTERIOR SLS / QTL">INTERIOR SLS / QTL</option>
+  <option value="OUTRO">Outro</option>
+</select>
+<input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
 
         <div class="grid-2">
           <div>
@@ -782,13 +792,18 @@
     let linha2Salva = false;
 
     const MAPA_RETORNO = {
-      "QTL / J4": "J4 / QTL",
-      "QTL / 44": "44 / QTL",
-      "QTL / CENTRO": "CENTRO / QTL",
-      "QTL / VISTORIA": "VISTORIA / QTL",
-      "QTL / TRANSPORTE": "TRANSPORTE / QTL",
-      "QTL / PREFEITURA": "PREFEITURA / QTL"
-    };
+  "QTL / J4": "J4 / QTL",
+  "QTL / 44": "44 / QTL",
+  "QTL / CENTRO": "CENTRO / QTL",
+  "QTL / VISTORIA": "VISTORIA / QTL",
+  "QTL / TRANSPORTE": "TRANSPORTE / QTL",
+  "QTL / PREFEITURA": "PREFEITURA / QTL",
+  "QTL / OCORRÊNCIA": "OCORRÊNCIA / QTL",
+  "QTL / BAIRRO": "BAIRRO / QTL",
+  "QTL / BR116": "BR116 / QTL",
+  "QTL / RS265": "RS265 / QTL",
+  "QTL / INTERIOR SLS": "INTERIOR SLS / QTL"
+};
 
     const elIdFunc = document.getElementById("idFunc");
     const elSenhaLogin = document.getElementById("senhaLogin");
