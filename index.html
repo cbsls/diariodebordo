@@ -1354,8 +1354,8 @@
         }
       } catch (e) {
   console.error(e);
-  msgErro(elUserOk, `❌ Erro no login: ${e.message || e}`);
-  elFormBox.classList.add("hidden");
+  msgErro(elStatusSalvar, `⚠️ Erro ao carregar pendência: ${e.message || e}`);
+}
 }
 
     function atualizarMensagemPendencia() {
@@ -1424,7 +1424,7 @@
       const senhaInformada = elSenhaLogin.value.trim();
 
       if (!id || !senhaInformada) {
-        msgErro(elUserOk, "❌ Informe ID Func e senha.");
+        msgErro(elStatusSalvar, `⚠️ Erro ao carregar pendência: ${e.message || e}`);
         elFormBox.classList.add("hidden");
         return;
       }
@@ -1481,12 +1481,13 @@
         }
         assumirCondutorLinha2DoUsuarioLogado();
         atualizarEstadoFinal();
-      } catch (e) {
+     } catch (e) {
   console.error(e);
   msgErro(elUserOk, `❌ Erro no login: ${e.message || e}`);
   elFormBox.classList.add("hidden");
 } finally {
   elBtnEntrar.disabled = false;
+}
 }
 
     async function obterUltimoRegistroDaVtr(vtr) {
