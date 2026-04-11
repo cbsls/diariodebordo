@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#b71c1c" />
   <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
@@ -2223,95 +2225,110 @@ Cadastre sua nova senha numérica:`);
         return;
       }
 
+      if (!window.jspdf || !window.jspdf.jsPDF || typeof window.jspdf.jsPDF !== "function") {
+        alert("Biblioteca PDF não carregada. Verifique a internet e tente novamente.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+
       const vtr = elFiltroVtr.value;
       const mes = Number(elFiltroMes.value);
       const ano = Number(elFiltroAno.value);
       const referencia = `${nomeMesNumero(mes)} ${ano}`;
       const dadosVtr = VTRS[vtr] || {};
 
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+      });
+
       const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
-      const paginas = quebrarEmPaginas(linhasExpandias, 14);
 
-      const htmlPaginas = paginas.map((pagina, index) =>
-        gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, pagina, index + 1, paginas.length)
-      ).join("");
+      const body = linhasExpandias.map(r => [
+        r.data || "",
+        r.local || "",
+        r.kmIni ?? "",
+        r.horaPartida || "",
+        r.kmFim ?? "",
+        r.horaChegada || "",
+        r.condutor || "",
+        "",
+        r.usuario || "",
+        ""
+      ]);
 
-      const w = window.open("", "_blank");
-      if (!w) {
-        alert("Não foi possível abrir a janela do PDF.");
-        return;
-      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("DIÁRIO DE BORDO FÍSICO", 148.5, 12, { align: "center" });
 
-      w.document.write(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <title>DIÁRIO DE BORDO FÍSICO - ${esc(vtr)} - ${esc(referencia)}</title>
-          <style>
-            @page { size: A4 landscape; margin: 10mm; }
-            html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }
-            body { padding-top: 56px; }
-            .folha { width: 100%; padding: 0; }
-            .quebra-pagina { page-break-after: always; }
-            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-            td, th { border: 1px solid #000; font-size: 10px; padding: 4px 4px; text-align: center; vertical-align: middle; word-break: break-word; }
-            .titulo td { font-weight: bold; font-size: 16px; height: 32px; letter-spacing: 0.2px; }
-            .subref td { font-weight: bold; font-size: 12px; height: 24px; }
-            .identificacao td { font-size: 11px; text-align: left; height: 28px; padding-left: 6px; }
-            .cabecalho td { font-weight: bold; height: 44px; line-height: 1.1; }
-            .linha-dados td { height: 28px; }
-            .w1 { width: 5.34%; } .w2 { width: 13.34%; } .w3 { width: 8.89%; } .w4 { width: 7.12%; } .w5 { width: 8.90%; }
-            .w6 { width: 7.12%; } .w7 { width: 12.45%; } .w8 { width: 8.89%; } .w9 { width: 10.67%; } .w10 { width: 11.56%; }
-            .al-esq { text-align: left; padding-left: 6px; }
-            #barraImpressao {
-              position: fixed;
-              top: 10px;
-              right: 10px;
-              z-index: 99999;
-              display: flex;
-              gap: 8px;
-            }
-            #btnImprimirPdf {
-              padding: 12px 18px;
-              font-size: 16px;
-              font-weight: bold;
-              border: none;
-              border-radius: 12px;
-              background: #b71c1c;
-              color: #fff;
-              box-shadow: 0 4px 12px rgba(0,0,0,.20);
-              cursor: pointer;
-            }
-            @media print {
-              body { padding-top: 0; }
-              #barraImpressao { display: none !important; }
-            }
-          </style>
-        </head>
-        <body>
-          <div id="barraImpressao">
-            <button id="btnImprimirPdf" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-          </div>
+      doc.setFontSize(9);
+      doc.text(`${vtr} - ${referencia}`, 148.5, 18, { align: "center" });
 
-          ${htmlPaginas}
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(`PLACA: ${dadosVtr.placa || ""}`, 8, 24);
+      doc.text(`MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, 55, 24);
+      doc.text(`ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, 175, 24);
 
-          <script>
-            window.addEventListener('beforeprint', function () {
-              var barra = document.getElementById('barraImpressao');
-              if (barra) barra.style.display = 'none';
-            });
+      doc.autoTable({
+        startY: 28,
+        head: [[
+          "DATA",
+          "LOCAL DE PARTIDA",
+          "KM DO VEÍC. NA PARTIDA",
+          "HORA DA PARTIDA",
+          "KM DO VEÍC. NO DESTINO",
+          "HORA DA CHEGADA",
+          "NOME CONDUTOR",
+          "ASSINATURA CONDUTOR",
+          "NOME USUÁRIO",
+          "ASSINATURA USUÁRIO"
+        ]],
+        body,
+        styles: {
+          fontSize: 7,
+          cellPadding: 1.5,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.1,
+          textColor: [0, 0, 0],
+          overflow: "linebreak",
+          halign: "center",
+          valign: "middle"
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontStyle: "bold"
+        },
+        theme: "grid",
+        margin: { left: 5, right: 5 },
+        columnStyles: {
+          0: { cellWidth: 14 },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 23 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 23 },
+          5: { cellWidth: 20 },
+          6: { cellWidth: 32 },
+          7: { cellWidth: 23 },
+          8: { cellWidth: 28 },
+          9: { cellWidth: 23 }
+        },
+        didDrawPage: function () {
+          const pageCount = doc.internal.getNumberOfPages();
+          const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+          doc.setFontSize(8);
+          doc.text(`PÁGINA ${currentPage}/${pageCount}`, 287, 18, { align: "right" });
+        }
+      });
 
-            window.addEventListener('afterprint', function () {
-              var barra = document.getElementById('barraImpressao');
-              if (barra) barra.style.display = 'flex';
-            });
-          <\/script>
-        </body>
-        </html>
-      `);
+      const nomeArquivo = `${vtr}_${nomeMesNumero(mes)}_${ano}.pdf`
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\-.]/g, "");
 
-      w.document.close();
+      doc.save(nomeArquivo);
     }
 
     tabInicioBtn.addEventListener("click", () => abrirAba("inicio"));
@@ -2380,4 +2397,4 @@ function carregarInicio() {
     carregarInicio();
   </script>
 </body>
-                           </html>
+  </html>
