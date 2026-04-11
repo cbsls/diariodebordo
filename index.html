@@ -43,15 +43,21 @@
       flex:1;
       min-width:0;
     }
-    .condutor-logado-box{
+    .topo-status-boxes{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:138px;
+      max-width:185px;
+    }
+    .condutor-logado-box,
+    .vtr-topo-box{
       color:#fff;
       padding:10px 12px;
       border-radius:14px;
       font-size:13px;
       font-weight:800;
       line-height:1.2;
-      min-width:130px;
-      max-width:170px;
       text-align:left;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
       transition:all .25s ease;
@@ -74,6 +80,30 @@
       margin-bottom:3px;
     }
     .condutor-logado-nome{
+      display:block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:13px;
+    }
+    .vtr-topo-inativa{
+      background: rgba(59,130,246,.18);
+      border: 1px solid rgba(255,255,255,.20);
+    }
+    .vtr-topo-ativa{
+      background: linear-gradient(180deg, rgba(59,130,246,.28) 0%, rgba(15,76,129,.40) 100%);
+      border: 1px solid rgba(191,219,254,.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 1px rgba(59,130,246,.08);
+    }
+    .vtr-topo-titulo{
+      display:block;
+      font-size:10px;
+      opacity:.9;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      margin-bottom:3px;
+    }
+    .vtr-topo-nome{
       display:block;
       white-space:nowrap;
       overflow:hidden;
@@ -492,9 +522,15 @@
         <h1 class="app-title">Diário de Bordo</h1>
         <div class="app-subtitle">CB São Lourenço do Sul • Lançamento, exportação e cadastro</div>
       </div>
-      <div class="condutor-logado-box condutor-logado-inativo" id="condutorLogadoTopo">
-        <span class="condutor-logado-titulo">Condutor logado</span>
-        <span class="condutor-logado-nome" id="condutorLogadoNome">Não logado</span>
+      <div class="topo-status-boxes">
+        <div class="condutor-logado-box condutor-logado-inativo" id="condutorLogadoTopo">
+          <span class="condutor-logado-titulo">Condutor logado</span>
+          <span class="condutor-logado-nome" id="condutorLogadoNome">Não logado</span>
+        </div>
+        <div class="vtr-topo-box vtr-topo-inativa" id="vtrTopoBox">
+          <span class="vtr-topo-titulo">VTR selecionada</span>
+          <span class="vtr-topo-nome" id="vtrTopoNome">Nenhuma VTR</span>
+        </div>
       </div>
     </div>
   </div>
@@ -916,6 +952,8 @@
     const elListaCadastroVtr = document.getElementById("listaCadastroVtr");
     const elCondutorLogadoTopo = document.getElementById("condutorLogadoTopo");
     const elCondutorLogadoNome = document.getElementById("condutorLogadoNome");
+    const elVtrTopoBox = document.getElementById("vtrTopoBox");
+    const elVtrTopoNome = document.getElementById("vtrTopoNome");
 
     function hojeISO() {
       const d = new Date();
@@ -977,6 +1015,16 @@
 
       elCondutorLogadoTopo.classList.toggle("condutor-logado-ativo", ativo);
       elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
+    }
+    function atualizarVtrTopo() {
+      const vtrAtual = elVtr && elVtr.value ? String(elVtr.value).trim() : "";
+      const ativo = !!vtrAtual;
+
+      elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
+      elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
+
+      elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
+      elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
     }
 
     function preencherHorarioPadrao() {
@@ -1061,9 +1109,11 @@
       const options = chaves.map(ch => `<option value="${esc(ch)}">${esc(ch)}</option>`).join("");
       elVtr.innerHTML = options;
       elFiltroVtr.innerHTML = `<option value="">Selecione a VTR</option>${options}`;
+      atualizarVtrTopo();
     }
 
     function atualizarInfoVtr() {
+      atualizarVtrTopo();
       const dados = VTRS[elVtr.value] || {
         placa: "NÃO CADASTRADO",
         marcamodelo: "NÃO CADASTRADO",
@@ -2234,6 +2284,7 @@
 
     function carregarInicio() {
       atualizarCondutorLogadoTopo();
+      atualizarVtrTopo();
       preencherUsuariosSelect();
       preencherVtrsSelects();
       preencherAnos();
