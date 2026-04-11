@@ -2219,7 +2219,6 @@ Cadastre sua nova senha numérica:`);
       `;
     }
 
-
     function exportarMes() {
       if (!registrosFiltrados.length) {
         alert("Nenhum registro carregado para exportar.");
@@ -2261,13 +2260,14 @@ Cadastre sua nova senha numérica:`);
       const hTitulo = 8;
       const hSub = 7;
       const hIdent = 7;
-      const hCab = 10;
-      const hLinha = 11.15;
+      const hCab = 12;
+      const hLinha = 10.8;
 
       function drawTextBox(txt, x, y, w, h, opts = {}) {
         const align = opts.align || "center";
         const bold = !!opts.bold;
         const size = opts.size || 7;
+
         const lines = Array.isArray(txt)
           ? txt
           : doc.splitTextToSize(String(txt || ""), Math.max(1, w - 1.6));
@@ -2275,23 +2275,28 @@ Cadastre sua nova senha numérica:`);
         doc.setFont("helvetica", bold ? "bold" : "normal");
         doc.setFontSize(size);
 
-        let startY = y + (h / 2);
-        if (lines.length === 1) {
-          startY += 0.2;
-        } else {
-          const lineH = size * 0.32 + 1.0;
-          const totalH = lineH * lines.length;
-          startY = y + ((h - totalH) / 2) + lineH - 0.3;
-        }
+        const lineHeight = size * 0.35 + 1.2;
+        const totalHeight = lines.length * lineHeight;
+        const startY = y + ((h - totalHeight) / 2) + (lineHeight / 2);
 
         lines.forEach((line, idx) => {
-          const yy = startY + idx * (size * 0.32 + 1.0);
+          const yy = startY + idx * lineHeight;
+
           if (align === "left") {
-            doc.text(line, x + 1.0, yy, { align: "left", baseline: "middle" });
+            doc.text(line, x + 1.2, yy, {
+              align: "left",
+              baseline: "middle"
+            });
           } else if (align === "right") {
-            doc.text(line, x + w - 1.0, yy, { align: "right", baseline: "middle" });
+            doc.text(line, x + w - 1.2, yy, {
+              align: "right",
+              baseline: "middle"
+            });
           } else {
-            doc.text(line, x + (w / 2), yy, { align: "center", baseline: "middle" });
+            doc.text(line, x + (w / 2), yy, {
+              align: "center",
+              baseline: "middle"
+            });
           }
         });
       }
@@ -2336,7 +2341,11 @@ Cadastre sua nova senha numérica:`);
         ];
 
         for (let i = 0; i < headers.length; i++) {
-          drawCell(colX[i], y, colWidths[i], hCab, headers[i], { bold: true, size: 6.1 });
+          drawCell(colX[i], y, colWidths[i], hCab, headers[i], {
+            bold: true,
+            size: 5.8,
+            align: "center"
+          });
         }
         y += hCab;
 
