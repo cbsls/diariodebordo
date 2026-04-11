@@ -1353,10 +1353,10 @@
           atualizarEstadoFinal();
         }
       } catch (e) {
-        console.error(e);
-        msgErro(elStatusSalvar, "❌ Falha ao carregar pendência compartilhada.");
-      }
-    }
+  console.error(e);
+  msgErro(elUserOk, `❌ Erro no login: ${e.message || e}`);
+  elFormBox.classList.add("hidden");
+}
 
     function atualizarMensagemPendencia() {
       if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
@@ -1482,13 +1482,12 @@
         assumirCondutorLinha2DoUsuarioLogado();
         atualizarEstadoFinal();
       } catch (e) {
-        console.error(e);
-        msgErro(elUserOk, "❌ Erro ao validar login no Supabase.");
-        elFormBox.classList.add("hidden");
-      } finally {
-        elBtnEntrar.disabled = false;
-      }
-    }
+  console.error(e);
+  msgErro(elUserOk, `❌ Erro no login: ${e.message || e}`);
+  elFormBox.classList.add("hidden");
+} finally {
+  elBtnEntrar.disabled = false;
+}
 
     async function obterUltimoRegistroDaVtr(vtr) {
       const { data, error } = await supabaseClient
