@@ -37,7 +37,49 @@
       padding:14px 16px 12px 16px;
       box-shadow:0 2px 10px rgba(0,0,0,.12);
     }
+    
     .app-header-top { display:flex; align-items:center; gap:12px; }
+    .app-header-info {
+      flex:1;
+      min-width:0;
+    }
+    .condutor-logado-box{
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.2;
+      min-width:130px;
+      max-width:170px;
+      text-align:left;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      transition:all .25s ease;
+    }
+    .condutor-logado-inativo{
+      background: rgba(107,114,128,.35);
+      border: 1px solid rgba(255,255,255,.20);
+    }
+    .condutor-logado-ativo{
+      background: linear-gradient(180deg, rgba(34,197,94,.28) 0%, rgba(22,163,74,.36) 100%);
+      border: 1px solid rgba(187,247,208,.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 1px rgba(34,197,94,.06);
+    }
+    .condutor-logado-titulo{
+      display:block;
+      font-size:10px;
+      opacity:.9;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      margin-bottom:3px;
+    }
+    .condutor-logado-nome{
+      display:block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:13px;
+    }
     .app-logo {
       width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12);
       display:flex; align-items:center; justify-content:center; font-size:28px;
@@ -446,9 +488,13 @@
   <div class="app-header">
     <div class="app-header-top">
       <div class="app-logo">🚒</div>
-      <div>
+      <div class="app-header-info">
         <h1 class="app-title">Diário de Bordo</h1>
         <div class="app-subtitle">CB São Lourenço do Sul • Lançamento, exportação e cadastro</div>
+      </div>
+      <div class="condutor-logado-box condutor-logado-inativo" id="condutorLogadoTopo">
+        <span class="condutor-logado-titulo">Condutor logado</span>
+        <span class="condutor-logado-nome" id="condutorLogadoNome">Não logado</span>
       </div>
     </div>
   </div>
@@ -868,6 +914,8 @@
     const elStatusBuscaVtr = document.getElementById("statusBuscaVtr");
     const elListaVtr = document.getElementById("listaVtr");
     const elListaCadastroVtr = document.getElementById("listaCadastroVtr");
+    const elCondutorLogadoTopo = document.getElementById("condutorLogadoTopo");
+    const elCondutorLogadoNome = document.getElementById("condutorLogadoNome");
 
     function hojeISO() {
       const d = new Date();
@@ -918,6 +966,17 @@
 
     function msgMuted(el, texto) {
       el.innerHTML = `<div class="muted">${texto}</div>`;
+    }
+
+    function atualizarCondutorLogadoTopo() {
+      const nome = logado && logado.guerra ? String(logado.guerra).trim() : "Não logado";
+      const ativo = !!(logado && logado.guerra);
+
+      elCondutorLogadoNome.textContent = nome || "Não logado";
+      elCondutorLogadoTopo.title = nome || "Não logado";
+
+      elCondutorLogadoTopo.classList.toggle("condutor-logado-ativo", ativo);
+      elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
     }
 
     function preencherHorarioPadrao() {
@@ -1330,6 +1389,7 @@
         }
 
         logado = user;
+        atualizarCondutorLogadoTopo();
         msgOk(elUserOk, `✅ ${user.guerra}`);
         elFormBox.classList.remove("hidden");
 
@@ -2173,6 +2233,7 @@
     elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
 
     function carregarInicio() {
+      atualizarCondutorLogadoTopo();
       preencherUsuariosSelect();
       preencherVtrsSelects();
       preencherAnos();
