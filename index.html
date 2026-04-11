@@ -1035,15 +1035,22 @@
       elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
     }
     function atualizarVtrTopo() {
-      const vtrAtual = elVtr && elVtr.value ? String(elVtr.value).trim() : "";
-      const ativo = !!vtrAtual;
+  let vtrAtual = "";
 
-      elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
-      elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
+  if (abaLancamento.classList.contains("active") && elVtr.value) {
+    vtrAtual = String(elVtr.value).trim();
+  } else if (abaExportar.classList.contains("active") && elFiltroVtr.value) {
+    vtrAtual = String(elFiltroVtr.value).trim();
+  }
 
-      elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
-      elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
-    }
+  const ativo = !!vtrAtual;
+
+  elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
+  elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
+
+  elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
+  elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
+}
 
     function preencherHorarioPadrao() {
       horarioAtualSeVazio(elHoraPartida);
@@ -1199,7 +1206,7 @@
         abaCadastro.classList.add("active");
         tabCadastroBtn.classList.add("active");
       }
-
+      atualizarVtrTopo();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -2270,6 +2277,7 @@
     tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
 
     elBtnEntrar.addEventListener("click", login);
+    elFiltroVtr.addEventListener("change", atualizarVtrTopo);
     elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
     elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
     elBtnEditarLinha1.addEventListener("click", editarLinha1);
