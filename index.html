@@ -569,7 +569,14 @@
         <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
 
         <label for="senhaLogin">Senha</label>
-        <input id="senhaLogin" type="password" placeholder="Digite sua senha" />
+      <input 
+        id="senhaLogin" 
+        type="password" 
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        placeholder="Digite sua senha"
+      />
 
         <button type="button" id="btnEntrar">Entrar</button>
         <div class="muted">No primeiro acesso, use sua própria ID como senha. Depois cadastre uma nova.</div>
@@ -2289,11 +2296,16 @@
       campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
     });
 
-    elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
-    elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
-    elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
+   elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
 
-    function carregarInicio() {
+elSenhaLogin.addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "");
+});
+
+elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
+
+function carregarInicio() {
       atualizarCondutorLogadoTopo();
       atualizarVtrTopo();
       preencherUsuariosSelect();
