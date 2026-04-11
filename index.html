@@ -2242,7 +2242,8 @@ Cadastre sua nova senha numérica:`);
       const doc = new jsPDF({
         orientation: "landscape",
         unit: "mm",
-        format: "a4"
+        format: "a4",
+        compress: true
       });
 
       const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
@@ -2255,31 +2256,54 @@ Cadastre sua nova senha numérica:`);
       const cabecalho = [[
         "DATA",
         "LOCAL DE PARTIDA",
-        "KM DO VEÍC. NA PARTIDA",
-        "HORA DA PARTIDA",
-        "KM DO VEÍC. NO DESTINO",
-        "HORA DA CHEGADA",
+        "KM DO VEÍC. NA\nPARTIDA",
+        "HORA DA\nPARTIDA",
+        "KM DO VEÍC. NO\nDESTINO",
+        "HORA DA\nCHEGADA",
         "NOME CONDUTOR",
-        "ASSINATURA CONDUTOR",
+        "ASSINATURA\nCONDUTOR",
         "NOME USUÁRIO",
-        "ASSINATURA USUÁRIO"
+        "ASSINATURA\nUSUÁRIO"
       ]];
+
+      const margemEsq = 4.5;
+      const margemDir = 4.5;
+      const larguraUtil = 297 - margemEsq - margemDir;
+
+      const colWidths = {
+        0: { cellWidth: 16 },
+        1: { cellWidth: 41 },
+        2: { cellWidth: 27 },
+        3: { cellWidth: 23 },
+        4: { cellWidth: 27 },
+        5: { cellWidth: 23 },
+        6: { cellWidth: 37 },
+        7: { cellWidth: 27 },
+        8: { cellWidth: 32 },
+        9: { cellWidth: 27 }
+      };
 
       function desenharCabecalhoPagina(numeroPagina, totalPaginas) {
         doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.3);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.text("DIÁRIO DE BORDO FÍSICO", 148.5, 11.5, { align: "center" });
-
-        doc.setFontSize(9);
-        doc.text(`${vtr} - ${referencia} - PÁGINA ${numeroPagina}/${totalPaginas}`, 148.5, 17.5, { align: "center" });
+        doc.setLineWidth(0.25);
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8);
-        doc.text(`PLACA: ${dadosVtr.placa || ""}`, 6, 24);
-        doc.text(`MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, 54, 24);
-        doc.text(`ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, 174, 24);
+        doc.setFontSize(11);
+        doc.text("DIÁRIO DE BORDO FÍSICO", 148.5, 9.5, { align: "center" });
+
+        doc.setFontSize(8.5);
+        doc.text(`${vtr} - ${referencia} - PÁGINA ${numeroPagina}/${totalPaginas}`, 148.5, 15.5, { align: "center" });
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.2);
+
+        doc.rect(margemEsq, 18, 78, 8);
+        doc.rect(margemEsq + 78, 18, 106, 8);
+        doc.rect(margemEsq + 184, 18, larguraUtil - 184, 8);
+
+        doc.text(`PLACA: ${dadosVtr.placa || ""}`, margemEsq + 1.5, 23);
+        doc.text(`MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, margemEsq + 79.5, 23);
+        doc.text(`ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, margemEsq + 185.5, 23);
       }
 
       paginas.forEach((pagina, paginaIndex) => {
@@ -2305,22 +2329,23 @@ Cadastre sua nova senha numérica:`);
         }
 
         doc.autoTable({
-          startY: 28,
+          startY: 26,
           head: cabecalho,
           body,
           theme: "grid",
-          margin: { left: 5, right: 5 },
+          margin: { left: margemEsq, right: margemDir },
+          tableWidth: larguraUtil,
           styles: {
             font: "helvetica",
-            fontSize: 7,
-            cellPadding: 1.2,
+            fontSize: 7.1,
+            cellPadding: 0.9,
             lineColor: [0, 0, 0],
             lineWidth: 0.2,
             textColor: [0, 0, 0],
             overflow: "linebreak",
             halign: "center",
             valign: "middle",
-            minCellHeight: 10.8
+            minCellHeight: 11.2
           },
           headStyles: {
             fillColor: [255, 255, 255],
@@ -2328,26 +2353,16 @@ Cadastre sua nova senha numérica:`);
             fontStyle: "bold",
             lineColor: [0, 0, 0],
             lineWidth: 0.25,
-            minCellHeight: 12
+            minCellHeight: 13,
+            fontSize: 6.6
           },
-          columnStyles: {
-            0: { cellWidth: 14 },
-            1: { cellWidth: 35 },
-            2: { cellWidth: 23 },
-            3: { cellWidth: 20 },
-            4: { cellWidth: 23 },
-            5: { cellWidth: 20 },
-            6: { cellWidth: 32 },
-            7: { cellWidth: 23 },
-            8: { cellWidth: 28 },
-            9: { cellWidth: 23 }
+          bodyStyles: {
+            minCellHeight: 11.2
           },
+          columnStyles: colWidths,
           didParseCell: function (data) {
-            if (data.section === "body") {
-              data.cell.styles.minCellHeight = 10.8;
-            }
-            if (data.section === "head") {
-              data.cell.styles.minCellHeight = 12;
+            if (data.section === "body" && (data.column.index === 1 || data.column.index === 6 || data.column.index === 8)) {
+              data.cell.styles.fontSize = 6.8;
             }
           }
         });
@@ -2426,4 +2441,4 @@ function carregarInicio() {
     carregarInicio();
   </script>
 </body>
-  </html>
+</html>
