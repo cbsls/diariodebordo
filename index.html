@@ -10,11 +10,10 @@
 
   <style>
     * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-
     :root{
       --bg:#e9edf3;
       --card:#ffffff;
-      --card-soft:#fafafa;
+      --soft:#fafafa;
       --primary:#d51313;
       --primary-dark:#8e0000;
       --success:#2e7d32;
@@ -22,22 +21,12 @@
       --muted:#666;
       --text:#24303f;
       --border:#d8dde4;
-      --tab-bg:#ffffffee;
       --shadow:0 4px 14px rgba(0,0,0,.08);
       --info:#0f4c81;
       --info-soft:#eef6ff;
     }
-
-    html, body {
-      margin:0;
-      padding:0;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    body {
-      padding:0 0 92px 0;
-    }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); }
+    body { padding:0 0 92px 0; }
 
     .app-header {
       position: sticky;
@@ -48,43 +37,14 @@
       padding:14px 16px 12px 16px;
       box-shadow:0 2px 10px rgba(0,0,0,.12);
     }
-
-    .app-header-top {
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
+    .app-header-top { display:flex; align-items:center; gap:12px; }
     .app-logo {
-      width:58px;
-      height:58px;
-      border-radius:18px;
-      background:rgba(255,255,255,.12);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:28px;
-      flex:0 0 58px;
-      border:1px solid rgba(255,255,255,.18);
+      width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:center; font-size:28px;
+      flex:0 0 58px; border:1px solid rgba(255,255,255,.18);
     }
-
-    .app-title-wrap {
-      min-width:0;
-      flex:1;
-    }
-
-    .app-title {
-      margin:0;
-      font-size:20px;
-      font-weight:800;
-      line-height:1.1;
-    }
-
-    .app-subtitle {
-      margin-top:4px;
-      font-size:13px;
-      opacity:.95;
-    }
+    .app-title { margin:0; font-size:20px; font-weight:800; line-height:1.1; }
+    .app-subtitle { margin-top:4px; font-size:13px; opacity:.95; }
 
     .conteudo-app {
       position: relative;
@@ -103,7 +63,6 @@
       inset:0;
       padding:16px 16px 0 16px;
     }
-
     .aba.active {
       opacity:1;
       transform:translateX(0);
@@ -113,9 +72,7 @@
       padding:0;
     }
 
-    .hidden {
-      display:none !important;
-    }
+    .hidden { display:none !important; }
 
     .card {
       background:var(--card);
@@ -171,123 +128,20 @@
       cursor:pointer;
     }
 
-    button:disabled {
-      opacity:.7;
-      cursor:wait;
-    }
+    button:disabled { opacity:.7; cursor:wait; }
 
-    .ok {
-      color:#0a7a28;
-      font-weight:bold;
-      margin-top:8px;
-    }
-
-    .erro {
-      color:#b00020;
-      font-weight:bold;
-      margin-top:8px;
-    }
-
-    .muted {
-      color:var(--muted);
-      font-size:14px;
-    }
+    .ok { color:#0a7a28; font-weight:bold; margin-top:8px; }
+    .erro { color:#b00020; font-weight:bold; margin-top:8px; }
+    .muted { color:var(--muted); font-size:14px; }
 
     .info-vtr {
-      background:var(--card-soft);
+      background:var(--soft);
       border:1px solid #ddd;
       border-radius:14px;
       padding:14px;
       margin-bottom:12px;
       line-height:1.5;
       font-size:15px;
-    }
-
-    .subtitulo-box {
-      margin-top:0;
-      margin-bottom:12px;
-      font-size:22px;
-      color:var(--text);
-    }
-
-    .registro, .vtr-item {
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:10px;
-      background:var(--card-soft);
-    }
-
-    .registro b, .vtr-item b {
-      font-size:18px;
-    }
-
-    .linha-acoes {
-      margin-top:10px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .linha-acoes > button {
-      flex:1;
-      min-width:140px;
-    }
-
-    .btn-pdf {
-      background:#0f4c81;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-edit {
-      background:#6d4c41;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-save {
-      background:var(--success);
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-cancel {
-      background:#757575;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-reset {
-      background:#9b1c1c;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-linha {
-      background:var(--primary-dark);
-      font-size:16px;
-      padding:12px;
-      margin-top:4px;
-    }
-
-    .btn-linha-ok {
-      background:var(--success) !important;
-    }
-
-    .btn-editar-linha {
-      background:#4b5563 !important;
-      font-size:15px;
-      padding:12px;
-      margin-top:4px;
-    }
-
-    .btn-finalizar {
-      background:var(--success) !important;
-    }
-
-    .btn-salvar-parcial {
-      background:var(--warning) !important;
     }
 
     .odometro-box {
@@ -298,13 +152,7 @@
       margin-bottom:10px;
       border:2px solid #333;
     }
-
-    .odometro-titulo {
-      font-size:14px;
-      color:#b8ffcd;
-      margin-bottom:6px;
-    }
-
+    .odometro-titulo { font-size:14px; color:#b8ffcd; margin-bottom:6px; }
     .odometro-valor {
       font-family:"Courier New", Courier, monospace;
       font-size:30px;
@@ -318,54 +166,36 @@
       gap:12px;
     }
 
-    .rodape-tabs {
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      background:var(--tab-bg);
-      backdrop-filter: blur(10px);
-      border-top:1px solid var(--border);
-      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-      display:flex;
+    .linha-acoes-local {
+      display:grid;
+      grid-template-columns:1fr 1fr;
       gap:10px;
-      z-index:999;
-      box-shadow:0 -2px 12px rgba(0,0,0,.08);
+      margin-top:6px;
     }
 
-    .rodape-btn {
-      flex:1;
-      border:none;
-      border-radius:18px;
-      padding:10px 8px;
-      font-size:12px;
-      font-weight:bold;
-      background:#dbe3ec;
-      color:#24303f;
-      cursor:pointer;
-      line-height:1.15;
-      min-height:62px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:4px;
+    .btn-linha {
+      background:var(--primary-dark);
+      font-size:16px;
+      padding:12px;
+      margin-top:4px;
     }
 
-    .rodape-btn .icone {
-      font-size:20px;
-      line-height:1;
+    .btn-linha-ok { background:var(--success) !important; }
+
+    .btn-editar-linha {
+      background:#4b5563 !important;
+      font-size:15px;
+      padding:12px;
+      margin-top:4px;
     }
 
-    .rodape-btn .texto {
-      font-size:12px;
-      font-weight:800;
-    }
+    .btn-finalizar { background:var(--success) !important; }
+    .btn-salvar-parcial { background:var(--warning) !important; }
 
-    .rodape-btn.active {
-      background:var(--primary);
-      color:#fff;
-      box-shadow:0 6px 16px rgba(213,19,19,.25);
+    .btn-pdf {
+      background:#0f4c81;
+      font-size:16px;
+      padding:12px;
     }
 
     .btn-odometro-discreto {
@@ -402,14 +232,8 @@
       color:#fff;
       background:#6b7280;
     }
-
-    .badge-ok {
-      background:var(--success);
-    }
-
-    .badge-pendente {
-      background:var(--primary-dark);
-    }
+    .badge-ok { background:var(--success); }
+    .badge-pendente { background:var(--primary-dark); }
 
     .clock-box {
       background:#f8fafc;
@@ -423,25 +247,8 @@
       gap:10px;
       flex-wrap:wrap;
     }
-
-    .clock-label {
-      font-size:13px;
-      color:#475569;
-      font-weight:bold;
-    }
-
-    .clock-time {
-      font-size:18px;
-      font-weight:bold;
-      color:#0f172a;
-    }
-
-    .linha-acoes-local {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:6px;
-    }
+    .clock-label { font-size:13px; color:#475569; font-weight:bold; }
+    .clock-time { font-size:18px; font-weight:bold; color:#0f172a; }
 
     .info-extra {
       background:#f8fafc;
@@ -476,11 +283,65 @@
       font-weight: bold;
     }
 
+    .subtitulo-box {
+      margin-top:0;
+      margin-bottom:12px;
+      font-size:22px;
+      color:var(--text);
+    }
+
+    .registro, .vtr-item {
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:10px;
+      background:var(--soft);
+    }
+
+    .rodape-tabs {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background:#ffffffee;
+      backdrop-filter: blur(10px);
+      border-top:1px solid var(--border);
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      display:flex;
+      gap:10px;
+      z-index:999;
+      box-shadow:0 -2px 12px rgba(0,0,0,.08);
+    }
+
+    .rodape-btn {
+      flex:1;
+      border:none;
+      border-radius:18px;
+      padding:10px 8px;
+      font-size:12px;
+      font-weight:bold;
+      background:#dbe3ec;
+      color:#24303f;
+      cursor:pointer;
+      line-height:1.15;
+      min-height:62px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+    }
+
+    .rodape-btn .icone { font-size:20px; line-height:1; }
+    .rodape-btn .texto { font-size:12px; font-weight:800; }
+    .rodape-btn.active {
+      background:var(--primary);
+      color:#fff;
+      box-shadow:0 6px 16px rgba(213,19,19,.25);
+    }
+
     @media (max-width: 700px) {
-      .grid-2,
-      .linha-acoes-local {
-        grid-template-columns:1fr;
-      }
+      .grid-2, .linha-acoes-local { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -489,7 +350,7 @@
   <div class="app-header">
     <div class="app-header-top">
       <div class="app-logo">🚒</div>
-      <div class="app-title-wrap">
+      <div>
         <h1 class="app-title">Diário de Bordo</h1>
         <div class="app-subtitle">CB São Lourenço do Sul • Lançamento, exportação e cadastro</div>
       </div>
@@ -634,7 +495,7 @@
           </div>
         </div>
 
-        <div class="info-extra" id="infoResumo">
+        <div class="info-extra">
           <b>Resumo automático</b><br>
           KM rodado total: <span id="kmRodadoTotal">0</span><br>
           Situação: <span id="situacaoResumo">Aguardando preenchimento</span>
@@ -723,8 +584,8 @@
 
   <script>
     const ADMIN_SENHA = "123456";
-    const RASCUNHO_KEY = "diario_rascunho_lancamento";
     const TABELA_AUTH = "diario_usuarios_auth";
+    const TABELA_PENDENCIAS = "diario_pendencias";
 
     const USUARIOS = [
       { guerra: "1º SGT VICENTE", id: "2614960" },
@@ -1033,32 +894,6 @@
               Status: ${esc(v.status || "")}<br>
               Descrição: ${esc(v.descricao || "")}<br>
               Ano: ${esc(v.ano || "")}
-              <div class="linha-acoes">
-                <button type="button" class="btn-edit" onclick="editarVtr('${esc(ch)}')">✏️ Editar cadastro</button>
-                <button type="button" class="btn-reset" onclick="resetarRegistrosVtr('${esc(ch)}')">🗑️ Reset registros</button>
-              </div>
-            </div>
-
-            <div id="edit_${itemId}" class="hidden">
-              <label>Tipo</label>
-              <input id="tipo_${itemId}" value="${esc(v.tipo || "")}" />
-              <label>Placa</label>
-              <input id="placa_${itemId}" value="${esc(v.placa || "")}" />
-              <label>Marca/Modelo</label>
-              <input id="marcamodelo_${itemId}" value="${esc(v.marcamodelo || "")}" />
-              <label>Órgão/Entidade</label>
-              <input id="orgao_${itemId}" value="${esc(v.orgao || "")}" />
-              <label>Status</label>
-              <input id="status_${itemId}" value="${esc(v.status || "")}" />
-              <label>Descrição</label>
-              <textarea id="descricao_${itemId}" rows="3">${esc(v.descricao || "")}</textarea>
-              <label>Ano</label>
-              <input id="ano_${itemId}" value="${esc(v.ano || "")}" />
-
-              <div class="linha-acoes">
-                <button type="button" class="btn-save" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar</button>
-                <button type="button" class="btn-cancel" onclick="cancelarEdicaoVtr()">↩️ Cancelar</button>
-              </div>
             </div>
           </div>
         `;
@@ -1097,6 +932,144 @@
       if (!campo.value) campo.value = horaAtual();
     }
 
+    function limparFormularioVisual() {
+      elSaidaSelect.value = "";
+      elSaidaOutro.value = "";
+      elSaidaOutro.classList.add("hidden");
+      elRetornoSelect.value = "";
+      elRetornoOutro.value = "";
+      elRetornoOutro.classList.add("hidden");
+      elKmIni.value = "";
+      elHoraPartida.value = "";
+      elKmFim.value = "";
+      elHoraChegada.value = "";
+      elKmIniRetorno.value = "";
+      elHoraSaidaRetorno.value = "";
+      elKmFimRetorno.value = "";
+      elHoraChegadaRetorno.value = "";
+      elCondutorIda.value = logado ? logado.guerra : "";
+      elCondutorRetorno.value = "";
+      elUsuario.value = "";
+      linha1Salva = false;
+      linha2Salva = false;
+      atualizarEstadoFinal();
+    }
+
+    function aplicarPendenciaNaTela(p) {
+      elData.value = p.data || hojeISO();
+      elSaidaSelect.value = p.localpartida && [...elSaidaSelect.options].some(o => o.value === p.localpartida) ? p.localpartida : (p.localpartida ? "OUTRO" : "");
+      if (elSaidaSelect.value === "OUTRO") {
+        elSaidaOutro.classList.remove("hidden");
+        elSaidaOutro.value = p.localpartida || "";
+      } else {
+        elSaidaOutro.classList.add("hidden");
+        elSaidaOutro.value = "";
+      }
+
+      elRetornoSelect.value = p.localretorno && [...elRetornoSelect.options].some(o => o.value === p.localretorno) ? p.localretorno : (p.localretorno ? "OUTRO" : "");
+      if (elRetornoSelect.value === "OUTRO") {
+        elRetornoOutro.classList.remove("hidden");
+        elRetornoOutro.value = p.localretorno || "";
+      } else {
+        elRetornoOutro.classList.add("hidden");
+        elRetornoOutro.value = "";
+      }
+
+      elKmIni.value = p.kmini ?? "";
+      elHoraPartida.value = p.horapartida || "";
+      elKmFim.value = p.kmfim ?? "";
+      elHoraChegada.value = p.horachegada || "";
+
+      elKmIniRetorno.value = p.kminiretorno ?? "";
+      elHoraSaidaRetorno.value = p.horasaidaretorno || "";
+      elKmFimRetorno.value = p.kmfimretorno ?? "";
+      elHoraChegadaRetorno.value = p.horachegadaretorno || "";
+
+      elCondutorIda.value = p.condutor_ida || "";
+      elCondutorRetorno.value = p.condutor_retorno || (logado ? logado.guerra : "");
+      elUsuario.value = p.usuario || "";
+
+      linha1Salva = Boolean(p.condutor_ida && p.localpartida && p.kmini != null && p.horapartida && p.kmfim != null && p.horachegada);
+      linha2Salva = Boolean(p.condutor_retorno && p.kminiretorno != null && p.horasaidaretorno && p.kmfimretorno != null && p.horachegadaretorno);
+
+      atualizarEstadoFinal();
+    }
+
+    async function buscarPendenciaSupabase(vtr) {
+      const { data, error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .select("*")
+        .eq("vtr", vtr)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    }
+
+    async function salvarPendenciaSupabase() {
+      const payload = {
+        vtr: elVtr.value,
+        data: elData.value || null,
+        localpartida: obterSaidaFinal() || null,
+        localretorno: obterRetornoFinal() || null,
+        kmini: elKmIni.value === "" ? null : Number(elKmIni.value),
+        horapartida: elHoraPartida.value || null,
+        kmfim: elKmFim.value === "" ? null : Number(elKmFim.value),
+        horachegada: elHoraChegada.value || null,
+        kminiretorno: elKmIniRetorno.value === "" ? null : Number(elKmIniRetorno.value),
+        horasaidaretorno: elHoraSaidaRetorno.value || null,
+        kmfimretorno: elKmFimRetorno.value === "" ? null : Number(elKmFimRetorno.value),
+        horachegadaretorno: elHoraChegadaRetorno.value || null,
+        condutor_ida: elCondutorIda.value || null,
+        condutor_retorno: elCondutorRetorno.value || null,
+        usuario: elUsuario.value || null,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .upsert([payload], { onConflict: "vtr" });
+
+      if (error) throw error;
+    }
+
+    async function excluirPendenciaSupabase(vtr) {
+      const { error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .delete()
+        .eq("vtr", vtr);
+
+      if (error) throw error;
+    }
+
+    async function carregarPendenciaDaVtr() {
+      if (!elVtr.value) return;
+
+      try {
+        const pendencia = await buscarPendenciaSupabase(elVtr.value);
+        if (pendencia) {
+          aplicarPendenciaNaTela(pendencia);
+
+          if (logado && linha1Salva && !linha2Salva) {
+            elCondutorRetorno.value = logado.guerra;
+          }
+
+          atualizarEstadoFinal();
+          msgMuted(elStatusSalvar, "Pendência compartilhada carregada do Supabase.");
+        } else {
+          limparFormularioVisual();
+          elData.value = hojeISO();
+          const kmBase = Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
+          elKmIni.value = kmBase || "";
+          elCondutorIda.value = logado ? logado.guerra : "";
+          atualizarEstadoFinal();
+        }
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Falha ao carregar pendência compartilhada.");
+      }
+    }
+
     function atualizarMensagemPendencia() {
       if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
         elPendenciaBox.classList.remove("hidden");
@@ -1104,7 +1077,7 @@
           ⚠️ REGISTRO PENDENTE DE FECHAMENTO<br>
           Condutor da 1ª linha: <b>${esc(elCondutorIda.value)}</b><br>
           Condutor da 2ª linha atual: <b>${esc(elCondutorRetorno.value || "aguardando login")}</b><br>
-          Complete o retorno e finalize o registro.
+          Registro carregado do Supabase. Complete o retorno e finalize.
         `;
       } else {
         elPendenciaBox.classList.add("hidden");
@@ -1138,25 +1111,19 @@
 
     async function cadastrarNovaSenhaPrimeiroAcesso(user) {
       const nova1 = prompt(`Primeiro acesso de ${user.guerra}.\nCadastre sua nova senha:`);
-
       if (nova1 === null) return false;
-
       const senha1 = String(nova1).trim();
       if (senha1.length < 4) {
         alert("A nova senha deve ter pelo menos 4 caracteres.");
         return false;
       }
-
       const nova2 = prompt("Confirme a nova senha:");
       if (nova2 === null) return false;
-
       const senha2 = String(nova2).trim();
-
       if (senha1 !== senha2) {
         alert("As senhas não conferem.");
         return false;
       }
-
       await salvarNovaSenhaNoSupabase(user, senha1);
       alert("Senha cadastrada com sucesso.");
       return true;
@@ -1173,7 +1140,6 @@
       }
 
       const user = USUARIOS.find(u => u.id === id);
-
       if (!user) {
         msgErro(elUserOk, "❌ ID não cadastrada.");
         elFormBox.classList.add("hidden");
@@ -1211,27 +1177,20 @@
         msgOk(elUserOk, `✅ ${user.guerra}`);
         elFormBox.classList.remove("hidden");
 
-        if (!elData.value) {
-          elData.value = hojeISO();
-        }
-
+        if (!elData.value) elData.value = hojeISO();
         elSenhaLogin.value = "";
 
         atualizarInfoVtr();
         await atualizarKmBaseDaVtr();
-        carregarRascunho();
+        await carregarPendenciaDaVtr();
 
-        if (!linha1Salva || !elCondutorIda.value.trim()) {
+        if (!linha1Salva) {
           elCondutorIda.value = user.guerra;
         }
-
         if (linha1Salva && !linha2Salva) {
           elCondutorRetorno.value = user.guerra;
-        } else if (!linha1Salva) {
-          elCondutorRetorno.value = "";
         }
 
-        salvarRascunho();
         atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
@@ -1276,7 +1235,7 @@
         }
 
         elOdometroValor.textContent = formatarOdometro(kmBase);
-        if (!elKmIni.value) elKmIni.value = kmBase || "";
+        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
         atualizarResumoAutomatico();
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
@@ -1284,7 +1243,7 @@
         const kmManual = obterOdometroManual(vtr);
         const kmBase = kmManual != null ? kmManual : 0;
         elOdometroValor.textContent = formatarOdometro(kmBase);
-        if (!elKmIni.value) elKmIni.value = kmBase || "";
+        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
         atualizarResumoAutomatico();
         msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
@@ -1316,9 +1275,6 @@
       salvarOdometroManual(vtr, km);
       elOdometroValor.textContent = formatarOdometro(km);
       if (!linha1Salva) elKmIni.value = km;
-      elKmIniRetorno.value = "";
-      salvarRascunho();
-      atualizarResumoAutomatico();
       msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
@@ -1342,7 +1298,6 @@
 
     function aplicarRetornoAutomatico() {
       controlarCamposSaida();
-
       if (elSaidaSelect.value && elSaidaSelect.value !== "OUTRO") {
         const retorno = MAPA_RETORNO[elSaidaSelect.value];
         if (retorno) {
@@ -1350,7 +1305,6 @@
           controlarCamposRetorno();
         }
       }
-      salvarRascunho();
       atualizarResumoAutomatico();
       atualizarMensagemPendencia();
     }
@@ -1362,7 +1316,6 @@
       } else {
         elKmIniRetorno.value = "";
       }
-      salvarRascunho();
       atualizarResumoAutomatico();
       atualizarEstadoFinal();
     }
@@ -1495,103 +1448,7 @@
       }
     }
 
-    function coletarRascunho() {
-      return {
-        vtr: elVtr.value,
-        data: elData.value,
-        saidaSelect: elSaidaSelect.value,
-        saidaOutro: elSaidaOutro.value,
-        retornoSelect: elRetornoSelect.value,
-        retornoOutro: elRetornoOutro.value,
-        kmIni: elKmIni.value,
-        horaPartida: elHoraPartida.value,
-        kmFim: elKmFim.value,
-        horaChegada: elHoraChegada.value,
-        kmIniRetorno: elKmIniRetorno.value,
-        horaSaidaRetorno: elHoraSaidaRetorno.value,
-        kmFimRetorno: elKmFimRetorno.value,
-        horaChegadaRetorno: elHoraChegadaRetorno.value,
-        condutorIda: elCondutorIda.value,
-        condutorRetorno: elCondutorRetorno.value,
-        usuario: elUsuario.value,
-        linha1Salva,
-        linha2Salva
-      };
-    }
-
-    function salvarRascunho() {
-      try {
-        localStorage.setItem(RASCUNHO_KEY, JSON.stringify(coletarRascunho()));
-      } catch {}
-    }
-
-    function carregarRascunho() {
-      try {
-        const bruto = localStorage.getItem(RASCUNHO_KEY);
-        if (!bruto) {
-          linha1Salva = false;
-          linha2Salva = false;
-          preencherHorarioPadrao();
-          atualizarEstadoFinal();
-          return;
-        }
-
-        const r = JSON.parse(bruto);
-        if (r.vtr && elVtr.value && r.vtr !== elVtr.value) {
-          linha1Salva = false;
-          linha2Salva = false;
-          preencherHorarioPadrao();
-          atualizarEstadoFinal();
-          return;
-        }
-
-        if (r.data) elData.value = r.data;
-        if (r.saidaSelect) elSaidaSelect.value = r.saidaSelect;
-        if (r.saidaOutro) elSaidaOutro.value = r.saidaOutro;
-        if (r.retornoSelect) elRetornoSelect.value = r.retornoSelect;
-        if (r.retornoOutro) elRetornoOutro.value = r.retornoOutro;
-        if (r.kmIni) elKmIni.value = r.kmIni;
-        if (r.horaPartida) elHoraPartida.value = r.horaPartida;
-        if (r.kmFim) elKmFim.value = r.kmFim;
-        if (r.horaChegada) elHoraChegada.value = r.horaChegada;
-        if (r.kmIniRetorno) elKmIniRetorno.value = r.kmIniRetorno;
-        if (r.horaSaidaRetorno) elHoraSaidaRetorno.value = r.horaSaidaRetorno;
-        if (r.kmFimRetorno) elKmFimRetorno.value = r.kmFimRetorno;
-        if (r.horaChegadaRetorno) elHoraChegadaRetorno.value = r.horaChegadaRetorno;
-        if (r.condutorIda) elCondutorIda.value = r.condutorIda;
-        if (r.condutorRetorno) elCondutorRetorno.value = r.condutorRetorno;
-        if (r.usuario) elUsuario.value = r.usuario;
-
-        controlarCamposSaida();
-        controlarCamposRetorno();
-
-        linha1Salva = Boolean(r.linha1Salva);
-        linha2Salva = Boolean(r.linha2Salva);
-
-        preencherHorarioPadrao();
-        atualizarEstadoFinal();
-      } catch {
-        linha1Salva = false;
-        linha2Salva = false;
-        preencherHorarioPadrao();
-        atualizarEstadoFinal();
-      }
-    }
-
-    function limparRascunho() {
-      localStorage.removeItem(RASCUNHO_KEY);
-      linha1Salva = false;
-      linha2Salva = false;
-    }
-
-    function preencherHorarioPadrao() {
-      horarioAtualSeVazio(elHoraPartida);
-      horarioAtualSeVazio(elHoraChegada);
-      horarioAtualSeVazio(elHoraSaidaRetorno);
-      horarioAtualSeVazio(elHoraChegadaRetorno);
-    }
-
-    function salvarLinha1() {
+    async function salvarLinha1() {
       preencherHorarioPadrao();
 
       if (!logado) {
@@ -1610,15 +1467,21 @@
 
       linha1Salva = true;
       atualizarKmInicialRetorno();
+
       if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
       if (!elCondutorRetorno.value.trim()) elCondutorRetorno.value = logado.guerra;
 
-      salvarRascunho();
-      atualizarEstadoFinal();
-      msgOk(elStatusSalvar, "✅ 1ª linha salva parcialmente.");
+      try {
+        await salvarPendenciaSupabase();
+        atualizarEstadoFinal();
+        msgOk(elStatusSalvar, "✅ 1ª linha salva no Supabase. Outro dispositivo poderá continuar.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Erro ao salvar 1ª linha no Supabase.");
+      }
     }
 
-    function salvarLinha2() {
+    async function salvarLinha2() {
       if (!validarLinha1()) {
         msgErro(elStatusSalvar, "❌ Salve primeiro a 1ª linha corretamente.");
         return;
@@ -1638,9 +1501,15 @@
       }
 
       linha2Salva = true;
-      salvarRascunho();
-      atualizarEstadoFinal();
-      msgOk(elStatusSalvar, "✅ 2ª linha salva parcialmente.");
+
+      try {
+        await salvarPendenciaSupabase();
+        atualizarEstadoFinal();
+        msgOk(elStatusSalvar, "✅ 2ª linha salva no Supabase.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Erro ao salvar 2ª linha no Supabase.");
+      }
     }
 
     function editarLinha1() {
@@ -1649,16 +1518,14 @@
       travarCamposLinha1(false);
       travarCamposLinha2(false);
       elCondutorRetorno.value = logado ? logado.guerra : "";
-      salvarRascunho();
       atualizarEstadoFinal();
-      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois, se necessário.");
+      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois.");
     }
 
     function editarLinha2() {
       linha2Salva = false;
       travarCamposLinha2(false);
       if (logado) elCondutorRetorno.value = logado.guerra;
-      salvarRascunho();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
     }
@@ -1667,9 +1534,14 @@
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
 
       if (!pronto) {
-        salvarRascunho();
-        atualizarEstadoFinal();
-        msgMuted(elStatusSalvar, "Rascunho salvo. Complete as duas linhas para finalizar.");
+        try {
+          await salvarPendenciaSupabase();
+          atualizarEstadoFinal();
+          msgMuted(elStatusSalvar, "Pendência salva no Supabase. Complete as duas linhas para finalizar.");
+        } catch (e) {
+          console.error(e);
+          msgErro(elStatusSalvar, "❌ Erro ao salvar pendência parcial.");
+        }
         return;
       }
 
@@ -1726,49 +1598,38 @@
           return;
         }
 
+        await excluirPendenciaSupabase(elVtr.value);
+
         salvarOdometroManual(elVtr.value, kmFimRetornoValor);
-        limparRascunho();
         msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
-        resetarFormularioAposFinalizacao(kmFimRetornoValor);
+
+        elSaidaSelect.value = "";
+        elSaidaOutro.value = "";
+        elSaidaOutro.classList.add("hidden");
+        elRetornoSelect.value = "";
+        elRetornoOutro.value = "";
+        elRetornoOutro.classList.add("hidden");
+        elKmIni.value = kmFimRetornoValor;
+        elHoraPartida.value = horaAtual();
+        elKmFim.value = "";
+        elHoraChegada.value = horaAtual();
+        elKmIniRetorno.value = "";
+        elHoraSaidaRetorno.value = horaAtual();
+        elKmFimRetorno.value = "";
+        elHoraChegadaRetorno.value = horaAtual();
+        elCondutorIda.value = logado ? logado.guerra : "";
+        elCondutorRetorno.value = "";
+        elUsuario.value = "";
+        elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
+        linha1Salva = false;
+        linha2Salva = false;
+        atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
         msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
       } finally {
         elBtnFinal.disabled = false;
       }
-    }
-
-    function resetarFormularioAposFinalizacao(kmBaseNovo) {
-      elSaidaSelect.value = "";
-      elSaidaOutro.value = "";
-      elSaidaOutro.classList.add("hidden");
-
-      elRetornoSelect.value = "";
-      elRetornoOutro.value = "";
-      elRetornoOutro.classList.add("hidden");
-
-      elKmIni.value = kmBaseNovo;
-      elHoraPartida.value = horaAtual();
-      elKmFim.value = "";
-      elHoraChegada.value = horaAtual();
-
-      elKmIniRetorno.value = "";
-      elHoraSaidaRetorno.value = horaAtual();
-      elKmFimRetorno.value = "";
-      elHoraChegadaRetorno.value = horaAtual();
-
-      elCondutorIda.value = logado ? logado.guerra : "";
-      elCondutorRetorno.value = "";
-      elUsuario.value = "";
-      elOdometroValor.textContent = formatarOdometro(kmBaseNovo);
-
-      linha1Salva = false;
-      linha2Salva = false;
-
-      travarCamposLinha1(false);
-      travarCamposLinha2(false);
-
-      atualizarEstadoFinal();
     }
 
     async function buscarRegistrosPorVtr() {
@@ -1993,91 +1854,6 @@
       w.document.close();
     }
 
-    async function resetarRegistrosVtr(chave) {
-      const senha = prompt("Senha admin:");
-      if (senha !== ADMIN_SENHA) {
-        alert("Senha inválida.");
-        return;
-      }
-
-      const confirmar = confirm(`Confirma apagar todos os registros da ${chave}?`);
-      if (!confirmar) return;
-
-      try {
-        const { error } = await supabaseClient.from("diario").delete().eq("vtr", chave);
-
-        if (error) {
-          alert(`Erro ao apagar registros: ${error.message}`);
-          return;
-        }
-
-        alert(`Registros da ${chave} apagados com sucesso.`);
-
-        if (elVtr.value === chave) await atualizarKmBaseDaVtr();
-
-        if (elFiltroVtr.value === chave) {
-          registrosFiltrados = [];
-          msgMuted(elListaVtr, "Registros apagados. Faça nova busca.");
-          msgMuted(elStatusBuscaVtr, "Registros da VTR removidos.");
-        }
-      } catch (e) {
-        console.error(e);
-        alert("Falha inesperada ao apagar registros.");
-      }
-    }
-
-    function editarVtr(chave) {
-      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
-      document.getElementById(`view_${itemId}`).classList.add("hidden");
-      document.getElementById(`edit_${itemId}`).classList.remove("hidden");
-    }
-
-    function cancelarEdicaoVtr() {
-      renderCadastroVtrs();
-    }
-
-    function salvarEdicaoVtr(chave) {
-      const senha = prompt("Senha admin:");
-      if (senha !== ADMIN_SENHA) {
-        alert("Senha inválida.");
-        return;
-      }
-
-      const itemId = chave.replace(/[^a-zA-Z0-9]/g, "_");
-
-      VTRS[chave] = {
-        ...VTRS[chave],
-        nome: chave,
-        tipo: document.getElementById(`tipo_${itemId}`).value.trim(),
-        placa: document.getElementById(`placa_${itemId}`).value.trim(),
-        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim(),
-        orgao: document.getElementById(`orgao_${itemId}`).value.trim(),
-        status: document.getElementById(`status_${itemId}`).value.trim(),
-        descricao: document.getElementById(`descricao_${itemId}`).value.trim(),
-        ano: document.getElementById(`ano_${itemId}`).value.trim()
-      };
-
-      salvarCadastroVtrs();
-      preencherVtrsSelects();
-      renderCadastroVtrs();
-
-      if (elVtr.value === chave) atualizarInfoVtr();
-
-      alert("Cadastro de VTR atualizado com sucesso.");
-    }
-
-    window.editarVtr = editarVtr;
-    window.cancelarEdicaoVtr = cancelarEdicaoVtr;
-    window.salvarEdicaoVtr = salvarEdicaoVtr;
-    window.resetarRegistrosVtr = resetarRegistrosVtr;
-
-    const camposRascunho = [
-      elData, elSaidaSelect, elSaidaOutro, elRetornoSelect, elRetornoOutro,
-      elKmIni, elHoraPartida, elKmFim, elHoraChegada,
-      elKmIniRetorno, elHoraSaidaRetorno, elKmFimRetorno, elHoraChegadaRetorno,
-      elUsuario
-    ];
-
     tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
     tabExportarBtn.addEventListener("click", () => abrirAba("exportar"));
     tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
@@ -2094,13 +1870,8 @@
 
     elVtr.addEventListener("change", async function() {
       atualizarInfoVtr();
-      linha1Salva = false;
-      linha2Salva = false;
-      elCondutorIda.value = logado ? logado.guerra : "";
-      elCondutorRetorno.value = "";
       await atualizarKmBaseDaVtr();
-      salvarRascunho();
-      atualizarEstadoFinal();
+      await carregarPendenciaDaVtr();
     });
 
     elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
@@ -2113,44 +1884,25 @@
       campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
     });
 
-    camposRascunho.forEach(campo => {
-      campo.addEventListener("input", () => {
-        salvarRascunho();
-        atualizarResumoAutomatico();
-        atualizarEstadoFinal();
-      });
-      campo.addEventListener("change", () => {
-        salvarRascunho();
-        atualizarResumoAutomatico();
-        atualizarEstadoFinal();
-      });
-    });
+    elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+    elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+    elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
 
-    elIdFunc.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") login();
-    });
+    function carregarInicio() {
+      preencherUsuariosSelect();
+      preencherVtrsSelects();
+      preencherAnos();
+      elFiltroMes.value = String(new Date().getMonth() + 1);
+      elData.value = hojeISO();
+      atualizarInfoVtr();
+      renderCadastroVtrs();
+      atualizarEstadoFinal();
+      abrirAba("lancamento");
+      atualizarRelogio();
+      setInterval(atualizarRelogio, 1000);
+    }
 
-    elSenhaLogin.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") login();
-    });
-
-    elHoraChegadaRetorno.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") finalizarOuSalvarParcial();
-    });
-
-    if (!elData.value) elData.value = hojeISO();
-
-    preencherUsuariosSelect();
-    preencherVtrsSelects();
-    preencherAnos();
-    elFiltroMes.value = String(new Date().getMonth() + 1);
-    atualizarInfoVtr();
-    renderCadastroVtrs();
-    preencherHorarioPadrao();
-    atualizarEstadoFinal();
-    abrirAba("lancamento");
-    atualizarRelogio();
-    setInterval(atualizarRelogio, 1000);
+    carregarInicio();
   </script>
 </body>
 </html>
