@@ -24,6 +24,8 @@
       --border:#d8dde4;
       --tab-bg:#ffffffee;
       --shadow:0 4px 14px rgba(0,0,0,.08);
+      --info:#0f4c81;
+      --info-soft:#eef6ff;
     }
 
     html, body {
@@ -462,6 +464,18 @@
       font-weight:bold;
     }
 
+    .pendencia-box {
+      background: var(--info-soft);
+      border: 1px solid #b8d8ff;
+      color: var(--info);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 0 12px 0;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: bold;
+    }
+
     @media (max-width: 700px) {
       .grid-2,
       .linha-acoes-local {
@@ -497,6 +511,8 @@
       </div>
 
       <div class="card hidden" id="formBox">
+        <div id="pendenciaBox" class="pendencia-box hidden"></div>
+
         <label for="vtr">VTR</label>
         <select id="vtr"></select>
 
@@ -524,40 +540,40 @@
         <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
 
         <label for="saidaSelect">Saída</label>
-<select id="saidaSelect">
-  <option value="">Selecione a saída</option>
-  <option value="QTL / J4">QTL / J4</option>
-  <option value="QTL / 44">QTL / 44</option>
-  <option value="QTL / CENTRO">QTL / CENTRO</option>
-  <option value="QTL / VISTORIA">QTL / VISTORIA</option>
-  <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
-  <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
-  <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
-  <option value="QTL / BAIRRO">QTL / BAIRRO</option>
-  <option value="QTL / BR116">QTL / BR116</option>
-  <option value="QTL / RS265">QTL / RS265</option>
-  <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
-  <option value="OUTRO">Outro</option>
-</select>
-<input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
+        <select id="saidaSelect">
+          <option value="">Selecione a saída</option>
+          <option value="QTL / J4">QTL / J4</option>
+          <option value="QTL / 44">QTL / 44</option>
+          <option value="QTL / CENTRO">QTL / CENTRO</option>
+          <option value="QTL / VISTORIA">QTL / VISTORIA</option>
+          <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
+          <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
+          <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
+          <option value="QTL / BAIRRO">QTL / BAIRRO</option>
+          <option value="QTL / BR116">QTL / BR116</option>
+          <option value="QTL / RS265">QTL / RS265</option>
+          <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
+          <option value="OUTRO">Outro</option>
+        </select>
+        <input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
 
-<label for="retornoSelect">Retorno</label>
-<select id="retornoSelect">
-  <option value="">Selecione o retorno</option>
-  <option value="J4 / QTL">J4 / QTL</option>
-  <option value="44 / QTL">44 / QTL</option>
-  <option value="CENTRO / QTL">CENTRO / QTL</option>
-  <option value="VISTORIA / QTL">VISTORIA / QTL</option>
-  <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
-  <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
-  <option value="OCORRÊNCIA / QTL">OCORRÊNCIA / QTL</option>
-  <option value="BAIRRO / QTL">BAIRRO / QTL</option>
-  <option value="BR116 / QTL">BR116 / QTL</option>
-  <option value="RS265 / QTL">RS265 / QTL</option>
-  <option value="INTERIOR SLS / QTL">INTERIOR SLS / QTL</option>
-  <option value="OUTRO">Outro</option>
-</select>
-<input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
+        <label for="retornoSelect">Retorno</label>
+        <select id="retornoSelect">
+          <option value="">Selecione o retorno</option>
+          <option value="J4 / QTL">J4 / QTL</option>
+          <option value="44 / QTL">44 / QTL</option>
+          <option value="CENTRO / QTL">CENTRO / QTL</option>
+          <option value="VISTORIA / QTL">VISTORIA / QTL</option>
+          <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
+          <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
+          <option value="OCORRÊNCIA / QTL">OCORRÊNCIA / QTL</option>
+          <option value="BAIRRO / QTL">BAIRRO / QTL</option>
+          <option value="BR116 / QTL">BR116 / QTL</option>
+          <option value="RS265 / QTL">RS265 / QTL</option>
+          <option value="INTERIOR SLS / QTL">INTERIOR SLS / QTL</option>
+          <option value="OUTRO">Outro</option>
+        </select>
+        <input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
 
         <div class="grid-2">
           <div>
@@ -624,12 +640,15 @@
           Situação: <span id="situacaoResumo">Aguardando preenchimento</span>
         </div>
 
-        <label for="condutor">Nome Condutor</label>
-        <input id="condutor" readonly />
+        <label for="condutorIda">Condutor 1ª Linha</label>
+        <input id="condutorIda" readonly />
 
-        <label for="usuario">Nome Usuário</label>
+        <label for="condutorRetorno">Condutor 2ª Linha</label>
+        <input id="condutorRetorno" readonly />
+
+        <label for="usuario">Usuário / Carona (opcional)</label>
         <select id="usuario">
-          <option value="">Selecione o usuário (opcional)</option>
+          <option value="">Selecione o usuário/carona (opcional)</option>
         </select>
 
         <button type="button" id="btnFinal">Salvar parcial</button>
@@ -792,18 +811,18 @@
     let linha2Salva = false;
 
     const MAPA_RETORNO = {
-  "QTL / J4": "J4 / QTL",
-  "QTL / 44": "44 / QTL",
-  "QTL / CENTRO": "CENTRO / QTL",
-  "QTL / VISTORIA": "VISTORIA / QTL",
-  "QTL / TRANSPORTE": "TRANSPORTE / QTL",
-  "QTL / PREFEITURA": "PREFEITURA / QTL",
-  "QTL / OCORRÊNCIA": "OCORRÊNCIA / QTL",
-  "QTL / BAIRRO": "BAIRRO / QTL",
-  "QTL / BR116": "BR116 / QTL",
-  "QTL / RS265": "RS265 / QTL",
-  "QTL / INTERIOR SLS": "INTERIOR SLS / QTL"
-};
+      "QTL / J4": "J4 / QTL",
+      "QTL / 44": "44 / QTL",
+      "QTL / CENTRO": "CENTRO / QTL",
+      "QTL / VISTORIA": "VISTORIA / QTL",
+      "QTL / TRANSPORTE": "TRANSPORTE / QTL",
+      "QTL / PREFEITURA": "PREFEITURA / QTL",
+      "QTL / OCORRÊNCIA": "OCORRÊNCIA / QTL",
+      "QTL / BAIRRO": "BAIRRO / QTL",
+      "QTL / BR116": "BR116 / QTL",
+      "QTL / RS265": "RS265 / QTL",
+      "QTL / INTERIOR SLS": "INTERIOR SLS / QTL"
+    };
 
     const elIdFunc = document.getElementById("idFunc");
     const elSenhaLogin = document.getElementById("senhaLogin");
@@ -817,6 +836,7 @@
     const elStatusOdometro = document.getElementById("statusOdometro");
     const elData = document.getElementById("data");
     const elRelogioAtual = document.getElementById("relogioAtual");
+    const elPendenciaBox = document.getElementById("pendenciaBox");
 
     const elSaidaSelect = document.getElementById("saidaSelect");
     const elSaidaOutro = document.getElementById("saidaOutro");
@@ -833,8 +853,10 @@
     const elKmFimRetorno = document.getElementById("kmFimRetorno");
     const elHoraChegadaRetorno = document.getElementById("horaChegadaRetorno");
 
-    const elCondutor = document.getElementById("condutor");
+    const elCondutorIda = document.getElementById("condutorIda");
+    const elCondutorRetorno = document.getElementById("condutorRetorno");
     const elUsuario = document.getElementById("usuario");
+
     const elBtnSalvarLinha1 = document.getElementById("btnSalvarLinha1");
     const elBtnSalvarLinha2 = document.getElementById("btnSalvarLinha2");
     const elBtnEditarLinha1 = document.getElementById("btnEditarLinha1");
@@ -962,7 +984,7 @@
     }
 
     function preencherUsuariosSelect() {
-      elUsuario.innerHTML = `<option value="">Selecione o usuário (opcional)</option>` +
+      elUsuario.innerHTML = `<option value="">Selecione o usuário/carona (opcional)</option>` +
         USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
     }
 
@@ -1075,6 +1097,21 @@
       if (!campo.value) campo.value = horaAtual();
     }
 
+    function atualizarMensagemPendencia() {
+      if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
+        elPendenciaBox.classList.remove("hidden");
+        elPendenciaBox.innerHTML = `
+          ⚠️ REGISTRO PENDENTE DE FECHAMENTO<br>
+          Condutor da 1ª linha: <b>${esc(elCondutorIda.value)}</b><br>
+          Condutor da 2ª linha atual: <b>${esc(elCondutorRetorno.value || "aguardando login")}</b><br>
+          Complete o retorno e finalize o registro.
+        `;
+      } else {
+        elPendenciaBox.classList.add("hidden");
+        elPendenciaBox.innerHTML = "";
+      }
+    }
+
     async function buscarSenhaNoSupabase(idFunc) {
       const { data, error } = await supabaseClient
         .from(TABELA_AUTH)
@@ -1171,7 +1208,6 @@
         }
 
         logado = user;
-        elCondutor.value = user.guerra;
         msgOk(elUserOk, `✅ ${user.guerra}`);
         elFormBox.classList.remove("hidden");
 
@@ -1184,6 +1220,19 @@
         atualizarInfoVtr();
         await atualizarKmBaseDaVtr();
         carregarRascunho();
+
+        if (!linha1Salva || !elCondutorIda.value.trim()) {
+          elCondutorIda.value = user.guerra;
+        }
+
+        if (linha1Salva && !linha2Salva) {
+          elCondutorRetorno.value = user.guerra;
+        } else if (!linha1Salva) {
+          elCondutorRetorno.value = "";
+        }
+
+        salvarRascunho();
+        atualizarEstadoFinal();
       } catch (e) {
         console.error(e);
         msgErro(elUserOk, "❌ Erro ao validar login no Supabase.");
@@ -1303,6 +1352,7 @@
       }
       salvarRascunho();
       atualizarResumoAutomatico();
+      atualizarMensagemPendencia();
     }
 
     function atualizarKmInicialRetorno() {
@@ -1339,7 +1389,7 @@
       if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
       if (kmFimValor < kmIniValor) return false;
       if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
-      if (!elCondutor.value.trim()) return false;
+      if (!elCondutorIda.value.trim()) return false;
       return true;
     }
 
@@ -1355,6 +1405,7 @@
       if (kmFimRetornoValor < kmIniRetornoValor) return false;
       if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
       if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
+      if (!elCondutorRetorno.value.trim()) return false;
       return true;
     }
 
@@ -1424,6 +1475,7 @@
     function atualizarEstadoFinal() {
       atualizarBadges();
       atualizarResumoAutomatico();
+      atualizarMensagemPendencia();
 
       const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
 
@@ -1459,6 +1511,8 @@
         horaSaidaRetorno: elHoraSaidaRetorno.value,
         kmFimRetorno: elKmFimRetorno.value,
         horaChegadaRetorno: elHoraChegadaRetorno.value,
+        condutorIda: elCondutorIda.value,
+        condutorRetorno: elCondutorRetorno.value,
         usuario: elUsuario.value,
         linha1Salva,
         linha2Salva
@@ -1504,6 +1558,8 @@
         if (r.horaSaidaRetorno) elHoraSaidaRetorno.value = r.horaSaidaRetorno;
         if (r.kmFimRetorno) elKmFimRetorno.value = r.kmFimRetorno;
         if (r.horaChegadaRetorno) elHoraChegadaRetorno.value = r.horaChegadaRetorno;
+        if (r.condutorIda) elCondutorIda.value = r.condutorIda;
+        if (r.condutorRetorno) elCondutorRetorno.value = r.condutorRetorno;
         if (r.usuario) elUsuario.value = r.usuario;
 
         controlarCamposSaida();
@@ -1538,6 +1594,15 @@
     function salvarLinha1() {
       preencherHorarioPadrao();
 
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
+        return;
+      }
+
+      if (!elCondutorIda.value.trim()) {
+        elCondutorIda.value = logado.guerra;
+      }
+
       if (!validarLinha1()) {
         msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente.");
         return;
@@ -1546,6 +1611,8 @@
       linha1Salva = true;
       atualizarKmInicialRetorno();
       if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
+      if (!elCondutorRetorno.value.trim()) elCondutorRetorno.value = logado.guerra;
+
       salvarRascunho();
       atualizarEstadoFinal();
       msgOk(elStatusSalvar, "✅ 1ª linha salva parcialmente.");
@@ -1557,7 +1624,13 @@
         return;
       }
 
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
+        return;
+      }
+
       preencherHorarioPadrao();
+      elCondutorRetorno.value = logado.guerra;
 
       if (!validarLinha2()) {
         msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
@@ -1575,6 +1648,7 @@
       linha2Salva = false;
       travarCamposLinha1(false);
       travarCamposLinha2(false);
+      elCondutorRetorno.value = logado ? logado.guerra : "";
       salvarRascunho();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois, se necessário.");
@@ -1583,6 +1657,7 @@
     function editarLinha2() {
       linha2Salva = false;
       travarCamposLinha2(false);
+      if (logado) elCondutorRetorno.value = logado.guerra;
       salvarRascunho();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
@@ -1639,7 +1714,8 @@
             horasaidaretorno: elHoraSaidaRetorno.value,
             kmfimretorno: kmFimRetornoValor,
             horachegadaretorno: elHoraChegadaRetorno.value,
-            condutor: elCondutor.value,
+            condutor: elCondutorIda.value,
+            condutor_retorno: elCondutorRetorno.value,
             usuario: elUsuario.value.trim(),
             assinaturacondutor: "",
             assinaturausuario: ""
@@ -1681,6 +1757,8 @@
       elKmFimRetorno.value = "";
       elHoraChegadaRetorno.value = horaAtual();
 
+      elCondutorIda.value = logado ? logado.guerra : "";
+      elCondutorRetorno.value = "";
       elUsuario.value = "";
       elOdometroValor.textContent = formatarOdometro(kmBaseNovo);
 
@@ -1741,10 +1819,9 @@
           <div class="registro">
             <b>${esc(r.vtr)}</b><br>
             Data: ${esc(formatarDataBR(r.data))}<br>
-            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)}<br>
-            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")}<br>
-            Condutor: ${esc(r.condutor)}<br>
-            Usuário: ${esc(r.usuario || "")}
+            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)} | Condutor: ${esc(r.condutor || "")}<br>
+            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")} | Condutor: ${esc(r.condutor_retorno || r.condutor || "")}<br>
+            Usuário/Carona: ${esc(r.usuario || "")}
           </div>
         `).join("");
       } catch (e) {
@@ -1780,7 +1857,7 @@
           horaPartida: r.horasaidaretorno || "",
           kmFim: r.kmfimretorno ?? "",
           horaChegada: r.horachegadaretorno || "",
-          condutor: r.condutor,
+          condutor: r.condutor_retorno || r.condutor || "",
           usuario: r.usuario || ""
         }
       ];
@@ -2019,6 +2096,8 @@
       atualizarInfoVtr();
       linha1Salva = false;
       linha2Salva = false;
+      elCondutorIda.value = logado ? logado.guerra : "";
+      elCondutorRetorno.value = "";
       await atualizarKmBaseDaVtr();
       salvarRascunho();
       atualizarEstadoFinal();
