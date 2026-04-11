@@ -39,10 +39,8 @@
     }
     
     .app-header-top { display:flex; align-items:center; gap:12px; }
-    .app-header-info {
-      flex:1;
-      min-width:0;
-    }
+    .app-header-info { flex:1; min-width:0; }
+
     .topo-status-boxes{
       display:flex;
       flex-direction:column;
@@ -50,452 +48,55 @@
       min-width:138px;
       max-width:185px;
     }
-    .condutor-logado-box,
-    .vtr-topo-box{
+
+    .condutor-logado-box, .vtr-topo-box {
       color:#fff;
       padding:10px 12px;
       border-radius:14px;
       font-size:13px;
       font-weight:800;
       line-height:1.2;
-      text-align:left;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-      transition:all .25s ease;
+      transition: all 0.3s ease;
     }
-    /* Estilos de Status Inativo (Cinza) */
+
     .condutor-logado-inativo, .vtr-topo-inativa {
       background: rgba(107,114,128,.35);
       border: 1px solid rgba(255,255,255,.20);
     }
-    /* Estilos de Status Ativo (Verde para Condutor, Azul para VTR conforme original) */
+
     .condutor-logado-ativo {
       background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
       border: 1px solid #ffffff;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
     }
+
     .vtr-topo-ativa {
       background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
       border: 1px solid #ffffff;
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
     }
 
-    .condutor-logado-titulo, .vtr-topo-titulo {
-      display:block;
-      font-size:10px;
-      opacity:.9;
-      letter-spacing:.4px;
-      text-transform:uppercase;
-      margin-bottom:3px;
-    }
-    .condutor-logado-nome, .vtr-topo-nome {
-      display:block;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      font-size:13px;
-    }
+    .condutor-logado-titulo, .vtr-topo-titulo { display:block; font-size:10px; opacity:.9; text-transform:uppercase; margin-bottom:3px; }
+    .condutor-logado-nome, .vtr-topo-nome { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    .app-logo {
-      width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12);
-      display:flex; align-items:center; justify-content:center; font-size:28px;
-      flex:0 0 58px; border:1px solid rgba(255,255,255,.18);
-    }
-    .app-title { margin:0; font-size:20px; font-weight:800; line-height:1.1; }
-    .app-subtitle { margin-top:4px; font-size:13px; opacity:.95; }
+    .app-logo { width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:28px; flex:0 0 58px; border:1px solid rgba(255,255,255,.18); }
+    .app-title { margin:0; font-size:20px; font-weight:800; }
+    .app-subtitle { font-size:11px; opacity:.95; }
 
-    .conteudo-app {
-      position: relative;
-      min-height: calc(100vh - 160px);
-      padding: 16px 16px 0 16px;
-      overflow-x:hidden;
-    }
-
-    .aba {
-      width:100%;
-      transition: opacity .28s ease, transform .28s ease;
-      opacity:0;
-      transform:translateX(24px);
-      pointer-events:none;
-      position:absolute;
-      inset:0;
-      padding:16px 16px 0 16px;
-    }
-    .aba.active {
-      opacity:1;
-      transform:translateX(0);
-      pointer-events:auto;
-      position:relative;
-      inset:auto;
-      padding:0;
-    }
-
+    .conteudo-app { padding: 16px; position: relative; }
+    .aba { display: none; }
+    .aba.active { display: block; }
+    .card { background:var(--card); border-radius:24px; padding:20px; margin-bottom:18px; box-shadow:var(--shadow); }
     .hidden { display:none !important; }
 
-    .card {
-      background:var(--card);
-      border-radius:24px;
-      padding:20px;
-      margin-bottom:18px;
-      box-shadow:var(--shadow);
-    }
+    label { display:block; font-size:16px; font-weight:bold; margin:8px 0 6px; }
+    input, select { width:100%; padding:14px; border-radius:12px; border:1px solid #ccc; font-size:16px; margin-bottom:10px; outline:none; }
+    button { width:100%; padding:15px; border:none; border-radius:16px; background:var(--primary); color:#fff; font-size:17px; font-weight:bold; cursor:pointer; }
+    
+    .ok { color:var(--success); font-weight:bold; margin-top:8px; }
+    .erro { color:var(--primary); font-weight:bold; margin-top:8px; }
 
-    label {
-      display:block;
-      font-size:17px;
-      font-weight:bold;
-      margin:8px 0 6px;
-    }
-
-    input, select, textarea {
-      width:100%;
-      padding:15px 16px;
-      border-radius:14px;
-      border:1px solid #ccc;
-      font-size:17px;
-      margin-bottom:12px;
-      background:#fff;
-      outline:none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color:#c7cdd6;
-      box-shadow:0 0 0 3px rgba(213,19,19,.06);
-    }
-
-    input[readonly], textarea[readonly] {
-      background:#f3f4f6;
-      color:#555;
-    }
-
-    select:disabled, input:disabled, textarea:disabled {
-      background:#f3f4f6;
-      color:#555;
-      opacity:1;
-    }
-
-    button {
-      width:100%;
-      padding:15px 16px;
-      border:none;
-      border-radius:16px;
-      background:var(--primary);
-      color:#fff;
-      font-size:19px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    button:disabled { opacity:.7; cursor:wait; }
-
-    .ok { color:#0a7a28; font-weight:bold; margin-top:8px; }
-    .erro { color:#b00020; font-weight:bold; margin-top:8px; }
-    .muted { color:var(--muted); font-size:14px; }
-
-    .info-vtr {
-      background:var(--soft);
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:12px;
-      line-height:1.5;
-      font-size:15px;
-    }
-
-    .odometro-box {
-      background:#111;
-      color:#19ff63;
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:10px;
-      border:2px solid #333;
-    }
-    .odometro-titulo { font-size:14px; color:#b8ffcd; margin-bottom:6px; }
-    .odometro-valor {
-      font-family:"Courier New", Courier, monospace;
-      font-size:30px;
-      font-weight:bold;
-      letter-spacing:2px;
-    }
-
-    .grid-2 {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .linha-acoes-local {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:6px;
-    }
-
-    .btn-linha {
-      background:var(--primary-dark);
-      font-size:16px;
-      padding:12px;
-      margin-top:4px;
-    }
-
-    .btn-linha-ok { background:var(--success) !important; }
-
-    .btn-editar-linha {
-      background:#4b5563 !important;
-      font-size:15px;
-      padding:12px;
-      margin-top:4px;
-    }
-
-    .btn-finalizar { background:var(--success) !important; }
-    .btn-salvar-parcial { background:var(--warning) !important; }
-
-    .btn-pdf {
-      background:#0f4c81;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .btn-odometro-discreto {
-      width:auto;
-      display:inline-block;
-      padding:8px 12px;
-      font-size:13px;
-      border-radius:10px;
-      background:#4b5563;
-      margin-bottom:10px;
-    }
-
-    .bloco-retorno {
-      border:1px dashed #d2d2d2;
-      border-radius:14px;
-      padding:14px;
-      margin:12px 0 6px 0;
-      background:#fcfcfc;
-    }
-
-    .bloco-retorno h3 {
-      margin:0 0 10px 0;
-      font-size:18px;
-      color:var(--text);
-    }
-
-    .badge-linha {
-      display:inline-block;
-      font-size:12px;
-      font-weight:bold;
-      padding:6px 10px;
-      border-radius:999px;
-      margin-bottom:8px;
-      color:#fff;
-      background:#6b7280;
-    }
-    .badge-ok { background:var(--success); }
-    .badge-pendente { background:var(--primary-dark); }
-
-    .clock-box {
-      background:#f8fafc;
-      border:1px solid #d9e1ea;
-      border-radius:14px;
-      padding:12px 14px;
-      margin:4px 0 12px 0;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .clock-label { font-size:13px; color:#475569; font-weight:bold; }
-    .clock-time { font-size:18px; font-weight:bold; color:#0f172a; }
-
-    .info-extra {
-      background:#f8fafc;
-      border:1px solid #d9e1ea;
-      border-radius:14px;
-      padding:12px;
-      margin:10px 0 12px 0;
-      font-size:15px;
-      line-height:1.5;
-    }
-
-    .alerta-operacional {
-      background:#fff7ed;
-      border:1px solid #fdba74;
-      color:#9a3412;
-      border-radius:14px;
-      padding:12px;
-      margin-top:10px;
-      font-size:14px;
-      font-weight:bold;
-    }
-
-    .pendencia-box {
-      background: var(--info-soft);
-      border: 1px solid #b8d8ff;
-      color: var(--info);
-      border-radius: 14px;
-      padding: 12px;
-      margin: 8px 0 12px 0;
-      font-size: 14px;
-      line-height: 1.5;
-      font-weight: bold;
-    }
-
-    .subtitulo-box {
-      margin-top:0;
-      margin-bottom:12px;
-      font-size:22px;
-      color:var(--text);
-    }
-
-    .registro, .vtr-item {
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:10px;
-      background:var(--soft);
-    }
-
-    .inicio-topo {
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-bottom:6px;
-    }
-
-    .inicio-legenda {
-      font-size:14px;
-      color:var(--muted);
-      line-height:1.45;
-    }
-
-    .inicio-grid {
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-    }
-
-    .inicio-item {
-      border:1px solid #d8dde4;
-      border-radius:18px;
-      padding:14px;
-      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
-      box-shadow:0 2px 10px rgba(0,0,0,.04);
-    }
-
-    .inicio-item-topo {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .inicio-vtr-nome {
-      font-size:20px;
-      font-weight:800;
-      color:var(--text);
-    }
-
-    .inicio-vtr-tipo {
-      font-size:12px;
-      color:#475569;
-      font-weight:700;
-      background:#eef2f7;
-      border-radius:999px;
-      padding:6px 10px;
-      white-space:nowrap;
-    }
-
-    .inicio-linha {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:10px 0;
-      border-top:1px solid #e5e7eb;
-    }
-
-    .inicio-linha:first-of-type { border-top:none; padding-top:0; }
-
-    .inicio-label {
-      font-size:13px;
-      color:#64748b;
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.3px;
-    }
-
-    .inicio-valor {
-      font-size:22px;
-      font-weight:800;
-      color:#111827;
-    }
-
-    .inicio-valor-menor {
-      font-size:18px;
-      font-weight:800;
-      color:#0f4c81;
-    }
-
-    .inicio-rodape {
-      margin-top:10px;
-      padding-top:10px;
-      border-top:1px dashed #d8dde4;
-      font-size:12px;
-      color:#64748b;
-    }
-
-    .btn-atualizar-inicio {
-      background:#0f4c81;
-      font-size:16px;
-      padding:12px;
-    }
-
-    .rodape-tabs {
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      background:#ffffffee;
-      backdrop-filter: blur(10px);
-      border-top:1px solid var(--border);
-      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-      display:flex;
-      gap:10px;
-      z-index:999;
-      box-shadow:0 -2px 12px rgba(0,0,0,.08);
-    }
-
-    .rodape-btn {
-      flex:1;
-      border:none;
-      border-radius:18px;
-      padding:10px 8px;
-      font-size:12px;
-      font-weight:bold;
-      background:#dbe3ec;
-      color:#24303f;
-      cursor:pointer;
-      line-height:1.15;
-      min-height:62px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:4px;
-    }
-
-    .rodape-btn .icone { font-size:20px; line-height:1; }
-    .rodape-btn .texto { font-size:12px; font-weight:800; }
-    .rodape-btn.active {
-      background:var(--primary);
-      color:#fff;
-      box-shadow:0 6px 16px rgba(213,19,19,.25);
-    }
-
-    @media (max-width: 700px) {
-      .grid-2, .linha-acoes-local { grid-template-columns:1fr; }
-    }
+    .rodape-tabs { position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; padding:10px; border-top:1px solid var(--border); gap:8px; z-index: 1001; }
+    .rodape-btn { flex:1; border:none; background:#eee; border-radius:12px; padding:10px; display:flex; flex-direction:column; align-items:center; font-size:11px; font-weight:bold; color: var(--muted); }
+    .rodape-btn.active { background: var(--primary); color: #fff; }
   </style>
 </head>
 <body>
@@ -505,270 +106,53 @@
       <div class="app-logo">🚒</div>
       <div class="app-header-info">
         <h1 class="app-title">Diário de Bordo</h1>
-        <div class="app-subtitle">CB São Lourenço do Sul • Lançamento, exportação e cadastro</div>
+        <div class="app-subtitle">CB São Lourenço do Sul</div>
       </div>
       <div class="topo-status-boxes">
         <div class="condutor-logado-box condutor-logado-inativo" id="condutorLogadoTopo">
-          <span class="condutor-logado-titulo">Condutor logado</span>
+          <span class="condutor-logado-titulo">Condutor</span>
           <span class="condutor-logado-nome" id="condutorLogadoNome">Não logado</span>
         </div>
         <div class="vtr-topo-box vtr-topo-inativa" id="vtrTopoBox">
-          <span class="vtr-topo-titulo">VTR selecionada</span>
-          <span class="vtr-topo-nome" id="vtrTopoNome">Nenhuma VTR</span>
+          <span class="vtr-topo-titulo">VTR</span>
+          <span class="vtr-topo-nome" id="vtrTopoNome">Nenhuma</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="conteudo-app">
-    
     <div id="abaInicio" class="aba active">
       <div class="card">
-        <div class="inicio-topo">
-          <h2 class="subtitulo-box">🏠 Início</h2>
-          <div class="inicio-legenda">Visão rápida das VTRs com <b>KM atual</b> e <b>KM rodado nas últimas 24h</b>.</div>
-        </div>
-        <button type="button" class="btn-atualizar-inicio" id="btnAtualizarInicio">🔄 Atualizar painel</button>
-        <div id="statusInicio" class="muted" style="margin-top:10px;">Carregando painel...</div>
-      </div>
-
-      <div class="card">
-        <div id="listaInicio" class="muted">Carregando resumo das VTRs...</div>
+        <h2>🏠 Início</h2>
+        <p>Selecione a aba Lançamento para registrar.</p>
       </div>
     </div>
 
     <div id="abaLancamento" class="aba">
-      <div class="card">
-        <label for="idFunc">ID Func</label>
-        <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
-
-        <label for="senhaLogin">Senha</label>
-        <input id="senhaLogin" type="password" placeholder="Digite sua senha" />
-
+      <div class="card" id="loginBox">
+        <label>ID Funcional</label>
+        <input id="idFunc" type="text" inputmode="numeric" placeholder="Ex: 2614960" />
+        <label>Senha</label>
+        <input id="senhaLogin" type="password" placeholder="Sua ID no 1º acesso" />
         <button type="button" id="btnEntrar">Entrar</button>
-        <div class="muted">No primeiro acesso, use sua própria ID como senha. Depois cadastre uma nova.</div>
         <div id="userOk"></div>
       </div>
 
       <div class="card hidden" id="formBox">
-        <div id="pendenciaBox" class="pendencia-box hidden"></div>
-
-        <label for="vtr">VTR</label>
-        <select id="vtr"></select>
-
-        <div class="info-vtr" id="infoVtr"></div>
-
-        <div class="odometro-box">
-          <div class="odometro-titulo">KM ATUAL DA VTR</div>
-          <div class="odometro-valor" id="odometroValor">000000</div>
-        </div>
-
-        <button type="button" class="btn-odometro-discreto" id="btnEditarOdometro">🔐 Atualizar KM</button>
-        <div id="statusOdometro" class="muted"></div>
-
-        <label for="data">Data</label>
-        <input id="data" type="date" />
-
-        <div class="clock-box">
-          <div>
-            <div class="clock-label">HORÁRIO ATUAL</div>
-            <div class="clock-time" id="relogioAtual">--:--:--</div>
-          </div>
-          <div class="muted">Os campos de hora podem ser preenchidos automaticamente.</div>
-        </div>
-
-        <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
-
-        <label for="saidaSelect">Saída</label>
-        <select id="saidaSelect">
-          <option value="">Selecione a saída</option>
-          <option value="QTL / J4">QTL / J4</option>
-          <option value="QTL / 44">QTL / 44</option>
-          <option value="QTL / CENTRO">QTL / CENTRO</option>
-          <option value="QTL / VISTORIA">QTL / VISTORIA</option>
-          <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
-          <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
-          <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
-          <option value="QTL / BAIRRO">QTL / BAIRRO</option> <option value="QTL / BR116">QTL / BR116</option>
-          <option value="QTL / RS265">QTL / RS265</option>
-          <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-        <input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
-
-        <label for="retornoSelect">Retorno</label>
-        <select id="retornoSelect">
-          <option value="">Selecione o retorno</option>
-          <option value="J4 / QTL">J4 / QTL</option>
-          <option value="44 / QTL">44 / QTL</option>
-          <option value="CENTRO / QTL">CENTRO / QTL</option>
-          <option value="VISTORIA / QTL">VISTORIA / QTL</option>
-          <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
-          <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
-          <option value="OCORRÊNCIA / QTL">OCORRÊNCIA / QTL</option>
-          <option value="BAIRRO / QTL">BAIRRO / QTL</option>
-          <option value="BR116 / QTL">BR116 / QTL</option>
-          <option value="RS265 / QTL">RS265 / QTL</option>
-          <option value="INTERIOR SLS / QTL">INTERIOR SLS / QTL</option>
-          <option value="OUTRO">Outro</option>
-        </select>
-        <input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
-
-        <div class="grid-2">
-          <div>
-            <label for="kmIni">KM Inicial</label>
-            <input id="kmIni" type="number" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="horaPartida">Hora da Partida</label>
-            <input id="horaPartida" type="time" />
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div>
-            <label for="kmFim">KM Chegada no Destino</label>
-            <input id="kmFim" type="number" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="horaChegada">Hora da Chegada no Destino</label>
-            <input id="horaChegada" type="time" />
-          </div>
-        </div>
-
-        <div class="linha-acoes-local">
-          <button type="button" class="btn-linha" id="btnSalvarLinha1">Salvar 1ª Linha</button>
-          <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha1">✏️ Editar 1ª Linha</button>
-        </div>
-
-        <div class="bloco-retorno">
-          <h3>↩️ Retorno</h3>
-          <span id="badgeLinha2" class="badge-linha badge-pendente">2ª LINHA PENDENTE</span>
-
-          <div class="grid-2">
-            <div>
-              <label for="kmIniRetorno">KM Inicial do Retorno</label>
-              <input id="kmIniRetorno" type="number" inputmode="numeric" readonly />
-            </div>
-            <div>
-              <label for="horaSaidaRetorno">Hora da Saída do Destino</label>
-              <input id="horaSaidaRetorno" type="time" />
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div>
-              <label for="kmFimRetorno">KM Final na Chegada ao QTL</label>
-              <input id="kmFimRetorno" type="number" inputmode="numeric" />
-            </div>
-            <div>
-              <label for="horaChegadaRetorno">Hora Final da Chegada ao QTL</label>
-              <input id="horaChegadaRetorno" type="time" />
-            </div>
-          </div>
-
-          <div class="linha-acoes-local">
-            <button type="button" class="btn-linha" id="btnSalvarLinha2">Salvar 2ª Linha</button>
-            <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha2">✏️ Editar 2ª Linha</button>
-          </div>
-        </div>
-
-        <div class="info-extra">
-          <b>Resumo automático</b><br>
-          KM rodado total: <span id="kmRodadoTotal">0</span><br>
-          Situação: <span id="situacaoResumo">Aguardando preenchimento</span>
-        </div>
-
-        <label for="condutorIda">Condutor 1ª Linha</label>
-        <input id="condutorIda" readonly />
-
-        <label for="condutorRetorno">Condutor 2ª Linha</label>
-        <input id="condutorRetorno" readonly />
-
-        <label for="usuario">Usuário / Carona (opcional)</label>
-        <select id="usuario">
-          <option value="">Selecione o usuário/carona (opcional)</option>
-        </select>
-
-        <button type="button" id="btnFinal">Salvar parcial</button>
-        <div id="statusSalvar"></div>
-        <div id="alertaOperacional" class="alerta-operacional">⚠️ ATENÇÃO OPERACIONAL: complete e salve as duas linhas para finalizar o registro.</div>
-      </div>
-    </div>
-
-    <div id="abaExportar" class="aba">
-      <div class="card">
-        <h2 class="subtitulo-box">📄 Exportar por VTR</h2>
-
-        <label for="filtroVtr">VTR</label>
-        <select id="filtroVtr"></select>
-
-        <div class="grid-2">
-          <div>
-            <label for="filtroMes">Mês</label>
-            <select id="filtroMes">
-              <option value="1">JANEIRO</option>
-              <option value="2">FEVEREIRO</option>
-              <option value="3">MARÇO</option>
-              <option value="4">ABRIL</option>
-              <option value="5">MAIO</option>
-              <option value="6">JUNHO</option>
-              <option value="7">JULHO</option>
-              <option value="8">AGOSTO</option>
-              <option value="9">SETEMBRO</option>
-              <option value="10">OUTUBRO</option>
-              <option value="11">NOVEMBRO</option>
-              <option value="12">DEZEMBRO</option>
-            </select>
-          </div>
-          <div>
-            <label for="filtroAno">Ano</label>
-            <select id="filtroAno"></select>
-          </div>
-        </div>
-
-        <button type="button" id="btnBuscarVtr">Buscar registros</button>
-        <button type="button" class="btn-pdf" id="btnExportarMes">📄 Exportar mês</button>
-        <div id="statusBuscaVtr" class="muted"></div>
-      </div>
-
-      <div class="card">
-        <div id="listaVtr" class="muted">Selecione VTR, mês e ano para listar os registros.</div>
-      </div>
-    </div>
-
-    <div id="abaCadastro" class="aba">
-      <div class="card">
-        <h2 class="subtitulo-box">🚒 Cadastro de VTR</h2>
-        <div id="listaCadastroVtr" class="muted">Carregando cadastro...</div>
+        <label>VTR</label>
+        <select id="vtrSelect"></select>
+        <button id="btnSair" style="background:#666; margin-top: 20px;">Sair / Trocar Condutor</button>
       </div>
     </div>
   </div>
 
   <div class="rodape-tabs">
-    <button type="button" class="rodape-btn active" id="tabInicioBtn">
-      <span class="icone">🏠</span>
-      <span class="texto">Início</span>
-    </button>
-    <button type="button" class="rodape-btn" id="tabLancamentoBtn">
-      <span class="icone">📋</span>
-      <span class="texto">Lançamento</span>
-    </button>
-    <button type="button" class="rodape-btn" id="tabExportarBtn">
-      <span class="icone">📄</span>
-      <span class="texto">Exportar</span>
-    </button>
-    <button type="button" class="rodape-btn" id="tabCadastroBtn">
-      <span class="icone">🚒</span>
-      <span class="texto">Cadastro</span>
-    </button>
+    <button class="rodape-btn active" id="tabInicioBtn"><span>🏠</span><span>Início</span></button>
+    <button class="rodape-btn" id="tabLancamentoBtn"><span>📋</span><span>Lançamento</span></button>
   </div>
 
   <script>
-    const ADMIN_SENHA = "123456";
-    const TABELA_AUTH = "diario_usuarios_auth";
-    const TABELA_PENDENCIAS = "diario_pendencias";
-
     const USUARIOS = [
       { guerra: "1º SGT VICENTE", id: "2614960" },
       { guerra: "2º SGT ANDERSON", id: "2882930" },
@@ -790,355 +174,76 @@
       { guerra: "SD WILLIAM", id: "4355504" }
     ];
 
-    const VTRS_INICIAIS = {
-      "ABT-0535": {
-        nome: "ABT-0535",
-        placa: "JCO-7I27",
-        marcamodelo: "ABT VOLKSWAGEN CONSTELLATION",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        tipo: "AUTO BOMBA TANQUE",
-        descricao: "ABT VOLKSWAGEN, CONSTELLATION, 2023/2024",
-        ano: "2023"
-      },
-      "ABT-7992": {
-        nome: "ABT-7992",
-        placa: "JBM-3781",
-        marcamodelo: "IVECO 170 E25 - ABT 5000L",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        tipo: "AUTO BOMBA TANQUE",
-        descricao: "IVECO 170 E25 - ABT 5000L, DESENCARCERADOR + APH + ALTURA + GERADOR + TORRE DE ILUMINAÇÃO",
-        ano: "2011"
-      },
-      "AR-426": {
-        nome: "AR-426",
-        placa: "JBN7A45",
-        marcamodelo: "FORD TRANSIT TCA AMBULÂNCIA",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        tipo: "AUTO RESGATE",
-        descricao: "FORD TRANSIT TCA AMBULÂNCIA",
-        ano: "2022/2023"
-      },
-      "ATP-1225": {
-        nome: "ATP-1225",
-        placa: "TQV-8D59",
-        marcamodelo: "PICKUP 4X4",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        descricao: "PICKUP 4X4",
-        ano: "2025"
-      },
-      "ATP-9316": {
-        nome: "ATP-9316",
-        placa: "IUW6520",
-        marcamodelo: "RENAULT DUSTER - 4P - VERMELHA",
-        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
-        status: "ATIVA",
-        tipo: "AUTO TRANSPORTE DE PESSOAL",
-        descricao: "RENAULT DUSTER - 4P - VERMELHA",
-        ano: "2013"
-      }
-    };
-
-    const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     let logado = null;
-    let VTRS = carregarCadastroVtrs();
-    let registrosFiltrados = [];
-    let linha1Salva = false;
-    let linha2Salva = false;
-    let loginExigidoLinha2 = false;
-    let condutorLinha1Original = "";
 
-    const MAPA_RETORNO = {
-      "QTL / J4": "J4 / QTL",
-      "QTL / 44": "44 / QTL",
-      "QTL / CENTRO": "CENTRO / QTL",
-      "QTL / VISTORIA": "VISTORIA / QTL",
-      "QTL / TRANSPORTE": "TRANSPORTE / QTL",
-      "QTL / PREFEITURA": "PREFEITURA / QTL",
-      "QTL / OCORRÊNCIA": "OCORRÊNCIA / QTL",
-      "QTL / BAIRRO": "BAIRRO / QTL",
-      "QTL / BR116": "BR116 / QTL",
-      "QTL / RS265": "RS265 / QTL",
-      "QTL / INTERIOR SLS": "INTERIOR SLS / QTL"
-    };
-
-    const elIdFunc = document.getElementById("idFunc");
-    const elSenhaLogin = document.getElementById("senhaLogin");
-    const elBtnEntrar = document.getElementById("btnEntrar");
-    const elUserOk = document.getElementById("userOk");
-    const elFormBox = document.getElementById("formBox");
-    const elVtr = document.getElementById("vtr");
-    const elInfoVtr = document.getElementById("infoVtr");
-    const elOdometroValor = document.getElementById("odometroValor");
-    const elBtnEditarOdometro = document.getElementById("btnEditarOdometro");
-    const elStatusOdometro = document.getElementById("statusOdometro");
-    const elData = document.getElementById("data");
-    const elRelogioAtual = document.getElementById("relogioAtual");
-    const elPendenciaBox = document.getElementById("pendenciaBox");
-
-    const elSaidaSelect = document.getElementById("saidaSelect");
-    const elSaidaOutro = document.getElementById("saidaOutro");
-    const elRetornoSelect = document.getElementById("retornoSelect");
-    const elRetornoOutro = document.getElementById("retornoOutro");
-
-    const elKmIni = document.getElementById("kmIni");
-    const elHoraPartida = document.getElementById("horaPartida");
-    const elKmFim = document.getElementById("kmFim");
-    const elHoraChegada = document.getElementById("horaChegada");
-
-    const elKmIniRetorno = document.getElementById("kmIniRetorno");
-    const elHoraSaidaRetorno = document.getElementById("horaSaidaRetorno");
-    const elKmFimRetorno = document.getElementById("kmFimRetorno");
-    const elHoraChegadaRetorno = document.getElementById("horaChegadaRetorno");
-
-    const elCondutorIda = document.getElementById("condutorIda");
-    const elCondutorRetorno = document.getElementById("condutorRetorno");
-    const elUsuario = document.getElementById("usuario");
-
-    const elBtnSalvarLinha1 = document.getElementById("btnSalvarLinha1");
-    const elBtnSalvarLinha2 = document.getElementById("btnSalvarLinha2");
-    const elBtnEditarLinha1 = document.getElementById("btnEditarLinha1");
-    const elBtnEditarLinha2 = document.getElementById("btnEditarLinha2");
-    const elBtnFinal = document.getElementById("btnFinal");
-    const elBadgeLinha1 = document.getElementById("badgeLinha1");
-    const elBadgeLinha2 = document.getElementById("badgeLinha2");
-    const elStatusSalvar = document.getElementById("statusSalvar");
-    const elKmRodadoTotal = document.getElementById("kmRodadoTotal");
-    const elSituacaoResumo = document.getElementById("situacaoResumo");
-    const elAlertaOperacional = document.getElementById("alertaOperacional");
-    const abaInicio = document.getElementById("abaInicio");
-    const elListaInicio = document.getElementById("listaInicio");
-    const elStatusInicio = document.getElementById("statusInicio");
-    const elBtnAtualizarInicio = document.getElementById("btnAtualizarInicio");
-    const tabInicioBtn = document.getElementById("tabInicioBtn");
-
-    const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
-    const tabExportarBtn = document.getElementById("tabExportarBtn");
-    const tabCadastroBtn = document.getElementById("tabCadastroBtn");
-    const abaLancamento = document.getElementById("abaLancamento");
-    const abaExportar = document.getElementById("abaExportar");
-    const abaCadastro = document.getElementById("abaCadastro");
-
-    const elFiltroVtr = document.getElementById("filtroVtr");
-    const elFiltroMes = document.getElementById("filtroMes");
-    const elFiltroAno = document.getElementById("filtroAno");
-    const elBtnBuscarVtr = document.getElementById("btnBuscarVtr");
-    const elBtnExportarMes = document.getElementById("btnExportarMes");
-    const elStatusBuscaVtr = document.getElementById("statusBuscaVtr");
-    const elListaVtr = document.getElementById("listaVtr");
-    const elListaCadastroVtr = document.getElementById("listaCadastroVtr");
-    const elCondutorLogadoTopo = document.getElementById("condutorLogadoTopo");
-    const elCondutorLogadoNome = document.getElementById("condutorLogadoNome");
-    const elVtrTopoBox = document.getElementById("vtrTopoBox");
-    const elVtrTopoNome = document.getElementById("vtrTopoNome");
-
-    function hojeISO() {
-      const d = new Date();
-      const ano = d.getFullYear();
-      const mes = String(d.getMonth() + 1).padStart(2, "0");
-      const dia = String(d.getDate()).padStart(2, "0");
-      return `${ano}-${mes}-${dia}`;
-    }
-
-    function horaAtual() {
-      const d = new Date();
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    }
-
-    function horaAtualCompleta() {
-      const d = new Date();
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
-    }
-
-    function atualizarRelogio() {
-      elRelogioAtual.textContent = horaAtualCompleta();
-    }
-
-    function esc(texto) {
-      return String(texto ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function formatarDataBR(dataISO) {
-      if (!dataISO) return "";
-      const partes = String(dataISO).split("-");
-      if (partes.length !== 3) return dataISO;
-      const [ano, mes, dia] = partes;
-      return `${dia}/${mes}/${ano.slice(2)}`;
-    }
-
-    function msgOk(el, texto) { el.innerHTML = `<div class="ok">${texto}</div>`; }
-    function msgErro(el, texto) { el.innerHTML = `<div class="erro">${texto}</div>`; }
-    function msgMuted(el, texto) { el.innerHTML = `<div class="muted">${texto}</div>`; }
-
-    function atualizarCondutorLogadoTopo() {
-      const nome = logado && logado.guerra ? String(logado.guerra).trim() : "Não logado";
-      const ativo = !!(logado && logado.guerra);
-      elCondutorLogadoNome.textContent = nome || "Não logado";
-      elCondutorLogadoTopo.title = nome || "Não logado";
-      elCondutorLogadoTopo.classList.toggle("condutor-logado-ativo", ativo);
-      elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
-    }
-
-    function atualizarVtrTopo() {
-      const vtrAtual = elVtr && elVtr.value ? String(elVtr.value).trim() : "";
-      const ativo = !!vtrAtual;
-      elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
-      elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
-      elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
-      elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
-    }
-
-    function preencherHorarioPadrao() {
-      horarioAtualSeVazio(elHoraPartida);
-      horarioAtualSeVazio(elHoraChegada);
-      horarioAtualSeVazio(elHoraSaidaRetorno);
-      horarioAtualSeVazio(elHoraChegadaRetorno);
-    }
-
-    function mesmoUsuarioDaLinha1() {
-      if (!logado) return false;
-      const nomeLinha1 = (condutorLinha1Original || elCondutorIda.value || "").trim();
-      return !!nomeLinha1 && nomeLinha1 === String(logado.guerra || "").trim();
-    }
-
-    function deveExigirNovoLoginParaLinha2() { return false; }
-
-    function assumirCondutorLinha2DoUsuarioLogado() {
-      if (!logado) return;
-      if (linha1Salva && !linha2Salva) {
-        elCondutorRetorno.value = String(logado.guerra || "").trim();
-        loginExigidoLinha2 = false;
+    function atualizarTopo() {
+      const box = document.getElementById("condutorLogadoTopo");
+      const nomeLabel = document.getElementById("condutorLogadoNome");
+      if (logado) {
+        box.classList.replace("condutor-logado-inativo", "condutor-logado-ativo");
+        nomeLabel.textContent = logado.guerra;
+      } else {
+        box.classList.replace("condutor-logado-ativo", "condutor-logado-inativo");
+        nomeLabel.textContent = "Não logado";
       }
     }
 
-    function formatarOdometro(valor) {
-      const n = Number(valor || 0);
-      return String(Math.max(0, n)).padStart(6, "0");
-    }
+    function login() {
+      const id = document.getElementById("idFunc").value;
+      const senha = document.getElementById("senhaLogin").value;
+      const user = USUARIOS.find(u => u.id === id);
 
-    function nomeMesNumero(numero) {
-      const nomes = ["", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-      return nomes[Number(numero)] || "";
-    }
-
-    function preencherAnos() {
-      const anoAtual = new Date().getFullYear();
-      let html = "";
-      for (let ano = anoAtual - 2; ano <= anoAtual + 2; ano++) {
-        html += `<option value="${ano}" ${ano === anoAtual ? "selected" : ""}>${ano}</option>`;
+      // No primeiro acesso a senha é a própria ID
+      if (user && senha === id) {
+        logado = user;
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("formBox").classList.remove("hidden");
+        document.getElementById("userOk").innerHTML = "";
+        atualizarTopo();
+      } else {
+        document.getElementById("userOk").innerHTML = "<div class='erro'>ID ou Senha incorretos</div>";
       }
-      elFiltroAno.innerHTML = html;
     }
 
-    function carregarCadastroVtrs() {
-      try {
-        const salvo = localStorage.getItem("diario_vtrs_cadastro");
-        if (!salvo) return JSON.parse(JSON.stringify(VTRS_INICIAIS));
-        const parsed = JSON.parse(salvo);
-        return { ...JSON.parse(JSON.stringify(VTRS_INICIAIS)), ...parsed };
-      } catch { return JSON.parse(JSON.stringify(VTRS_INICIAIS)); }
-    }
+    // Eventos
+    document.getElementById("btnEntrar").addEventListener("click", login);
+    
+    document.getElementById("btnSair").addEventListener("click", () => {
+      logado = null;
+      document.getElementById("loginBox").classList.remove("hidden");
+      document.getElementById("formBox").classList.add("hidden");
+      document.getElementById("idFunc").value = "";
+      document.getElementById("senhaLogin").value = "";
+      atualizarTopo();
+    });
 
-    function salvarCadastroVtrs() { localStorage.setItem("diario_vtrs_cadastro", JSON.stringify(VTRS)); }
-    function chaveOdometro(vtr) { return `diario_odometro_${vtr}`; }
-    function obterOdometroManual(vtr) {
-      const valor = localStorage.getItem(chaveOdometro(vtr));
-      return valor ? Number(valor) : null;
-    }
-    function salvarOdometroManual(vtr, km) { localStorage.setItem(chaveOdometro(vtr), String(km)); }
+    // Abas
+    document.querySelectorAll('.rodape-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.rodape-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.aba').forEach(a => a.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.id.replace('tab', 'aba').replace('Btn', '');
+        document.getElementById(target).classList.add('active');
+      });
+    });
 
-    function preencherUsuariosSelect() {
-      elUsuario.innerHTML = `<option value="">Selecione o usuário/carona (opcional)</option>` + 
-        USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
-    }
-
-    function preencherVtrsSelects() {
-      const chaves = Object.keys(VTRS).sort();
-      const options = chaves.map(ch => `<option value="${esc(ch)}">${esc(ch)}</option>`).join("");
-      elVtr.innerHTML = options;
-      elFiltroVtr.innerHTML = `<option value="">Selecione a VTR</option>${options}`;
-      atualizarVtrTopo();
-    }
-
-    function atualizarInfoVtr() {
-      atualizarVtrTopo();
-      const dados = VTRS[elVtr.value] || { placa: "NÃO CADASTRADO", marcamodelo: "NÃO CADASTRADO", orgao: "CBMRS CB SLS", status: "", tipo: "", descricao: "", ano: "" };
-      elInfoVtr.innerHTML = `
-        <b>PLACA:</b> ${esc(dados.placa)}<br>
-        <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
-        <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}<br>
-        <b>TIPO:</b> ${esc(dados.tipo || "")}<br>
-        <b>STATUS:</b> ${esc(dados.status || "")}<br>
-        <b>ANO:</b> ${esc(dados.ano || "")}
-      `;
-    }
-
-    function renderCadastroVtrs() {
-      const chaves = Object.keys(VTRS).sort();
-      elListaCadastroVtr.innerHTML = chaves.map(ch => {
-        const v = VTRS[ch];
-        const itemId = ch.replace(/[^a-zA-Z0-9]/g, "_");
-        return `
-          <div class="vtr-item">
-            <div id="view_${itemId}">
-              <b>${esc(ch)}</b><br>
-              Tipo: ${esc(v.tipo || "")}<br>
-              Placa: ${esc(v.placa || "")}<br>
-              Marca/Modelo: ${esc(v.marcamodelo || "")}<br>
-              Órgão: ${esc(v.orgao || "")}<br>
-              Status: ${esc(v.status || "")}<br>
-              Descrição: ${esc(v.descricao || "")}<br>
-              Ano: ${esc(v.ano || "")}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function abrirAba(nome) {
-      abaInicio.classList.remove("active");
-      abaLancamento.classList.remove("active");
-      abaExportar.classList.remove("active");
-      abaCadastro.classList.remove("active");
-      tabInicioBtn.classList.remove("active");
-      tabLancamentoBtn.classList.remove("active");
-      tabExportarBtn.classList.remove("active");
-      tabCadastroBtn.classList.remove("active");
-
-      if (nome === "inicio") { abaInicio.classList.add("active"); tabInicioBtn.classList.add("active"); carregarPainelInicio(); }
-      else if (nome === "lancamento") { abaLancamento.classList.add("active"); tabLancamentoBtn.classList.add("active"); }
-      else if (nome === "exportar") { abaExportar.classList.add("active"); tabExportarBtn.classList.add("active"); }
-      else if (nome === "cadastro") { abaCadastro.classList.add("active"); tabCadastroBtn.classList.add("active"); }
-    }
-
-    // Eventos de clique nas abas
-    tabInicioBtn.addEventListener("click", () => abrirAba("inicio"));
-    tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
-    tabExportarBtn.addEventListener("click", () => abrirAba("exportar"));
-    tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
-
-    // Inicialização
-    setInterval(atualizarRelogio, 1000);
-    preencherUsuariosSelect();
-    preencherVtrsSelects();
-    preencherAnos();
-    elData.value = hojeISO();
-    atualizarInfoVtr();
-    renderCadastroVtrs();
-    abrirAba("inicio");
-
+    // Preencher VTRs
+    const vtrs = ["ABT-0535", "ABT-7992", "AR-426", "ATP-1225", "ATP-9316"];
+    const sel = document.getElementById("vtrSelect");
+    sel.innerHTML = '<option value="">Selecione...</option>' + vtrs.map(v => `<option>${v}</option>`).join('');
+    
+    sel.addEventListener("change", (e) => {
+      const box = document.getElementById("vtrTopoBox");
+      const label = document.getElementById("vtrTopoNome");
+      if(e.target.value) {
+        box.classList.replace("vtr-topo-inativa", "vtr-topo-ativa");
+        label.textContent = e.target.value;
+      } else {
+        box.classList.replace("vtr-topo-ativa", "vtr-topo-inativa");
+        label.textContent = "Nenhuma";
+      }
+    });
   </script>
 </body>
 </html>
