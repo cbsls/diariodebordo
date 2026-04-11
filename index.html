@@ -62,16 +62,24 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
       transition:all .25s ease;
     }
-    .condutor-logado-inativo{
+    /* Estilos de Status Inativo (Cinza) */
+    .condutor-logado-inativo, .vtr-topo-inativa {
       background: rgba(107,114,128,.35);
       border: 1px solid rgba(255,255,255,.20);
     }
-    .condutor-logado-ativo{
-      background: linear-gradient(180deg, rgba(34,197,94,.28) 0%, rgba(22,163,74,.36) 100%);
-      border: 1px solid rgba(187,247,208,.55);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 1px rgba(34,197,94,.06);
+    /* Estilos de Status Ativo (Verde para Condutor, Azul para VTR conforme original) */
+    .condutor-logado-ativo {
+      background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
     }
-    .condutor-logado-titulo{
+    .vtr-topo-ativa {
+      background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .condutor-logado-titulo, .vtr-topo-titulo {
       display:block;
       font-size:10px;
       opacity:.9;
@@ -79,37 +87,14 @@
       text-transform:uppercase;
       margin-bottom:3px;
     }
-    .condutor-logado-nome{
+    .condutor-logado-nome, .vtr-topo-nome {
       display:block;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
       font-size:13px;
     }
-    .vtr-topo-inativa{
-      background: rgba(59,130,246,.18);
-      border: 1px solid rgba(255,255,255,.20);
-    }
-    .vtr-topo-ativa{
-      background: linear-gradient(180deg, rgba(59,130,246,.28) 0%, rgba(15,76,129,.40) 100%);
-      border: 1px solid rgba(191,219,254,.55);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 1px rgba(59,130,246,.08);
-    }
-    .vtr-topo-titulo{
-      display:block;
-      font-size:10px;
-      opacity:.9;
-      letter-spacing:.4px;
-      text-transform:uppercase;
-      margin-bottom:3px;
-    }
-    .vtr-topo-nome{
-      display:block;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      font-size:13px;
-    }
+
     .app-logo {
       width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12);
       display:flex; align-items:center; justify-content:center; font-size:28px;
@@ -604,8 +589,7 @@
           <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
           <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
           <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
-          <option value="QTL / BAIRRO">QTL / BAIRRO</option>
-          <option value="QTL / BR116">QTL / BR116</option>
+          <option value="QTL / BAIRRO">QTL / BAIRRO</option> <option value="QTL / BR116">QTL / BR116</option>
           <option value="QTL / RS265">QTL / RS265</option>
           <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
           <option value="OUTRO">Outro</option>
@@ -994,35 +978,24 @@
       return `${dia}/${mes}/${ano.slice(2)}`;
     }
 
-    function msgOk(el, texto) {
-      el.innerHTML = `<div class="ok">${texto}</div>`;
-    }
-
-    function msgErro(el, texto) {
-      el.innerHTML = `<div class="erro">${texto}</div>`;
-    }
-
-    function msgMuted(el, texto) {
-      el.innerHTML = `<div class="muted">${texto}</div>`;
-    }
+    function msgOk(el, texto) { el.innerHTML = `<div class="ok">${texto}</div>`; }
+    function msgErro(el, texto) { el.innerHTML = `<div class="erro">${texto}</div>`; }
+    function msgMuted(el, texto) { el.innerHTML = `<div class="muted">${texto}</div>`; }
 
     function atualizarCondutorLogadoTopo() {
       const nome = logado && logado.guerra ? String(logado.guerra).trim() : "Não logado";
       const ativo = !!(logado && logado.guerra);
-
       elCondutorLogadoNome.textContent = nome || "Não logado";
       elCondutorLogadoTopo.title = nome || "Não logado";
-
       elCondutorLogadoTopo.classList.toggle("condutor-logado-ativo", ativo);
       elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
     }
+
     function atualizarVtrTopo() {
       const vtrAtual = elVtr && elVtr.value ? String(elVtr.value).trim() : "";
       const ativo = !!vtrAtual;
-
       elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
       elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
-
       elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
       elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
     }
@@ -1040,9 +1013,7 @@
       return !!nomeLinha1 && nomeLinha1 === String(logado.guerra || "").trim();
     }
 
-    function deveExigirNovoLoginParaLinha2() {
-      return false;
-    }
+    function deveExigirNovoLoginParaLinha2() { return false; }
 
     function assumirCondutorLinha2DoUsuarioLogado() {
       if (!logado) return;
@@ -1077,30 +1048,19 @@
         if (!salvo) return JSON.parse(JSON.stringify(VTRS_INICIAIS));
         const parsed = JSON.parse(salvo);
         return { ...JSON.parse(JSON.stringify(VTRS_INICIAIS)), ...parsed };
-      } catch {
-        return JSON.parse(JSON.stringify(VTRS_INICIAIS));
-      }
+      } catch { return JSON.parse(JSON.stringify(VTRS_INICIAIS)); }
     }
 
-    function salvarCadastroVtrs() {
-      localStorage.setItem("diario_vtrs_cadastro", JSON.stringify(VTRS));
-    }
-
-    function chaveOdometro(vtr) {
-      return `diario_odometro_${vtr}`;
-    }
-
+    function salvarCadastroVtrs() { localStorage.setItem("diario_vtrs_cadastro", JSON.stringify(VTRS)); }
+    function chaveOdometro(vtr) { return `diario_odometro_${vtr}`; }
     function obterOdometroManual(vtr) {
       const valor = localStorage.getItem(chaveOdometro(vtr));
       return valor ? Number(valor) : null;
     }
-
-    function salvarOdometroManual(vtr, km) {
-      localStorage.setItem(chaveOdometro(vtr), String(km));
-    }
+    function salvarOdometroManual(vtr, km) { localStorage.setItem(chaveOdometro(vtr), String(km)); }
 
     function preencherUsuariosSelect() {
-      elUsuario.innerHTML = `<option value="">Selecione o usuário/carona (opcional)</option>` +
+      elUsuario.innerHTML = `<option value="">Selecione o usuário/carona (opcional)</option>` + 
         USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
     }
 
@@ -1114,16 +1074,7 @@
 
     function atualizarInfoVtr() {
       atualizarVtrTopo();
-      const dados = VTRS[elVtr.value] || {
-        placa: "NÃO CADASTRADO",
-        marcamodelo: "NÃO CADASTRADO",
-        orgao: "CBMRS CB SLS",
-        status: "",
-        tipo: "",
-        descricao: "",
-        ano: ""
-      };
-
+      const dados = VTRS[elVtr.value] || { placa: "NÃO CADASTRADO", marcamodelo: "NÃO CADASTRADO", orgao: "CBMRS CB SLS", status: "", tipo: "", descricao: "", ano: "" };
       elInfoVtr.innerHTML = `
         <b>PLACA:</b> ${esc(dados.placa)}<br>
         <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
@@ -1139,7 +1090,6 @@
       elListaCadastroVtr.innerHTML = chaves.map(ch => {
         const v = VTRS[ch];
         const itemId = ch.replace(/[^a-zA-Z0-9]/g, "_");
-
         return `
           <div class="vtr-item">
             <div id="view_${itemId}">
@@ -1162,1144 +1112,33 @@
       abaLancamento.classList.remove("active");
       abaExportar.classList.remove("active");
       abaCadastro.classList.remove("active");
-
       tabInicioBtn.classList.remove("active");
       tabLancamentoBtn.classList.remove("active");
       tabExportarBtn.classList.remove("active");
       tabCadastroBtn.classList.remove("active");
 
-      if (nome === "inicio") {
-        abaInicio.classList.add("active");
-        tabInicioBtn.classList.add("active");
-      } else if (nome === "lancamento") {
-        abaLancamento.classList.add("active");
-        tabLancamentoBtn.classList.add("active");
-      } else if (nome === "exportar") {
-        abaExportar.classList.add("active");
-        tabExportarBtn.classList.add("active");
-      } else {
-        abaCadastro.classList.add("active");
-        tabCadastroBtn.classList.add("active");
-      }
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (nome === "inicio") { abaInicio.classList.add("active"); tabInicioBtn.classList.add("active"); carregarPainelInicio(); }
+      else if (nome === "lancamento") { abaLancamento.classList.add("active"); tabLancamentoBtn.classList.add("active"); }
+      else if (nome === "exportar") { abaExportar.classList.add("active"); tabExportarBtn.classList.add("active"); }
+      else if (nome === "cadastro") { abaCadastro.classList.add("active"); tabCadastroBtn.classList.add("active"); }
     }
 
-    function compararHoras(h1, h2) {
-      if (!h1 || !h2) return 0;
-      return h1.localeCompare(h2);
-    }
-
-    function horarioAtualSeVazio(campo) {
-      if (!campo.value) campo.value = horaAtual();
-    }
-
-    function limparFormularioVisual() {
-      elSaidaSelect.value = "";
-      elSaidaOutro.value = "";
-      elSaidaOutro.classList.add("hidden");
-      elRetornoSelect.value = "";
-      elRetornoOutro.value = "";
-      elRetornoOutro.classList.add("hidden");
-      elKmIni.value = "";
-      elHoraPartida.value = "";
-      elKmFim.value = "";
-      elHoraChegada.value = "";
-      elKmIniRetorno.value = "";
-      elHoraSaidaRetorno.value = "";
-      elKmFimRetorno.value = "";
-      elHoraChegadaRetorno.value = "";
-      elCondutorIda.value = logado ? logado.guerra : "";
-      elCondutorRetorno.value = "";
-      elUsuario.value = "";
-      linha1Salva = false;
-      linha2Salva = false;
-      loginExigidoLinha2 = false;
-      condutorLinha1Original = "";
-      atualizarEstadoFinal();
-    }
-
-    function aplicarPendenciaNaTela(p) {
-      elData.value = p.data || hojeISO();
-      elSaidaSelect.value = p.localpartida && [...elSaidaSelect.options].some(o => o.value === p.localpartida) ? p.localpartida : (p.localpartida ? "OUTRO" : "");
-      if (elSaidaSelect.value === "OUTRO") {
-        elSaidaOutro.classList.remove("hidden");
-        elSaidaOutro.value = p.localpartida || "";
-      } else {
-        elSaidaOutro.classList.add("hidden");
-        elSaidaOutro.value = "";
-      }
-
-      elRetornoSelect.value = p.localretorno && [...elRetornoSelect.options].some(o => o.value === p.localretorno) ? p.localretorno : (p.localretorno ? "OUTRO" : "");
-      if (elRetornoSelect.value === "OUTRO") {
-        elRetornoOutro.classList.remove("hidden");
-        elRetornoOutro.value = p.localretorno || "";
-      } else {
-        elRetornoOutro.classList.add("hidden");
-        elRetornoOutro.value = "";
-      }
-
-      elKmIni.value = p.kmini ?? "";
-      elHoraPartida.value = p.horapartida || "";
-      elKmFim.value = p.kmfim ?? "";
-      elHoraChegada.value = p.horachegada || "";
-
-      elKmIniRetorno.value = p.kminiretorno ?? "";
-      elHoraSaidaRetorno.value = p.horasaidaretorno || "";
-      elKmFimRetorno.value = p.kmfimretorno ?? "";
-      elHoraChegadaRetorno.value = p.horachegadaretorno || "";
-
-      elCondutorIda.value = p.condutor_ida || "";
-      elCondutorRetorno.value = p.condutor_retorno || (logado ? logado.guerra : "");
-      elUsuario.value = p.usuario || "";
-
-      linha1Salva = Boolean(p.condutor_ida && p.localpartida && p.kmini != null && p.horapartida && p.kmfim != null && p.horachegada);
-      linha2Salva = Boolean(p.condutor_retorno && p.kminiretorno != null && p.horasaidaretorno && p.kmfimretorno != null && p.horachegadaretorno);
-      condutorLinha1Original = p.condutor_ida || "";
-      loginExigidoLinha2 = linha1Salva && !linha2Salva;
-
-      atualizarEstadoFinal();
-    }
-
-    async function buscarPendenciaSupabase(vtr) {
-      const { data, error } = await supabaseClient
-        .from(TABELA_PENDENCIAS)
-        .select("*")
-        .eq("vtr", vtr)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    }
-
-    async function salvarPendenciaSupabase() {
-      const payload = {
-        vtr: elVtr.value,
-        data: elData.value || null,
-        localpartida: obterSaidaFinal() || null,
-        localretorno: obterRetornoFinal() || null,
-        kmini: elKmIni.value === "" ? null : Number(elKmIni.value),
-        horapartida: elHoraPartida.value || null,
-        kmfim: elKmFim.value === "" ? null : Number(elKmFim.value),
-        horachegada: elHoraChegada.value || null,
-        kminiretorno: elKmIniRetorno.value === "" ? null : Number(elKmIniRetorno.value),
-        horasaidaretorno: elHoraSaidaRetorno.value || null,
-        kmfimretorno: elKmFimRetorno.value === "" ? null : Number(elKmFimRetorno.value),
-        horachegadaretorno: elHoraChegadaRetorno.value || null,
-        condutor_ida: elCondutorIda.value || null,
-        condutor_retorno: elCondutorRetorno.value || null,
-        usuario: elUsuario.value || null,
-        updated_at: new Date().toISOString()
-      };
-
-      const { error } = await supabaseClient
-        .from(TABELA_PENDENCIAS)
-        .upsert([payload], { onConflict: "vtr" });
-
-      if (error) throw error;
-    }
-
-    async function excluirPendenciaSupabase(vtr) {
-      const { error } = await supabaseClient
-        .from(TABELA_PENDENCIAS)
-        .delete()
-        .eq("vtr", vtr);
-
-      if (error) throw error;
-    }
-
-    async function carregarPendenciaDaVtr() {
-      if (!elVtr.value) return;
-
-      try {
-        const pendencia = await buscarPendenciaSupabase(elVtr.value);
-        if (pendencia) {
-          aplicarPendenciaNaTela(pendencia);
-
-          assumirCondutorLinha2DoUsuarioLogado();
-          atualizarEstadoFinal();
-          msgMuted(elStatusSalvar, "Pendência compartilhada carregada do Supabase.");
-        } else {
-          limparFormularioVisual();
-          elData.value = hojeISO();
-          const kmBase = Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
-          elKmIni.value = kmBase || "";
-          elCondutorIda.value = logado ? logado.guerra : "";
-          atualizarEstadoFinal();
-        }
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusSalvar, "❌ Falha ao carregar pendência compartilhada.");
-      }
-    }
-
-    function atualizarMensagemPendencia() {
-      if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
-        const avisoLogin = '<br>✅ A 2ª linha sempre fica com o militar que estiver logado no aparelho ao assumir o retorno.';
-
-        elPendenciaBox.classList.remove("hidden");
-        elPendenciaBox.innerHTML = `
-          ⚠️ REGISTRO PENDENTE DE FECHAMENTO<br>
-          Condutor da 1ª linha: <b>${esc(elCondutorIda.value)}</b><br>
-          Condutor da 2ª linha atual: <b>${esc(elCondutorRetorno.value || "aguardando login")}</b><br>
-          Registro carregado do Supabase. Complete o retorno e finalize.${avisoLogin}
-        `;
-      } else {
-        elPendenciaBox.classList.add("hidden");
-        elPendenciaBox.innerHTML = "";
-      }
-    }
-
-    async function buscarSenhaNoSupabase(idFunc) {
-      const { data, error } = await supabaseClient
-        .from(TABELA_AUTH)
-        .select("id_func, nome_guerra, senha")
-        .eq("id_func", idFunc)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    }
-
-    async function salvarNovaSenhaNoSupabase(user, senhaNova) {
-      const { error } = await supabaseClient
-        .from(TABELA_AUTH)
-        .upsert([{
-          id_func: user.id,
-          nome_guerra: user.guerra,
-          senha: senhaNova,
-          updated_at: new Date().toISOString()
-        }], { onConflict: "id_func" });
-
-      if (error) throw error;
-    }
-
-    async function cadastrarNovaSenhaPrimeiroAcesso(user) {
-      const nova1 = prompt(`Primeiro acesso de ${user.guerra}.\nCadastre sua nova senha:`);
-      if (nova1 === null) return false;
-      const senha1 = String(nova1).trim();
-      if (senha1.length < 4) {
-        alert("A nova senha deve ter pelo menos 4 caracteres.");
-        return false;
-      }
-      const nova2 = prompt("Confirme a nova senha:");
-      if (nova2 === null) return false;
-      const senha2 = String(nova2).trim();
-      if (senha1 !== senha2) {
-        alert("As senhas não conferem.");
-        return false;
-      }
-      await salvarNovaSenhaNoSupabase(user, senha1);
-      alert("Senha cadastrada com sucesso.");
-      return true;
-    }
-
-    async function login() {
-      const id = elIdFunc.value.trim();
-      const senhaInformada = elSenhaLogin.value.trim();
-
-      if (!id || !senhaInformada) {
-        msgErro(elUserOk, "❌ Informe ID Func e senha.");
-        elFormBox.classList.add("hidden");
-        return;
-      }
-
-      const user = USUARIOS.find(u => u.id === id);
-      if (!user) {
-        msgErro(elUserOk, "❌ ID não cadastrada.");
-        elFormBox.classList.add("hidden");
-        return;
-      }
-
-      elBtnEntrar.disabled = true;
-      msgMuted(elUserOk, "Validando acesso...");
-
-      try {
-        const auth = await buscarSenhaNoSupabase(user.id);
-
-        if (!auth) {
-          if (senhaInformada !== user.id) {
-            msgErro(elUserOk, "❌ No primeiro acesso, use sua própria ID como senha.");
-            elFormBox.classList.add("hidden");
-            return;
-          }
-
-          const cadastrou = await cadastrarNovaSenhaPrimeiroAcesso(user);
-          if (!cadastrou) {
-            msgErro(elUserOk, "❌ Cadastro da nova senha cancelado.");
-            elFormBox.classList.add("hidden");
-            return;
-          }
-        } else {
-          if (senhaInformada !== String(auth.senha)) {
-            msgErro(elUserOk, "❌ Senha inválida.");
-            elFormBox.classList.add("hidden");
-            return;
-          }
-        }
-
-        logado = user;
-        atualizarCondutorLogadoTopo();
-        msgOk(elUserOk, `✅ ${user.guerra}`);
-        elFormBox.classList.remove("hidden");
-
-        if (!elData.value) elData.value = hojeISO();
-        elSenhaLogin.value = "";
-
-        atualizarInfoVtr();
-        await atualizarKmBaseDaVtr();
-        await carregarPendenciaDaVtr();
-
-        if (!linha1Salva) {
-          elCondutorIda.value = user.guerra;
-          condutorLinha1Original = user.guerra;
-        }
-        assumirCondutorLinha2DoUsuarioLogado();
-        atualizarEstadoFinal();
-      } catch (e) {
-        console.error(e);
-        msgErro(elUserOk, "❌ Erro ao validar login no Supabase.");
-        elFormBox.classList.add("hidden");
-      } finally {
-        elBtnEntrar.disabled = false;
-      }
-    }
-
-    async function obterUltimoRegistroDaVtr(vtr) {
-      const { data, error } = await supabaseClient
-        .from("diario")
-        .select("*")
-        .eq("vtr", vtr)
-        .order("data", { ascending: false })
-        .order("id", { ascending: false })
-        .limit(1);
-
-      if (error) throw error;
-      return data && data.length ? data[0] : null;
-    }
-
-    async function atualizarKmBaseDaVtr() {
-      const vtr = elVtr.value;
-      if (!vtr) return;
-
-      try {
-        msgMuted(elStatusOdometro, "Consultando KM atual...");
-        const ultimo = await obterUltimoRegistroDaVtr(vtr);
-        const kmManual = obterOdometroManual(vtr);
-
-        let kmBase = 0;
-        if (ultimo) {
-          if (ultimo.kmfimretorno != null && ultimo.kmfimretorno !== "") {
-            kmBase = Number(ultimo.kmfimretorno);
-          } else if (ultimo.kmfim != null && ultimo.kmfim !== "") {
-            kmBase = Number(ultimo.kmfim);
-          }
-        } else if (kmManual != null) {
-          kmBase = kmManual;
-        }
-
-        elOdometroValor.textContent = formatarOdometro(kmBase);
-        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
-        atualizarResumoAutomatico();
-        msgMuted(elStatusOdometro, "KM atual carregada.");
-      } catch (e) {
-        console.error(e);
-        const kmManual = obterOdometroManual(vtr);
-        const kmBase = kmManual != null ? kmManual : 0;
-        elOdometroValor.textContent = formatarOdometro(kmBase);
-        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
-        atualizarResumoAutomatico();
-        msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
-      }
-    }
-
-    async function editarOdometroAdmin() {
-      const vtr = elVtr.value;
-      if (!vtr) {
-        msgErro(elStatusOdometro, "❌ Selecione uma VTR.");
-        return;
-      }
-
-      const senha = prompt("Senha admin:");
-      if (senha !== ADMIN_SENHA) {
-        msgErro(elStatusOdometro, "❌ Senha inválida.");
-        return;
-      }
-
-      const atual = elOdometroValor.textContent.replace(/\D/g, "") || "0";
-      const novo = prompt(`Informe a KM atual da ${vtr}:`, String(Number(atual)));
-      if (novo === null) return;
-
-      const km = Number(novo);
-      if (Number.isNaN(km) || km < 0) {
-        msgErro(elStatusOdometro, "❌ KM inválida.");
-        return;
-      }
-
-      salvarOdometroManual(vtr, km);
-      elOdometroValor.textContent = formatarOdometro(km);
-      if (!linha1Salva) elKmIni.value = km;
-      msgOk(elStatusOdometro, "✅ KM atualizada.");
-    }
-
-    function controlarCamposSaida() {
-      if (elSaidaSelect.value === "OUTRO") {
-        elSaidaOutro.classList.remove("hidden");
-      } else {
-        elSaidaOutro.classList.add("hidden");
-        elSaidaOutro.value = "";
-      }
-    }
-
-    function controlarCamposRetorno() {
-      if (elRetornoSelect.value === "OUTRO") {
-        elRetornoOutro.classList.remove("hidden");
-      } else {
-        elRetornoOutro.classList.add("hidden");
-        elRetornoOutro.value = "";
-      }
-    }
-
-    function aplicarRetornoAutomatico() {
-      controlarCamposSaida();
-      if (elSaidaSelect.value && elSaidaSelect.value !== "OUTRO") {
-        const retorno = MAPA_RETORNO[elSaidaSelect.value];
-        if (retorno) {
-          elRetornoSelect.value = retorno;
-          controlarCamposRetorno();
-        }
-      }
-      atualizarResumoAutomatico();
-      atualizarMensagemPendencia();
-    }
-
-    function atualizarKmInicialRetorno() {
-      const kmIda = Number(elKmFim.value);
-      if (!Number.isNaN(kmIda) && kmIda >= 0) {
-        elKmIniRetorno.value = kmIda;
-      } else {
-        elKmIniRetorno.value = "";
-      }
-      atualizarResumoAutomatico();
-      atualizarEstadoFinal();
-    }
-
-    function obterSaidaFinal() {
-      return elSaidaSelect.value === "OUTRO" ? elSaidaOutro.value.trim() : elSaidaSelect.value.trim();
-    }
-
-    function obterRetornoFinal() {
-      return elRetornoSelect.value === "OUTRO" ? elRetornoOutro.value.trim() : elRetornoSelect.value.trim();
-    }
-
-    function validarLinha1() {
-      const saidaFinal = obterSaidaFinal();
-      const retornoFinal = obterRetornoFinal();
-      const kmIniValor = Number(elKmIni.value);
-      const kmFimValor = Number(elKmFim.value);
-
-      if (!elData.value) return false;
-      if (!saidaFinal) return false;
-      if (!retornoFinal) return false;
-      if (elKmIni.value === "" || elKmFim.value === "") return false;
-      if (!elHoraPartida.value || !elHoraChegada.value) return false;
-      if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
-      if (kmFimValor < kmIniValor) return false;
-      if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
-      if (!elCondutorIda.value.trim()) return false;
-      return true;
-    }
-
-    function validarLinha2() {
-      const kmIniRetornoValor = Number(elKmIniRetorno.value);
-      const kmFimRetornoValor = Number(elKmFimRetorno.value);
-      const kmFimValor = Number(elKmFim.value);
-
-      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") return false;
-      if (!elHoraSaidaRetorno.value || !elHoraChegadaRetorno.value) return false;
-      if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
-      if (kmIniRetornoValor !== kmFimValor) return false;
-      if (kmFimRetornoValor < kmIniRetornoValor) return false;
-      if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
-      if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
-      if (!elCondutorRetorno.value.trim()) return false;
-      return true;
-    }
-
-    function travarCamposLinha1(travar) {
-      elSaidaSelect.disabled = travar;
-      elSaidaOutro.readOnly = travar;
-      elRetornoSelect.disabled = travar;
-      elRetornoOutro.readOnly = travar;
-      elKmIni.readOnly = travar;
-      elHoraPartida.readOnly = travar;
-      elKmFim.readOnly = travar;
-      elHoraChegada.readOnly = travar;
-    }
-
-    function travarCamposLinha2(travar) {
-      elHoraSaidaRetorno.readOnly = travar;
-      elKmFimRetorno.readOnly = travar;
-      elHoraChegadaRetorno.readOnly = travar;
-    }
-
-    function atualizarBadges() {
-      if (linha1Salva) {
-        elBadgeLinha1.textContent = "1ª LINHA SALVA";
-        elBadgeLinha1.className = "badge-linha badge-ok";
-        elBtnSalvarLinha1.textContent = "✅ Salvo 1ª Linha";
-        elBtnSalvarLinha1.classList.add("btn-linha-ok");
-        elBtnEditarLinha1.classList.remove("hidden");
-      } else {
-        elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
-        elBadgeLinha1.className = "badge-linha badge-pendente";
-        elBtnSalvarLinha1.textContent = "Salvar 1ª Linha";
-        elBtnSalvarLinha1.classList.remove("btn-linha-ok");
-        elBtnEditarLinha1.classList.add("hidden");
-      }
-
-      if (linha2Salva) {
-        elBadgeLinha2.textContent = "2ª LINHA SALVA";
-        elBadgeLinha2.className = "badge-linha badge-ok";
-        elBtnSalvarLinha2.textContent = "✅ Salvo 2ª Linha";
-        elBtnSalvarLinha2.classList.add("btn-linha-ok");
-        elBtnEditarLinha2.classList.remove("hidden");
-      } else {
-        elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
-        elBadgeLinha2.className = "badge-linha badge-pendente";
-        elBtnSalvarLinha2.textContent = "Salvar 2ª Linha";
-        elBtnSalvarLinha2.classList.remove("btn-linha-ok");
-        elBtnEditarLinha2.classList.add("hidden");
-      }
-    }
-
-    function atualizarResumoAutomatico() {
-      const kmIni = Number(elKmIni.value || 0);
-      const kmFinal = Number(elKmFimRetorno.value || elKmFim.value || 0);
-      let rodado = 0;
-      if (!Number.isNaN(kmIni) && !Number.isNaN(kmFinal) && kmFinal >= kmIni) rodado = kmFinal - kmIni;
-      elKmRodadoTotal.textContent = rodado;
-
-      if (linha1Salva && linha2Salva && validarLinha1() && validarLinha2()) {
-        elSituacaoResumo.textContent = "Pronto para finalizar";
-      } else if (linha1Salva || linha2Salva) {
-        elSituacaoResumo.textContent = "Salvo parcialmente";
-      } else {
-        elSituacaoResumo.textContent = "Aguardando preenchimento";
-      }
-    }
-
-    function atualizarEstadoFinal() {
-      atualizarBadges();
-      atualizarResumoAutomatico();
-      atualizarMensagemPendencia();
-
-      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
-
-      travarCamposLinha1(linha1Salva);
-      travarCamposLinha2(linha2Salva);
-
-      if (pronto) {
-        elBtnFinal.textContent = "Finalizar";
-        elBtnFinal.classList.add("btn-finalizar");
-        elBtnFinal.classList.remove("btn-salvar-parcial");
-        elAlertaOperacional.classList.add("hidden");
-      } else {
-        elBtnFinal.textContent = "Salvar parcial";
-        elBtnFinal.classList.remove("btn-finalizar");
-        elBtnFinal.classList.add("btn-salvar-parcial");
-        elAlertaOperacional.classList.remove("hidden");
-      }
-    }
-
-    async function salvarLinha1() {
-      preencherHorarioPadrao();
-
-      if (!logado) {
-        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
-        return;
-      }
-
-      if (!elCondutorIda.value.trim()) {
-        elCondutorIda.value = logado.guerra;
-      }
-
-      if (!validarLinha1()) {
-        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente.");
-        return;
-      }
-
-      linha1Salva = true;
-      condutorLinha1Original = elCondutorIda.value.trim() || logado.guerra;
-      loginExigidoLinha2 = false;
-      atualizarKmInicialRetorno();
-
-      if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
-      assumirCondutorLinha2DoUsuarioLogado();
-
-      try {
-        await salvarPendenciaSupabase();
-        atualizarEstadoFinal();
-        msgOk(elStatusSalvar, "✅ 1ª linha salva no Supabase. Outro dispositivo poderá continuar.");
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusSalvar, "❌ Erro ao salvar 1ª linha no Supabase.");
-      }
-    }
-
-    async function salvarLinha2() {
-      if (!validarLinha1()) {
-        msgErro(elStatusSalvar, "❌ Salve primeiro a 1ª linha corretamente.");
-        return;
-      }
-
-      if (!logado) {
-        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
-        return;
-      }
-
-      preencherHorarioPadrao();
-      assumirCondutorLinha2DoUsuarioLogado();
-
-      if (!validarLinha2()) {
-        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
-        return;
-      }
-
-      linha2Salva = true;
-      loginExigidoLinha2 = false;
-
-      try {
-        await salvarPendenciaSupabase();
-        atualizarEstadoFinal();
-        msgOk(elStatusSalvar, "✅ 2ª linha salva no Supabase.");
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusSalvar, "❌ Erro ao salvar 2ª linha no Supabase.");
-      }
-    }
-
-    function editarLinha1() {
-      linha1Salva = false;
-      linha2Salva = false;
-      loginExigidoLinha2 = false;
-      condutorLinha1Original = logado ? logado.guerra : "";
-      travarCamposLinha1(false);
-      travarCamposLinha2(false);
-      elCondutorRetorno.value = logado ? logado.guerra : "";
-      atualizarEstadoFinal();
-      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois.");
-    }
-
-    function editarLinha2() {
-      linha2Salva = false;
-      loginExigidoLinha2 = false;
-      travarCamposLinha2(false);
-      assumirCondutorLinha2DoUsuarioLogado();
-      atualizarEstadoFinal();
-      msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
-    }
-
-    async function finalizarOuSalvarParcial() {
-      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
-
-      if (!pronto) {
-        try {
-          await salvarPendenciaSupabase();
-          atualizarEstadoFinal();
-          msgMuted(elStatusSalvar, "Pendência salva no Supabase. Complete as duas linhas para finalizar.");
-        } catch (e) {
-          console.error(e);
-          msgErro(elStatusSalvar, "❌ Erro ao salvar pendência parcial.");
-        }
-        return;
-      }
-
-      if (!logado) {
-        msgErro(elStatusSalvar, "❌ Faça o login primeiro");
-        return;
-      }
-
-      const saidaFinal = obterSaidaFinal();
-      const retornoFinal = obterRetornoFinal();
-
-      const kmIniValor = Number(elKmIni.value);
-      const kmFimValor = Number(elKmFim.value);
-      const kmIniRetornoValor = Number(elKmIniRetorno.value);
-      const kmFimRetornoValor = Number(elKmFimRetorno.value);
-
-      const dadosVtr = VTRS[elVtr.value] || {
-        placa: "NÃO CADASTRADO",
-        marcamodelo: "NÃO CADASTRADO",
-        orgao: "CBMRS CB SLS"
-      };
-
-      elBtnFinal.disabled = true;
-      msgMuted(elStatusSalvar, "Finalizando...");
-
-      try {
-        const { error } = await supabaseClient
-          .from("diario")
-          .insert([{
-            vtr: elVtr.value,
-            placa: dadosVtr.placa,
-            marcamodelo: dadosVtr.marcamodelo,
-            orgao: dadosVtr.orgao,
-            data: elData.value,
-            localpartida: saidaFinal,
-            localretorno: retornoFinal,
-            kmini: kmIniValor,
-            horapartida: elHoraPartida.value,
-            kmfim: kmFimValor,
-            horachegada: elHoraChegada.value,
-            kminiretorno: kmIniRetornoValor,
-            horasaidaretorno: elHoraSaidaRetorno.value,
-            kmfimretorno: kmFimRetornoValor,
-            horachegadaretorno: elHoraChegadaRetorno.value,
-            condutor: elCondutorIda.value,
-            condutor_retorno: elCondutorRetorno.value,
-            usuario: elUsuario.value.trim(),
-            assinaturacondutor: "",
-            assinaturausuario: ""
-          }]);
-
-        if (error) {
-          msgErro(elStatusSalvar, `❌ Erro ao finalizar: ${error.message}`);
-          return;
-        }
-
-        await excluirPendenciaSupabase(elVtr.value);
-
-        salvarOdometroManual(elVtr.value, kmFimRetornoValor);
-        msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
-
-        elSaidaSelect.value = "";
-        elSaidaOutro.value = "";
-        elSaidaOutro.classList.add("hidden");
-        elRetornoSelect.value = "";
-        elRetornoOutro.value = "";
-        elRetornoOutro.classList.add("hidden");
-        elKmIni.value = kmFimRetornoValor;
-        elHoraPartida.value = horaAtual();
-        elKmFim.value = "";
-        elHoraChegada.value = horaAtual();
-        elKmIniRetorno.value = "";
-        elHoraSaidaRetorno.value = horaAtual();
-        elKmFimRetorno.value = "";
-        elHoraChegadaRetorno.value = horaAtual();
-        elCondutorIda.value = logado ? logado.guerra : "";
-        elCondutorRetorno.value = "";
-        elUsuario.value = "";
-        elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
-        linha1Salva = false;
-        linha2Salva = false;
-        loginExigidoLinha2 = false;
-        condutorLinha1Original = logado ? logado.guerra : "";
-        atualizarEstadoFinal();
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
-      } finally {
-        elBtnFinal.disabled = false;
-      }
-    }
-
-    function obterKmFinalRegistro(registro) {
-      if (registro && registro.kmfimretorno != null && registro.kmfimretorno !== "") return Number(registro.kmfimretorno) || 0;
-      if (registro && registro.kmfim != null && registro.kmfim !== "") return Number(registro.kmfim) || 0;
-      return 0;
-    }
-
-    function obterKmRodadoRegistro(registro) {
-      const kmIni = Number(registro?.kmini ?? 0);
-      const kmFinal = obterKmFinalRegistro(registro);
-      if (Number.isNaN(kmIni) || Number.isNaN(kmFinal) || kmFinal < kmIni) return 0;
-      return kmFinal - kmIni;
-    }
-
-    function obterDataHoraFimRegistro(registro) {
-      if (!registro?.data) return null;
-      const hora = registro.horachegadaretorno || registro.horachegada || "23:59";
-      const dt = new Date(`${registro.data}T${hora}:00`);
-      return Number.isNaN(dt.getTime()) ? null : dt;
-    }
-
-    function renderPainelInicio(lista) {
-      if (!lista.length) {
-        elListaInicio.innerHTML = '<div class="muted">Nenhuma VTR encontrada.</div>';
-        return;
-      }
-
-      elListaInicio.innerHTML = `<div class="inicio-grid">${lista.map(item => `
-        <div class="inicio-item">
-          <div class="inicio-item-topo">
-            <div class="inicio-vtr-nome">${esc(item.nome)}</div>
-            <div class="inicio-vtr-tipo">${esc(item.tipo || 'VTR')}</div>
-          </div>
-          <div class="inicio-linha">
-            <div>
-              <div class="inicio-label">KM atual</div>
-              <div class="muted">Última posição conhecida</div>
-            </div>
-            <div class="inicio-valor">${esc(formatarOdometro(item.kmAtual))}</div>
-          </div>
-          <div class="inicio-linha">
-            <div>
-              <div class="inicio-label">Rodado nas últimas 24h</div>
-              <div class="muted">Soma dos registros finalizados</div>
-            </div>
-            <div class="inicio-valor-menor">${esc(String(item.km24h))} km</div>
-          </div>
-          <div class="inicio-rodape">Placa: <b>${esc(item.placa || '-')}</b></div>
-        </div>
-      `).join('')}</div>`;
-    }
-
-    async function carregarPainelInicio() {
-      const agora = new Date();
-      const limite24h = new Date(agora.getTime() - 24 * 60 * 60 * 1000);
-      const dataConsulta = new Date(limite24h.getTime() - 24 * 60 * 60 * 1000);
-      const inicioFiltro = `${dataConsulta.getFullYear()}-${String(dataConsulta.getMonth()+1).padStart(2,'0')}-${String(dataConsulta.getDate()).padStart(2,'0')}`;
-      const chaves = Object.keys(VTRS).sort();
-
-      msgMuted(elStatusInicio, 'Atualizando painel das VTRs...');
-      elBtnAtualizarInicio.disabled = true;
-
-      try {
-        const resultados = await Promise.all(chaves.map(async (nomeVtr) => {
-          let kmAtual = 0;
-          let km24h = 0;
-
-          const { data: ultimoData, error: ultimoError } = await supabaseClient
-            .from('diario')
-            .select('*')
-            .eq('vtr', nomeVtr)
-            .order('data', { ascending: false })
-            .order('id', { ascending: false })
-            .limit(1);
-
-          if (ultimoError) throw ultimoError;
-
-          const ultimo = ultimoData && ultimoData.length ? ultimoData[0] : null;
-          if (ultimo) {
-            kmAtual = obterKmFinalRegistro(ultimo);
-          } else {
-            const kmManual = obterOdometroManual(nomeVtr);
-            kmAtual = kmManual != null ? Number(kmManual) : 0;
-          }
-
-          const { data: recentes, error: recentesError } = await supabaseClient
-            .from('diario')
-            .select('*')
-            .eq('vtr', nomeVtr)
-            .gte('data', inicioFiltro)
-            .order('data', { ascending: false })
-            .order('id', { ascending: false });
-
-          if (recentesError) throw recentesError;
-
-          km24h = (recentes || []).reduce((total, reg) => {
-            const fimRegistro = obterDataHoraFimRegistro(reg);
-            if (!fimRegistro || fimRegistro < limite24h) return total;
-            return total + obterKmRodadoRegistro(reg);
-          }, 0);
-
-          return {
-            nome: nomeVtr,
-            placa: VTRS[nomeVtr]?.placa || '',
-            tipo: VTRS[nomeVtr]?.tipo || '',
-            kmAtual,
-            km24h
-          };
-        }));
-
-        renderPainelInicio(resultados);
-        msgOk(elStatusInicio, `✅ Painel atualizado às ${horaAtualCompleta()}`);
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusInicio, '❌ Erro ao carregar painel inicial.');
-        elListaInicio.innerHTML = '<div class="muted">Não foi possível carregar o resumo das VTRs.</div>';
-      } finally {
-        elBtnAtualizarInicio.disabled = false;
-      }
-    }
-
-    async function buscarRegistrosPorVtr() {
-      const vtr = elFiltroVtr.value;
-      const mes = Number(elFiltroMes.value);
-      const ano = Number(elFiltroAno.value);
-
-      if (!vtr) {
-        msgErro(elStatusBuscaVtr, "❌ Selecione uma VTR");
-        msgMuted(elListaVtr, "Selecione VTR, mês e ano para listar os registros.");
-        return;
-      }
-
-      const inicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
-      const ultimoDia = new Date(ano, mes, 0).getDate();
-      const fim = `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
-
-      msgMuted(elStatusBuscaVtr, "Buscando...");
-      msgMuted(elListaVtr, "Carregando registros...");
-
-      try {
-        const { data, error } = await supabaseClient
-          .from("diario")
-          .select("*")
-          .eq("vtr", vtr)
-          .gte("data", inicio)
-          .lte("data", fim)
-          .order("data", { ascending: true })
-          .order("id", { ascending: true });
-
-        if (error) {
-          msgErro(elStatusBuscaVtr, `❌ Erro ao buscar: ${error.message}`);
-          msgMuted(elListaVtr, "Falha ao carregar.");
-          return;
-        }
-
-        registrosFiltrados = data || [];
-        const referencia = `${nomeMesNumero(mes)} ${ano}`;
-
-        msgOk(elStatusBuscaVtr, `✅ ${registrosFiltrados.length} registro(s) encontrado(s) em ${referencia}`);
-
-        if (!registrosFiltrados.length) {
-          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR neste mês.");
-          return;
-        }
-
-        elListaVtr.innerHTML = registrosFiltrados.map(r => `
-          <div class="registro">
-            <b>${esc(r.vtr)}</b><br>
-            Data: ${esc(formatarDataBR(r.data))}<br>
-            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)} | Condutor: ${esc(r.condutor || "")}<br>
-            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")} | Condutor: ${esc(r.condutor_retorno || r.condutor || "")}<br>
-            Usuário/Carona: ${esc(r.usuario || "")}
-          </div>
-        `).join("");
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusBuscaVtr, "❌ Falha inesperada ao buscar");
-        msgMuted(elListaVtr, "Falha ao carregar.");
-      }
-    }
-
-    function quebrarEmPaginas(linhas, porPagina) {
-      const paginas = [];
-      for (let i = 0; i < linhas.length; i += porPagina) paginas.push(linhas.slice(i, i + porPagina));
-      return paginas.length ? paginas : [[]];
-    }
-
-    function gerarLinhasDoRegistro(r) {
-      const kmIniRet = r.kminiretorno != null && r.kminiretorno !== "" ? r.kminiretorno : r.kmfim;
-      return [
-        {
-          data: formatarDataBR(r.data),
-          local: r.localpartida,
-          kmIni: r.kmini,
-          horaPartida: r.horapartida,
-          kmFim: r.kmfim,
-          horaChegada: r.horachegada,
-          condutor: r.condutor,
-          usuario: r.usuario || ""
-        },
-        {
-          data: formatarDataBR(r.data),
-          local: r.localretorno || "",
-          kmIni: kmIniRet ?? "",
-          horaPartida: r.horasaidaretorno || "",
-          kmFim: r.kmfimretorno ?? "",
-          horaChegada: r.horachegadaretorno || "",
-          condutor: r.condutor_retorno || r.condutor || "",
-          usuario: r.usuario || ""
-        }
-      ];
-    }
-
-    function gerarLinhasTabelaPdf(linhas, linhasPorPagina = 14) {
-      const htmlLinhas = linhas.map(r => `
-        <tr class="linha-dados">
-          <td>${esc(r.data)}</td>
-          <td>${esc(r.local)}</td>
-          <td>${esc(r.kmIni)}</td>
-          <td>${esc(r.horaPartida)}</td>
-          <td>${esc(r.kmFim)}</td>
-          <td>${esc(r.horaChegada)}</td>
-          <td>${esc(r.condutor)}</td>
-          <td></td>
-          <td>${esc(r.usuario)}</td>
-          <td></td>
-        </tr>
-      `).join("");
-
-      const faltantes = Math.max(0, linhasPorPagina - linhas.length);
-      const vazias = Array.from({ length: faltantes }, () => `
-        <tr class="linha-dados">
-          <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        </tr>
-      `).join("");
-
-      return htmlLinhas + vazias;
-    }
-
-    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, linhasPagina, numeroPagina, totalPaginas) {
-      const linhasTabela = gerarLinhasTabelaPdf(linhasPagina, 14);
-
-      return `
-        <div class="folha ${numeroPagina < totalPaginas ? 'quebra-pagina' : ''}">
-          <table>
-            <colgroup>
-              <col class="w1"><col class="w2"><col class="w3"><col class="w4"><col class="w5">
-              <col class="w6"><col class="w7"><col class="w8"><col class="w9"><col class="w10">
-            </colgroup>
-
-            <tr class="titulo">
-              <td colspan="10">DIÁRIO DE BORDO FÍSICO</td>
-            </tr>
-
-            <tr class="subref">
-              <td colspan="10">${esc(vtr)} - ${esc(referencia)} - PÁGINA ${numeroPagina}/${totalPaginas}</td>
-            </tr>
-
-            <tr class="identificacao">
-              <td colspan="3" class="al-esq"><b>PLACA:</b> ${esc(dadosVtr.placa || "")}</td>
-              <td colspan="4" class="al-esq"><b>MARCA/MODELO:</b> ${esc(dadosVtr.marcamodelo || "")}</td>
-              <td colspan="3" class="al-esq"><b>ÓRGÃO/ENTIDADE:</b> ${esc(dadosVtr.orgao || "")}</td>
-            </tr>
-
-            <tr class="cabecalho">
-              <td>DATA</td>
-              <td>LOCAL DE PARTIDA</td>
-              <td>KM DO VEÍC. NA PARTIDA</td>
-              <td>HORA DA PARTIDA</td>
-              <td>KM DO VEIC. NO DESTINO</td>
-              <td>HORA DA CHEGADA</td>
-              <td>NOME CONDUTOR</td>
-              <td>ASSINATURA CONDUTOR</td>
-              <td>NOME USUÁRIO</td>
-              <td>ASSINATURA USUÁRIO</td>
-            </tr>
-
-            ${linhasTabela}
-          </table>
-        </div>
-      `;
-    }
-
-    function exportarMes() {
-      if (!registrosFiltrados.length) {
-        alert("Nenhum registro carregado para exportar.");
-        return;
-      }
-
-      const vtr = elFiltroVtr.value;
-      const mes = Number(elFiltroMes.value);
-      const ano = Number(elFiltroAno.value);
-      const referencia = `${nomeMesNumero(mes)} ${ano}`;
-      const dadosVtr = VTRS[vtr] || {};
-
-      const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
-      const paginas = quebrarEmPaginas(linhasExpandias, 14);
-
-      const htmlPaginas = paginas.map((pagina, index) =>
-        gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, pagina, index + 1, paginas.length)
-      ).join("");
-
-      const w = window.open("", "_blank");
-      if (!w) {
-        alert("Não foi possível abrir a janela do PDF.");
-        return;
-      }
-
-      w.document.write(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <title>DIÁRIO DE BORDO FÍSICO - ${esc(vtr)} - ${esc(referencia)}</title>
-          <style>
-            @page { size: A4 landscape; margin: 10mm; }
-            html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }
-            .folha { width: 100%; padding: 0; }
-            .quebra-pagina { page-break-after: always; }
-            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-            td, th { border: 1px solid #000; font-size: 10px; padding: 4px 4px; text-align: center; vertical-align: middle; word-break: break-word; }
-            .titulo td { font-weight: bold; font-size: 16px; height: 32px; letter-spacing: 0.2px; }
-            .subref td { font-weight: bold; font-size: 12px; height: 24px; }
-            .identificacao td { font-size: 11px; text-align: left; height: 28px; padding-left: 6px; }
-            .cabecalho td { font-weight: bold; height: 44px; line-height: 1.1; }
-            .linha-dados td { height: 28px; }
-            .w1 { width: 5.34%; } .w2 { width: 13.34%; } .w3 { width: 8.89%; } .w4 { width: 7.12%; } .w5 { width: 8.90%; }
-            .w6 { width: 7.12%; } .w7 { width: 12.45%; } .w8 { width: 8.89%; } .w9 { width: 10.67%; } .w10 { width: 11.56%; }
-            .al-esq { text-align: left; padding-left: 6px; }
-          </style>
-        </head>
-        <body>
-          ${htmlPaginas}
-          <script>
-            window.onload = function () { window.print(); };
-          <\/script>
-        </body>
-        </html>
-      `);
-
-      w.document.close();
-    }
-
+    // Eventos de clique nas abas
     tabInicioBtn.addEventListener("click", () => abrirAba("inicio"));
     tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
     tabExportarBtn.addEventListener("click", () => abrirAba("exportar"));
     tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
 
-    elBtnEntrar.addEventListener("click", login);
-    elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
-    elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
-    elBtnEditarLinha1.addEventListener("click", editarLinha1);
-    elBtnEditarLinha2.addEventListener("click", editarLinha2);
-    elBtnFinal.addEventListener("click", finalizarOuSalvarParcial);
-    elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
-    elBtnExportarMes.addEventListener("click", exportarMes);
-    elBtnEditarOdometro.addEventListener("click", editarOdometroAdmin);
-    elBtnAtualizarInicio.addEventListener("click", carregarPainelInicio);
+    // Inicialização
+    setInterval(atualizarRelogio, 1000);
+    preencherUsuariosSelect();
+    preencherVtrsSelects();
+    preencherAnos();
+    elData.value = hojeISO();
+    atualizarInfoVtr();
+    renderCadastroVtrs();
+    abrirAba("inicio");
 
-    elVtr.addEventListener("change", async function() {
-      atualizarInfoVtr();
-      await atualizarKmBaseDaVtr();
-      await carregarPendenciaDaVtr();
-    });
-
-    elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
-    elSaidaSelect.addEventListener("change", controlarCamposSaida);
-    elRetornoSelect.addEventListener("change", controlarCamposRetorno);
-    elKmFim.addEventListener("input", atualizarKmInicialRetorno);
-    elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
-
-    [elHoraPartida, elHoraChegada, elHoraSaidaRetorno, elHoraChegadaRetorno].forEach(campo => {
-      campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
-    });
-
-    elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
-    elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
-    elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
-
-    function carregarInicio() {
-      atualizarCondutorLogadoTopo();
-      atualizarVtrTopo();
-      preencherUsuariosSelect();
-      preencherVtrsSelects();
-      preencherAnos();
-      elFiltroMes.value = String(new Date().getMonth() + 1);
-      elData.value = hojeISO();
-      atualizarInfoVtr();
-      renderCadastroVtrs();
-      atualizarEstadoFinal();
-      abrirAba("inicio");
-      atualizarRelogio();
-      setInterval(atualizarRelogio, 1000);
-      carregarPainelInicio();
-    }
-
-    carregarInicio();
   </script>
 </body>
 </html>
