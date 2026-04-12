@@ -1089,6 +1089,102 @@
       return String(Math.max(0, n)).padStart(6, "0");
     }
 
+    function obterKmAtualOdometroNumerico() {
+      return Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
+    }
+
+    function atualizarLimitesKmCampos() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmIniValor = elKmIni.value === "" ? NaN : Number(elKmIni.value);
+      const kmFimValor = elKmFim.value === "" ? NaN : Number(elKmFim.value);
+      const kmIniRetornoValor = elKmIniRetorno.value === "" ? NaN : Number(elKmIniRetorno.value);
+
+      const minKmIni = kmBase;
+      const minKmFim = !Number.isNaN(kmIniValor) ? Math.max(kmBase, kmIniValor) : kmBase;
+      const minKmIniRetorno = !Number.isNaN(kmFimValor) ? Math.max(kmBase, kmFimValor) : kmBase;
+      const minKmFimRetorno = !Number.isNaN(kmIniRetornoValor) ? Math.max(kmBase, kmIniRetornoValor) : minKmIniRetorno;
+
+      elKmIni.min = String(minKmIni);
+      elKmFim.min = String(minKmFim);
+      elKmIniRetorno.min = String(minKmIniRetorno);
+      elKmFimRetorno.min = String(minKmFimRetorno);
+    }
+
+    function obterMensagemErroRegrasKm() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmIniValor = elKmIni.value === "" ? NaN : Number(elKmIni.value);
+      const kmFimValor = elKmFim.value === "" ? NaN : Number(elKmFim.value);
+      const kmIniRetornoValor = elKmIniRetorno.value === "" ? NaN : Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = elKmFimRetorno.value === "" ? NaN : Number(elKmFimRetorno.value);
+
+      if (elKmIni.value !== "" && (Number.isNaN(kmIniValor) || kmIniValor < kmBase)) {
+        return `❌ A KM Inicial não pode ser inferior à KM atual da VTR (${kmBase}).`;
+      }
+
+      if (elKmFim.value !== "" && (Number.isNaN(kmFimValor) || kmFimValor < Math.max(kmBase, kmIniValor || kmBase))) {
+        return `❌ A KM Chegada no Destino não pode ser inferior à KM Inicial da saída.`;
+      }
+
+      if (elKmIniRetorno.value !== "" && (Number.isNaN(kmIniRetornoValor) || kmIniRetornoValor < Math.max(kmBase, kmFimValor || kmBase))) {
+        return `❌ A KM Inicial do Retorno não pode ser inferior à última KM lançada da ida.`;
+      }
+
+      if (elKmFimRetorno.value !== "" && (Number.isNaN(kmFimRetornoValor) || kmFimRetornoValor < Math.max(kmBase, kmIniRetornoValor || kmBase))) {
+        return `❌ A KM Final na Chegada ao QTL não pode ser inferior à KM Inicial do retorno.`;
+      }
+
+      return "";
+    }
+
+    function aplicarRegraMinimaKm(campo, minimo, mensagem) {
+      if (!campo || campo.value === "") {
+        atualizarLimitesKmCampos();
+        return;
+      }
+
+      const valor = Number(campo.value);
+      if (Number.isNaN(valor) || valor < minimo) {
+        campo.value = String(minimo);
+        msgErro(elStatusSalvar, mensagem.replace("{minimo}", minimo));
+      }
+
+      atualizarLimitesKmCampos();
+      atualizarResumoAutomatico();
+    }
+
+    function ajustarKmInicialMinima() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      aplicarRegraMinimaKm(
+        elKmIni,
+        kmBase,
+        "⚠️ KM Inicial ajustada para {minimo}. Ela não pode ser inferior à KM atual da VTR."
+      );
+    }
+
+    function ajustarKmFimIdaMinimo() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmReferencia = Math.max(kmBase, Number(elKmIni.value || kmBase));
+
+      aplicarRegraMinimaKm(
+        elKmFim,
+        kmReferencia,
+        "⚠️ KM Chegada no Destino ajustada para {minimo}. Ela não pode ser inferior à última KM válida."
+      );
+
+      atualizarKmInicialRetorno();
+    }
+
+    function ajustarKmFimRetornoMinimo() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmReferencia = Math.max(kmBase, Number(elKmIniRetorno.value || kmBase));
+
+      aplicarRegraMinimaKm(
+        elKmFimRetorno,
+        kmReferencia,
+        "⚠️ KM Final na Chegada ao QTL ajustada para {minimo}. Ela não pode ser inferior à última KM válida."
+      );
+    }
+
     function nomeMesNumero(numero) {
       const nomes = ["", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
       return nomes[Number(numero)] || "";
@@ -1248,6 +1344,7 @@
       linha2Salva = false;
       loginExigidoLinha2 = false;
       condutorLinha1Original = "";
+      atualizarLimitesKmCampos();
       atualizarEstadoFinal();
     }
 
@@ -1357,6 +1454,7 @@
           const kmBase = Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
           elKmIni.value = kmBase || "";
           elCondutorIda.value = logado ? logado.guerra : "";
+          atualizarLimitesKmCampos();
           atualizarEstadoFinal();
         }
       } catch (e) {
@@ -1534,6 +1632,7 @@ Cadastre sua nova senha numérica:`);
 
         elOdometroValor.textContent = formatarOdometro(kmBase);
         if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarLimitesKmCampos();
         atualizarResumoAutomatico();
         msgMuted(elStatusOdometro, "KM atual carregada.");
       } catch (e) {
@@ -1542,6 +1641,7 @@ Cadastre sua nova senha numérica:`);
         const kmBase = kmManual != null ? kmManual : 0;
         elOdometroValor.textContent = formatarOdometro(kmBase);
         if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarLimitesKmCampos();
         atualizarResumoAutomatico();
         msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
       }
@@ -1573,6 +1673,7 @@ Cadastre sua nova senha numérica:`);
       salvarOdometroManual(vtr, km);
       elOdometroValor.textContent = formatarOdometro(km);
       if (!linha1Salva) elKmIni.value = km;
+      atualizarLimitesKmCampos();
       msgOk(elStatusOdometro, "✅ KM atualizada.");
     }
 
@@ -1609,11 +1710,15 @@ Cadastre sua nova senha numérica:`);
 
     function atualizarKmInicialRetorno() {
       const kmIda = Number(elKmFim.value);
-      if (!Number.isNaN(kmIda) && kmIda >= 0) {
+      const kmBase = obterKmAtualOdometroNumerico();
+
+      if (!Number.isNaN(kmIda) && kmIda >= kmBase) {
         elKmIniRetorno.value = kmIda;
       } else {
         elKmIniRetorno.value = "";
       }
+
+      atualizarLimitesKmCampos();
       atualizarResumoAutomatico();
       atualizarEstadoFinal();
     }
@@ -1631,6 +1736,7 @@ Cadastre sua nova senha numérica:`);
       const retornoFinal = obterRetornoFinal();
       const kmIniValor = Number(elKmIni.value);
       const kmFimValor = Number(elKmFim.value);
+      const kmBase = obterKmAtualOdometroNumerico();
 
       if (!elData.value) return false;
       if (!saidaFinal) return false;
@@ -1638,7 +1744,8 @@ Cadastre sua nova senha numérica:`);
       if (elKmIni.value === "" || elKmFim.value === "") return false;
       if (!elHoraPartida.value || !elHoraChegada.value) return false;
       if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
-      if (kmFimValor < kmIniValor) return false;
+      if (kmIniValor < kmBase) return false;
+      if (kmFimValor < Math.max(kmBase, kmIniValor)) return false;
       if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
       if (!elCondutorIda.value.trim()) return false;
       return true;
@@ -1648,12 +1755,14 @@ Cadastre sua nova senha numérica:`);
       const kmIniRetornoValor = Number(elKmIniRetorno.value);
       const kmFimRetornoValor = Number(elKmFimRetorno.value);
       const kmFimValor = Number(elKmFim.value);
+      const kmBase = obterKmAtualOdometroNumerico();
 
       if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") return false;
       if (!elHoraSaidaRetorno.value || !elHoraChegadaRetorno.value) return false;
       if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmIniRetornoValor < Math.max(kmBase, kmFimValor)) return false;
       if (kmIniRetornoValor !== kmFimValor) return false;
-      if (kmFimRetornoValor < kmIniRetornoValor) return false;
+      if (kmFimRetornoValor < Math.max(kmBase, kmIniRetornoValor)) return false;
       if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
       if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
       if (!elCondutorRetorno.value.trim()) return false;
@@ -1758,8 +1867,14 @@ Cadastre sua nova senha numérica:`);
         elCondutorIda.value = logado.guerra;
       }
 
+      const erroKm = obterMensagemErroRegrasKm();
+      if (erroKm) {
+        msgErro(elStatusSalvar, erroKm);
+        return;
+      }
+
       if (!validarLinha1()) {
-        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente.");
+        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente e respeitar a KM atual da VTR.");
         return;
       }
 
@@ -1795,8 +1910,14 @@ Cadastre sua nova senha numérica:`);
       preencherHorarioPadrao();
       assumirCondutorLinha2DoUsuarioLogado();
 
+      const erroKm = obterMensagemErroRegrasKm();
+      if (erroKm) {
+        msgErro(elStatusSalvar, erroKm);
+        return;
+      }
+
       if (!validarLinha2()) {
-        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente.");
+        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente e respeitar a KM atual da VTR.");
         return;
       }
 
@@ -1821,6 +1942,7 @@ Cadastre sua nova senha numérica:`);
       travarCamposLinha1(false);
       travarCamposLinha2(false);
       elCondutorRetorno.value = logado ? logado.guerra : "";
+      atualizarLimitesKmCampos();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois.");
     }
@@ -1830,14 +1952,20 @@ Cadastre sua nova senha numérica:`);
       loginExigidoLinha2 = false;
       travarCamposLinha2(false);
       assumirCondutorLinha2DoUsuarioLogado();
+      atualizarLimitesKmCampos();
       atualizarEstadoFinal();
       msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
     }
 
     async function finalizarOuSalvarParcial() {
-      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+      const erroKm = obterMensagemErroRegrasKm();
+      const pronto = !erroKm && linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
 
       if (!pronto) {
+        if (erroKm) {
+          msgErro(elStatusSalvar, erroKm);
+          return;
+        }
         try {
           await salvarPendenciaSupabase();
           atualizarEstadoFinal();
@@ -1925,6 +2053,7 @@ Cadastre sua nova senha numérica:`);
         elCondutorRetorno.value = "";
         elUsuario.value = "";
         elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
+        atualizarLimitesKmCampos();
         linha1Salva = false;
         linha2Salva = false;
         loginExigidoLinha2 = false;
@@ -2476,8 +2605,15 @@ body.forEach((row) => {
     elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
     elSaidaSelect.addEventListener("change", controlarCamposSaida);
     elRetornoSelect.addEventListener("change", controlarCamposRetorno);
-    elKmFim.addEventListener("input", atualizarKmInicialRetorno);
-    elKmFim.addEventListener("blur", atualizarKmInicialRetorno);
+    elKmIni.addEventListener("blur", ajustarKmInicialMinima);
+    elKmIni.addEventListener("input", atualizarLimitesKmCampos);
+    elKmFim.addEventListener("input", () => {
+      atualizarKmInicialRetorno();
+      atualizarLimitesKmCampos();
+    });
+    elKmFim.addEventListener("blur", ajustarKmFimIdaMinimo);
+    elKmFimRetorno.addEventListener("input", atualizarLimitesKmCampos);
+    elKmFimRetorno.addEventListener("blur", ajustarKmFimRetornoMinimo);
 
     [elHoraPartida, elHoraChegada, elHoraSaidaRetorno, elHoraChegadaRetorno].forEach(campo => {
       campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
@@ -2506,6 +2642,7 @@ function carregarInicio() {
       elData.value = hojeISO();
       atualizarInfoVtr();
       renderCadastroVtrs();
+      atualizarLimitesKmCampos();
       atualizarEstadoFinal();
       abrirAba("inicio");
       atualizarRelogio();
