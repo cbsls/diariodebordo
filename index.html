@@ -2246,58 +2246,62 @@ Cadastre sua nova senha numérica:`);
         compress: true
       });
 
-      const pageW = 297;
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
       const marginX = 4;
       const topY = 4;
+      const bottomY = 4;
       const tableW = pageW - (marginX * 2);
 
-      const colWidths = [14, 34, 22, 18, 20, 18, 33, 20, 24, 24];
+      const colRatios = [14, 34, 22, 18, 20, 18, 33, 20, 24, 24];
+      const ratioTotal = colRatios.reduce((s, n) => s + n, 0);
+      const colWidths = colRatios.map(v => (v / ratioTotal) * tableW);
+
       const colX = [marginX];
-      for (let i = 0; i < colWidths.length - 1; i++) {
-        colX.push(colX[i] + colWidths[i]);
+      for (let i = 1; i < colWidths.length; i++) {
+        colX.push(colX[i - 1] + colWidths[i - 1]);
       }
 
       const hTitulo = 8;
       const hSub = 7;
       const hIdent = 7;
       const hCab = 12;
-      const hLinha = 10.8;
+      const areaLinhas = pageH - topY - bottomY - hTitulo - hSub - hIdent - hCab;
+      const hLinha = areaLinhas / linhasPorPagina;
+
+      function normalizarValor(v) {
+        return v === null || v === undefined ? "" : String(v);
+      }
 
       function drawTextBox(txt, x, y, w, h, opts = {}) {
         const align = opts.align || "center";
         const bold = !!opts.bold;
         const size = opts.size || 7;
-
-        const lines = Array.isArray(txt)
+        const paddingX = opts.paddingX ?? 1.2;
+        const paddingTop = opts.paddingTop ?? 0;
+        const maxWidth = Math.max(1, w - (paddingX * 2));
+        const linhas = Array.isArray(txt)
           ? txt
-          : doc.splitTextToSize(String(txt || ""), Math.max(1, w - 1.6));
+          : doc.splitTextToSize(normalizarValor(txt), maxWidth);
 
         doc.setFont("helvetica", bold ? "bold" : "normal");
         doc.setFontSize(size);
 
-        const lineHeight = size * 0.35 + 1.2;
-        const totalHeight = lines.length * lineHeight;
-        const startY = y + ((h - totalHeight) / 2) + (lineHeight / 2);
+        const lineHeight = size * 0.36 + 1.1;
+        const totalHeight = Math.max(lineHeight, linhas.length * lineHeight);
+        const startY = y + ((h - totalHeight) / 2) + (lineHeight / 2) + paddingTop;
 
-        lines.forEach((line, idx) => {
+        linhas.forEach((linha, idx) => {
           const yy = startY + idx * lineHeight;
+          let xx = x + (w / 2);
 
-          if (align === "left") {
-            doc.text(line, x + 1.2, yy, {
-              align: "left",
-              baseline: "middle"
-            });
-          } else if (align === "right") {
-            doc.text(line, x + w - 1.2, yy, {
-              align: "right",
-              baseline: "middle"
-            });
-          } else {
-            doc.text(line, x + (w / 2), yy, {
-              align: "center",
-              baseline: "middle"
-            });
-          }
+          if (align === "left") xx = x + paddingX;
+          if (align === "right") xx = x + w - paddingX;
+
+          doc.text(linha, xx, yy, {
+            align,
+            baseline: "middle"
+          });
         });
       }
 
@@ -2306,45 +2310,68 @@ Cadastre sua nova senha numérica:`);
         drawTextBox(txt, x, y, w, h, opts);
       }
 
-      function drawPageHeader(pageNum, totalPages) {
+      function drawPageHeader(pageNum, totalPaginas) {
         let y = topY;
 
         doc.setDrawColor(0, 0, 0);
+        doc.setTextColor(0, 0, 0);
         doc.setLineWidth(0.25);
 
-        drawCell(marginX, y, tableW, hTitulo, "DIÁRIO DE BORDO FÍSICO", { bold: true, size: 11 });
+        drawCell(marginX, y, tableW, hTitulo, "DIÁRIO DE BORDO FÍSICO", {
+          bold: true,
+          size: 10.5
+        });
         y += hTitulo;
 
-        drawCell(marginX, y, tableW, hSub, `${vtr} - ${referencia} - PÁGINA ${pageNum}/${totalPages}`, { bold: true, size: 8 });
+        drawCell(marginX, y, tableW, hSub, `${vtr} - ${referencia} - PÁGINA ${pageNum}/${totalPaginas}`, {
+          bold: true,
+          size: 7.5
+        });
         y += hSub;
 
         const wA = colWidths[0] + colWidths[1] + colWidths[2];
         const wB = colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6];
         const wC = colWidths[7] + colWidths[8] + colWidths[9];
 
-        drawCell(marginX, y, wA, hIdent, `PLACA: ${dadosVtr.placa || ""}`, { align: "left", bold: true, size: 7 });
-        drawCell(marginX + wA, y, wB, hIdent, `MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, { align: "left", bold: true, size: 7 });
-        drawCell(marginX + wA + wB, y, wC, hIdent, `ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, { align: "left", bold: true, size: 6.3 });
+        drawCell(marginX, y, wA, hIdent, `PLACA: ${dadosVtr.placa || ""}`, {
+          align: "left",
+          bold: true,
+          size: 6.6,
+          paddingX: 1.4
+        });
+        drawCell(marginX + wA, y, wB, hIdent, `MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, {
+          align: "left",
+          bold: true,
+          size: 6.4,
+          paddingX: 1.4
+        });
+        drawCell(marginX + wA + wB, y, wC, hIdent, `ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, {
+          align: "left",
+          bold: true,
+          size: 5.7,
+          paddingX: 1.2
+        });
         y += hIdent;
 
         const headers = [
           "DATA",
           "LOCAL DE PARTIDA",
-          "KM DO VEÍC. NA PARTIDA",
-          "HORA DA PARTIDA",
-          "KM DO VEÍC. NO DESTINO",
-          "HORA DA CHEGADA",
+          "KM DO VEÍC. NA\nPARTIDA",
+          "HORA DA\nPARTIDA",
+          "KM DO VEÍC. NO\nDESTINO",
+          "HORA DA\nCHEGADA",
           "NOME CONDUTOR",
-          "ASSINATURA CONDUTOR",
+          "ASSINATURA\nCONDUTOR",
           "NOME USUÁRIO",
-          "ASSINATURA USUÁRIO"
+          "ASSINATURA\nUSUÁRIO"
         ];
 
         for (let i = 0; i < headers.length; i++) {
           drawCell(colX[i], y, colWidths[i], hCab, headers[i], {
             bold: true,
-            size: 5.8,
-            align: "center"
+            size: 5.5,
+            align: "center",
+            paddingX: 1.0
           });
         }
         y += hCab;
@@ -2352,14 +2379,10 @@ Cadastre sua nova senha numérica:`);
         return y;
       }
 
-      function normalizarValor(v) {
-        return v === null || v === undefined ? "" : String(v);
-      }
-
-      const linhasExpandias = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
+      const linhasExpandidas = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
       const paginas = [];
-      for (let i = 0; i < linhasExpandias.length; i += linhasPorPagina) {
-        paginas.push(linhasExpandias.slice(i, i + linhasPorPagina));
+      for (let i = 0; i < linhasExpandidas.length; i += linhasPorPagina) {
+        paginas.push(linhasExpandidas.slice(i, i + linhasPorPagina));
       }
       if (!paginas.length) paginas.push([]);
 
@@ -2387,9 +2410,13 @@ Cadastre sua nova senha numérica:`);
 
         body.forEach((row) => {
           for (let i = 0; i < row.length; i++) {
-            const align = i === 1 ? "left" : "center";
-            const size = i === 1 ? 6.2 : 6.4;
-            drawCell(colX[i], y, colWidths[i], hLinha, row[i], { align, size });
+            const ehTextoEsquerda = i === 1;
+            const size = i === 6 ? 5.8 : (i === 1 ? 5.9 : 6.1);
+            drawCell(colX[i], y, colWidths[i], hLinha, row[i], {
+              align: ehTextoEsquerda ? "left" : "center",
+              size,
+              paddingX: ehTextoEsquerda ? 1.2 : 1.0
+            });
           }
           y += hLinha;
         });
@@ -2401,7 +2428,6 @@ Cadastre sua nova senha numérica:`);
 
       doc.save(nomeArquivo);
     }
-
 
     tabInicioBtn.addEventListener("click", () => abrirAba("inicio"));
     tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
