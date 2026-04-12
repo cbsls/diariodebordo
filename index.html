@@ -1979,8 +1979,8 @@ Cadastre sua nova senha numérica:`);
           </div>
           <div class="inicio-linha">
             <div>
-              <div class="inicio-label">Rodado nas últimas 24h</div>
-              <div class="muted">Soma dos registros finalizados</div>
+              <div class="inicio-label">Rodado 09:00 → agora</div>
+              <div class="muted">Janela operacional do plantão</div>
             </div>
             <div class="inicio-valor-menor">${esc(String(item.km24h))} km</div>
           </div>
@@ -1989,75 +1989,92 @@ Cadastre sua nova senha numérica:`);
       `).join('')}</div>`;
     }
 
-    async function carregarPainelInicio() {
-      const agora = new Date();
-      const limite24h = new Date(agora.getTime() - 24 * 60 * 60 * 1000);
-      const dataConsulta = new Date(limite24h.getTime() - 24 * 60 * 60 * 1000);
-      const inicioFiltro = `${dataConsulta.getFullYear()}-${String(dataConsulta.getMonth()+1).padStart(2,'0')}-${String(dataConsulta.getDate()).padStart(2,'0')}`;
-      const chaves = Object.keys(VTRS).sort();
+  async function carregarPainelInicio() {
+  const agora = new Date();
 
-      msgMuted(elStatusInicio, 'Atualizando painel das VTRs...');
-      elBtnAtualizarInicio.disabled = true;
+  // Janela operacional: 09:00 até agora
+  let inicioJanela = new Date();
+  inicioJanela.setHours(9, 0, 0, 0);
 
-      try {
-        const resultados = await Promise.all(chaves.map(async (nomeVtr) => {
-          let kmAtual = 0;
-          let km24h = 0;
+  // Se ainda não passou das 09:00, considera desde ontem às 09:00
+  if (agora < inicioJanela) {
+    inicioJanela.setDate(inicioJanela.getDate() - 1);
+  }
 
-          const { data: ultimoData, error: ultimoError } = await supabaseClient
-            .from('diario')
-            .select('*')
-            .eq('vtr', nomeVtr)
-            .order('data', { ascending: false })
-            .order('id', { ascending: false })
-            .limit(1);
+  // Busca registros com margem de segurança
+  const dataConsulta = new Date(inicioJanela);
+  dataConsulta.setDate(dataConsulta.getDate() - 1);
 
-          if (ultimoError) throw ultimoError;
+  const inicioFiltro = `${dataConsulta.getFullYear()}-${String(dataConsulta.getMonth() + 1).padStart(2, '0')}-${String(dataConsulta.getDate()).padStart(2, '0')}`;
+  const chaves = Object.keys(VTRS).sort();
 
-          const ultimo = ultimoData && ultimoData.length ? ultimoData[0] : null;
-          if (ultimo) {
-            kmAtual = obterKmFinalRegistro(ultimo);
-          } else {
-            const kmManual = obterOdometroManual(nomeVtr);
-            kmAtual = kmManual != null ? Number(kmManual) : 0;
-          }
+  msgMuted(elStatusInicio, 'Atualizando painel das VTRs...');
+  elBtnAtualizarInicio.disabled = true;
 
-          const { data: recentes, error: recentesError } = await supabaseClient
-            .from('diario')
-            .select('*')
-            .eq('vtr', nomeVtr)
-            .gte('data', inicioFiltro)
-            .order('data', { ascending: false })
-            .order('id', { ascending: false });
+  try {
+    const resultados = await Promise.all(chaves.map(async (nomeVtr) => {
+      let kmAtual = 0;
+      let km24h = 0;
 
-          if (recentesError) throw recentesError;
+      // Busca último registro da VTR
+      const { data: ultimoData, error: ultimoError } = await supabaseClient
+        .from('diario')
+        .select('*')
+        .eq('vtr', nomeVtr)
+        .order('data', { ascending: false })
+        .order('id', { ascending: false })
+        .limit(1);
 
-          km24h = (recentes || []).reduce((total, reg) => {
-            const fimRegistro = obterDataHoraFimRegistro(reg);
-            if (!fimRegistro || fimRegistro < limite24h) return total;
-            return total + obterKmRodadoRegistro(reg);
-          }, 0);
+      if (ultimoError) throw ultimoError;
 
-          return {
-            nome: nomeVtr,
-            placa: VTRS[nomeVtr]?.placa || '',
-            tipo: VTRS[nomeVtr]?.tipo || '',
-            kmAtual,
-            km24h
-          };
-        }));
+      const ultimo = ultimoData && ultimoData.length ? ultimoData[0] : null;
 
-        renderPainelInicio(resultados);
-        msgOk(elStatusInicio, `✅ Painel atualizado às ${horaAtualCompleta()}`);
-      } catch (e) {
-        console.error(e);
-        msgErro(elStatusInicio, '❌ Erro ao carregar painel inicial.');
-        elListaInicio.innerHTML = '<div class="muted">Não foi possível carregar o resumo das VTRs.</div>';
-      } finally {
-        elBtnAtualizarInicio.disabled = false;
+      if (ultimo) {
+        kmAtual = obterKmFinalRegistro(ultimo);
+      } else {
+        const kmManual = obterOdometroManual(nomeVtr);
+        kmAtual = kmManual != null ? Number(kmManual) : 0;
       }
-    }
 
+      // Busca registros dentro da janela operacional
+      const { data: recentes, error: recentesError } = await supabaseClient
+        .from('diario')
+        .select('*')
+        .eq('vtr', nomeVtr)
+        .gte('data', inicioFiltro)
+        .order('data', { ascending: false })
+        .order('id', { ascending: false });
+
+      if (recentesError) throw recentesError;
+
+      km24h = (recentes || []).reduce((total, reg) => {
+        const fimRegistro = obterDataHoraFimRegistro(reg);
+
+        if (!fimRegistro) return total;
+        if (fimRegistro < inicioJanela || fimRegistro > agora) return total;
+
+        return total + obterKmRodadoRegistro(reg);
+      }, 0);
+
+      return {
+        nome: nomeVtr,
+        placa: VTRS[nomeVtr]?.placa || '',
+        tipo: VTRS[nomeVtr]?.tipo || '',
+        kmAtual,
+        km24h
+      };
+    }));
+
+    renderPainelInicio(resultados);
+    msgOk(elStatusInicio, `✅ Painel atualizado às ${horaAtualCompleta()}`);
+  } catch (e) {
+    console.error(e);
+    msgErro(elStatusInicio, '❌ Erro ao carregar painel inicial.');
+    elListaInicio.innerHTML = '<div class="muted">Não foi possível carregar o resumo das VTRs.</div>';
+  } finally {
+    elBtnAtualizarInicio.disabled = false;
+  }
+}
     async function buscarRegistrosPorVtr() {
       const vtr = elFiltroVtr.value;
       const mes = Number(elFiltroMes.value);
