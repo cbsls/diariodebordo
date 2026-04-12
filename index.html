@@ -2311,73 +2311,75 @@ Cadastre sua nova senha numérica:`);
       }
 
       function drawPageHeader(pageNum, totalPaginas) {
-        let y = topY;
+  let y = topY;
 
-        doc.setDrawColor(0, 0, 0);
-        doc.setTextColor(0, 0, 0);
-        doc.setLineWidth(0.25);
+  doc.setDrawColor(0, 0, 0);
+  doc.setTextColor(0, 0, 0);
+  doc.setLineWidth(0.25);
 
-        drawCell(marginX, y, tableW, hTitulo, "DIÁRIO DE BORDO FÍSICO", {
-          bold: true,
-          size: 10.5
-        });
-        y += hTitulo;
+  drawCell(marginX, y, tableW, hTitulo, "DIÁRIO DE BORDO FÍSICO", {
+    bold: true,
+    size: 11
+  });
+  y += hTitulo;
 
-        drawCell(marginX, y, tableW, hSub, `${vtr} - ${referencia} - PÁGINA ${pageNum}/${totalPaginas}`, {
-          bold: true,
-          size: 7.5
-        });
-        y += hSub;
+  drawCell(marginX, y, tableW, hSub, `${vtr} - ${referencia} - PÁGINA ${pageNum}/${totalPaginas}`, {
+    bold: true,
+    size: 8.8
+  });
+  y += hSub;
 
-        const wA = colWidths[0] + colWidths[1] + colWidths[2];
-        const wB = colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6];
-        const wC = colWidths[7] + colWidths[8] + colWidths[9];
+  const wA = colWidths[0] + colWidths[1] + colWidths[2];
+  const wB = colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6];
+  const wC = colWidths[7] + colWidths[8] + colWidths[9];
 
-        drawCell(marginX, y, wA, hIdent, `PLACA: ${dadosVtr.placa || ""}`, {
-          align: "left",
-          bold: true,
-          size: 6.6,
-          paddingX: 1.4
-        });
-        drawCell(marginX + wA, y, wB, hIdent, `MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, {
-          align: "left",
-          bold: true,
-          size: 6.4,
-          paddingX: 1.4
-        });
-        drawCell(marginX + wA + wB, y, wC, hIdent, `ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, {
-          align: "left",
-          bold: true,
-          size: 5.7,
-          paddingX: 1.2
-        });
-        y += hIdent;
+  drawCell(marginX, y, wA, hIdent, `PLACA: ${dadosVtr.placa || ""}`, {
+    align: "left",
+    bold: true,
+    size: 7.2,
+    paddingX: 1.4
+  });
 
-        const headers = [
-          "DATA",
-          "LOCAL DE PARTIDA",
-          "KM DO VEÍC. NA\nPARTIDA",
-          "HORA DA\nPARTIDA",
-          "KM DO VEÍC. NO\nDESTINO",
-          "HORA DA\nCHEGADA",
-          "NOME CONDUTOR",
-          "ASSINATURA\nCONDUTOR",
-          "NOME USUÁRIO",
-          "ASSINATURA\nUSUÁRIO"
-        ];
+  drawCell(marginX + wA, y, wB, hIdent, `MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, {
+    align: "left",
+    bold: true,
+    size: 7.0,
+    paddingX: 1.4
+  });
 
-        for (let i = 0; i < headers.length; i++) {
-          drawCell(colX[i], y, colWidths[i], hCab, headers[i], {
-            bold: true,
-            size: 5.5,
-            align: "center",
-            paddingX: 1.0
-          });
-        }
-        y += hCab;
+  drawCell(marginX + wA + wB, y, wC, hIdent, `ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, {
+    align: "left",
+    bold: true,
+    size: 6.3,
+    paddingX: 1.2
+  });
+  y += hIdent;
 
-        return y;
-      }
+  const headers = [
+    "DATA",
+    "LOCAL DE PARTIDA",
+    "KM DO VEÍC. NA\nPARTIDA",
+    "HORA DA\nPARTIDA",
+    "KM DO VEÍC. NO\nDESTINO",
+    "HORA DA\nCHEGADA",
+    "NOME CONDUTOR",
+    "ASSINATURA\nCONDUTOR",
+    "NOME USUÁRIO",
+    "ASSINATURA\nUSUÁRIO"
+  ];
+
+  for (let i = 0; i < headers.length; i++) {
+    drawCell(colX[i], y, colWidths[i], hCab, headers[i], {
+      bold: true,
+      size: 6.3,
+      align: "center",
+      paddingX: 1.0
+    });
+  }
+  y += hCab;
+
+  return y;
+}
 
       const linhasExpandidas = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
       const paginas = [];
