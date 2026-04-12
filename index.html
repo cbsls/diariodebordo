@@ -2404,22 +2404,23 @@ Cadastre sua nova senha numérica:`);
           ""
         ]);
 
-        while (body.length < linhasPorPagina) {
-          body.push(["", "", "", "", "", "", "", "", "", ""]);
-        }
+       while (body.length < linhasPorPagina) {
+  body.push(["", "", "", "", "", "", "", "", "", ""]);
+}
 
-        body.forEach((row) => {
-          for (let i = 0; i < row.length; i++) {
-            const ehTextoEsquerda = i === 1;
-            const size = i === 6 ? 5.8 : (i === 1 ? 5.9 : 6.1);
-            drawCell(colX[i], y, colWidths[i], hLinha, row[i], {
-              align: ehTextoEsquerda ? "left" : "center",
-              size,
-              paddingX: ehTextoEsquerda ? 1.2 : 1.0
-            });
-          }
-          y += hLinha;
-        });
+body.forEach((row) => {
+  for (let i = 0; i < row.length; i++) {
+    const ehTextoEsquerda = false;
+    const size = i === 6 ? 7.5 : (i === 1 ? 7.5 : 8);
+
+    drawCell(colX[i], y, colWidths[i], hLinha, row[i], {
+      align: ehTextoEsquerda ? "left" : "center",
+      size,
+      paddingX: ehTextoEsquerda ? 1.2 : 1.0
+    });
+  }
+  y += hLinha;
+});
       });
 
       const nomeArquivo = `${vtr}_${nomeMesNumero(mes)}_${ano}.pdf`
