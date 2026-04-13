@@ -1,34 +1,2925 @@
-const CACHE_NAME = 'diario-bordo-v2';
-const URLS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🚒 Diário de Bordo</title>
+  <meta name="theme-color" content="#b71c1c" />
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
-  );
-});
+  <style>
+    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+    :root{
+      --bg:#e9edf3;
+      --card:#ffffff;
+      --soft:#fafafa;
+      --primary:#d51313;
+      --primary-dark:#8e0000;
+      --success:#2e7d32;
+      --warning:#b45309;
+      --muted:#666;
+      --text:#24303f;
+      --border:#d8dde4;
+      --shadow:0 4px 14px rgba(0,0,0,.08);
+      --info:#0f4c81;
+      --info-soft:#eef6ff;
+    }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); }
+    body { padding:0 0 92px 0; }
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(180deg, #cc1010 0%, #b71c1c 100%);
+      color:#fff;
+      padding:14px 16px 12px 16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.12);
+    }
+    
+    .app-header-top { display:flex; align-items:center; gap:12px; }
+    .app-header-info {
+      flex:1;
+      min-width:0;
+    }
+    .topo-status-boxes{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:138px;
+      max-width:185px;
+    }
+    .condutor-logado-box,
+    .vtr-topo-box{
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.2;
+      text-align:left;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      transition:all .25s ease;
+    }
+    .condutor-logado-inativo{
+      background: linear-gradient(180deg, rgba(107,114,128,.70) 0%, rgba(75,85,99,.85) 100%);
+      border: 1px solid rgba(255,255,255,.28);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 4px 14px rgba(31,41,55,.20);
+    }
+    .condutor-logado-ativo{
+      background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+      border: 1px solid rgba(220,252,231,.95);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 0 0 2px rgba(34,197,94,.20),
+        0 6px 18px rgba(21,128,61,.35);
+    }
+    .condutor-logado-titulo{
+      display:block;
+      font-size:10px;
+      opacity:1;
+      color:#ecfdf5;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      margin-bottom:4px;
+      font-weight:900;
+    }
+    .condutor-logado-nome{
+      display:block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:14px;
+      font-weight:900;
+      color:#ffffff;
+      text-shadow:0 1px 2px rgba(0,0,0,.18);
+    }
+    .vtr-topo-inativa{
+      background: rgba(59,130,246,.18);
+      border: 1px solid rgba(255,255,255,.20);
+    }
+    .vtr-topo-ativa{
+      background: linear-gradient(180deg, rgba(59,130,246,.28) 0%, rgba(15,76,129,.40) 100%);
+      border: 1px solid rgba(191,219,254,.55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 1px rgba(59,130,246,.08);
+    }
+    .vtr-topo-titulo{
+      display:block;
+      font-size:10px;
+      opacity:.9;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      margin-bottom:3px;
+    }
+    .vtr-topo-nome{
+      display:block;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:13px;
+    }
+    .app-logo {
+      width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.12);
+      display:flex; align-items:center; justify-content:center; font-size:28px;
+      flex:0 0 58px; border:1px solid rgba(255,255,255,.18);
+    }
+    .app-title { margin:0; font-size:20px; font-weight:800; line-height:1.1; }
+    .app-subtitle { margin-top:4px; font-size:13px; opacity:.95; }
+
+    .conteudo-app {
+      position: relative;
+      min-height: calc(100vh - 160px);
+      padding: 16px 16px 0 16px;
+      overflow-x:hidden;
+    }
+
+    .aba {
+      width:100%;
+      transition: opacity .28s ease, transform .28s ease;
+      opacity:0;
+      transform:translateX(24px);
+      pointer-events:none;
+      position:absolute;
+      inset:0;
+      padding:16px 16px 0 16px;
+    }
+    .aba.active {
+      opacity:1;
+      transform:translateX(0);
+      pointer-events:auto;
+      position:relative;
+      inset:auto;
+      padding:0;
+    }
+
+    .hidden { display:none !important; }
+
+    .card {
+      background:var(--card);
+      border-radius:24px;
+      padding:20px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
+
+    label {
+      display:block;
+      font-size:17px;
+      font-weight:bold;
+      margin:8px 0 6px;
+    }
+
+    input, select, textarea {
+      width:100%;
+      padding:15px 16px;
+      border-radius:14px;
+      border:1px solid #ccc;
+      font-size:17px;
+      margin-bottom:12px;
+      background:#fff;
+      outline:none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color:#c7cdd6;
+      box-shadow:0 0 0 3px rgba(213,19,19,.06);
+    }
+
+    input[readonly], textarea[readonly] {
+      background:#f3f4f6;
+      color:#555;
+    }
+
+    select:disabled, input:disabled, textarea:disabled {
+      background:#f3f4f6;
+      color:#555;
+      opacity:1;
+    }
+
+    button {
+      width:100%;
+      padding:15px 16px;
+      border:none;
+      border-radius:16px;
+      background:var(--primary);
+      color:#fff;
+      font-size:19px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    button:disabled { opacity:.7; cursor:wait; }
+
+    .ok { color:#0a7a28; font-weight:bold; margin-top:8px; }
+    .erro { color:#b00020; font-weight:bold; margin-top:8px; }
+    .muted { color:var(--muted); font-size:14px; }
+
+    .info-vtr {
+      background:var(--soft);
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+      line-height:1.5;
+      font-size:15px;
+    }
+
+    .odometro-box {
+      background:#111;
+      color:#19ff63;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:10px;
+      border:2px solid #333;
+    }
+    .odometro-titulo { font-size:14px; color:#b8ffcd; margin-bottom:6px; }
+    .odometro-valor {
+      font-family:"Courier New", Courier, monospace;
+      font-size:30px;
+      font-weight:bold;
+      letter-spacing:2px;
+    }
+
+    .grid-2 {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .linha-acoes-local {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .btn-linha {
+      background:var(--primary-dark);
+      font-size:16px;
+      padding:12px;
+      margin-top:4px;
+    }
+
+    .btn-linha-ok { background:var(--success) !important; }
+
+    .btn-editar-linha {
+      background:#4b5563 !important;
+      font-size:15px;
+      padding:12px;
+      margin-top:4px;
+    }
+
+    .btn-finalizar { background:var(--success) !important; }
+    .btn-salvar-parcial { background:var(--warning) !important; }
+
+    .btn-pdf {
+      background:#0f4c81;
+      font-size:16px;
+      padding:12px;
+    }
+
+    .btn-odometro-discreto {
+      width:auto;
+      display:inline-block;
+      padding:8px 12px;
+      font-size:13px;
+      border-radius:10px;
+      background:#4b5563;
+      margin-bottom:10px;
+    }
+
+    .bloco-retorno {
+      border:1px dashed #d2d2d2;
+      border-radius:14px;
+      padding:14px;
+      margin:12px 0 6px 0;
+      background:#fcfcfc;
+    }
+
+    .bloco-retorno h3 {
+      margin:0 0 10px 0;
+      font-size:18px;
+      color:var(--text);
+    }
+
+    .badge-linha {
+      display:inline-block;
+      font-size:12px;
+      font-weight:bold;
+      padding:6px 10px;
+      border-radius:999px;
+      margin-bottom:8px;
+      color:#fff;
+      background:#6b7280;
+    }
+    .badge-ok { background:var(--success); }
+    .badge-pendente { background:var(--primary-dark); }
+
+    .clock-box {
+      background:#f8fafc;
+      border:1px solid #d9e1ea;
+      border-radius:14px;
+      padding:12px 14px;
+      margin:4px 0 12px 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .clock-label { font-size:13px; color:#475569; font-weight:bold; }
+    .clock-time { font-size:18px; font-weight:bold; color:#0f172a; }
+
+    .info-extra {
+      background:#f8fafc;
+      border:1px solid #d9e1ea;
+      border-radius:14px;
+      padding:12px;
+      margin:10px 0 12px 0;
+      font-size:15px;
+      line-height:1.5;
+    }
+
+    .alerta-operacional {
+      background:#fff7ed;
+      border:1px solid #fdba74;
+      color:#9a3412;
+      border-radius:14px;
+      padding:12px;
+      margin-top:10px;
+      font-size:14px;
+      font-weight:bold;
+    }
+
+    .pendencia-box {
+      background: var(--info-soft);
+      border: 1px solid #b8d8ff;
+      color: var(--info);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 0 12px 0;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: bold;
+    }
+
+    .subtitulo-box {
+      margin-top:0;
+      margin-bottom:12px;
+      font-size:22px;
+      color:var(--text);
+    }
+
+    .registro, .vtr-item {
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:10px;
+      background:var(--soft);
+    }
+
+    .inicio-topo {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:6px;
+    }
+
+    .inicio-legenda {
+      font-size:14px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .inicio-grid {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    .inicio-item {
+      border:1px solid #d8dde4;
+      border-radius:18px;
+      padding:14px;
+      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
+      box-shadow:0 2px 10px rgba(0,0,0,.04);
+    }
+
+    .inicio-item-topo {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .inicio-vtr-nome {
+      font-size:20px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .inicio-vtr-tipo {
+      font-size:12px;
+      color:#475569;
+      font-weight:700;
+      background:#eef2f7;
+      border-radius:999px;
+      padding:6px 10px;
+      white-space:nowrap;
+    }
+
+    .inicio-linha {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:10px 0;
+      border-top:1px solid #e5e7eb;
+    }
+
+    .inicio-linha:first-of-type { border-top:none; padding-top:0; }
+
+    .inicio-label {
+      font-size:13px;
+      color:#64748b;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+
+    .inicio-valor {
+      font-size:22px;
+      font-weight:800;
+      color:#111827;
+    }
+
+    .inicio-valor-menor {
+      font-size:18px;
+      font-weight:800;
+      color:#0f4c81;
+    }
+
+    .inicio-rodape {
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px dashed #d8dde4;
+      font-size:12px;
+      color:#64748b;
+    }
+
+    .btn-atualizar-inicio {
+      background:#0f4c81;
+      font-size:16px;
+      padding:12px;
+    }
+
+
+    .inicio-cartao-linha {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:6px;
+      flex-wrap:wrap;
+      font-weight:700;
+      color:#24303f;
+    }
+
+    .inicio-cartao-icone {
+      width:22px;
+      height:22px;
+      border-radius:8px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#22c55e,#15803d);
+      color:#fff;
+      font-size:13px;
+      box-shadow:0 2px 8px rgba(21,128,61,.25);
+      flex:0 0 22px;
+    }
+
+    .btn-mobilidade-home {
+      width:100%;
+      margin-top:10px;
+      padding:12px 14px;
+      border:none;
+      border-radius:14px;
+      background:linear-gradient(135deg,#2e7d32,#43a047);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(46,125,50,.22);
+    }
+
+    .btn-mobilidade-home:active {
+      transform:scale(.98);
+    }
+
+    .rodape-tabs {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background:#ffffffee;
+      backdrop-filter: blur(10px);
+      border-top:1px solid var(--border);
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      display:flex;
+      gap:10px;
+      z-index:999;
+      box-shadow:0 -2px 12px rgba(0,0,0,.08);
+    }
+
+    .rodape-btn {
+      flex:1;
+      border:none;
+      border-radius:18px;
+      padding:10px 8px;
+      font-size:12px;
+      font-weight:bold;
+      background:#dbe3ec;
+      color:#24303f;
+      cursor:pointer;
+      line-height:1.15;
+      min-height:62px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+    }
+
+    .rodape-btn .icone { font-size:20px; line-height:1; }
+    .rodape-btn .texto { font-size:12px; font-weight:800; }
+    .rodape-btn.active {
+      background:var(--primary);
+      color:#fff;
+      box-shadow:0 6px 16px rgba(213,19,19,.25);
+    }
+
+    @media (max-width: 700px) {
+      .grid-2, .linha-acoes-local { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-header">
+    <div class="app-header-top">
+      <div class="app-logo">🚒</div>
+      <div class="app-header-info">
+        <h1 class="app-title">Diário de Bordo</h1>
+        <div class="app-subtitle">CB São Lourenço do Sul</div>
+      </div>
+      <div class="topo-status-boxes">
+        <div class="condutor-logado-box condutor-logado-inativo" id="condutorLogadoTopo">
+          <span class="condutor-logado-titulo">Condutor logado</span>
+          <span class="condutor-logado-nome" id="condutorLogadoNome">Não logado</span>
+        </div>
+        <div class="vtr-topo-box vtr-topo-inativa" id="vtrTopoBox">
+          <span class="vtr-topo-titulo">VTR selecionada</span>
+          <span class="vtr-topo-nome" id="vtrTopoNome">Nenhuma VTR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="conteudo-app">
+    
+    <div id="abaInicio" class="aba active">
+      <div class="card">
+        <div class="inicio-topo">
+          <h2 class="subtitulo-box">🏠 Início</h2>
+          <div class="inicio-legenda">Visão rápida das VTRs com <b>KM atual</b> e <b>KM rodado nas últimas 24h</b>.</div>
+        </div>
+        <button type="button" class="btn-atualizar-inicio" id="btnAtualizarInicio">🔄 Atualizar painel</button>
+        <div id="statusInicio" class="muted" style="margin-top:10px;">Carregando painel...</div>
+      </div>
+
+      <div class="card">
+        <div id="listaInicio" class="muted">Carregando resumo das VTRs...</div>
+      </div>
+    </div>
+
+    <div id="abaLancamento" class="aba">
+      <div class="card">
+        <label for="idFunc">ID Func</label>
+        <input id="idFunc" type="text" inputmode="numeric" placeholder="Digite sua ID funcional" />
+
+        <label for="senhaLogin">Senha</label>
+      <input 
+        id="senhaLogin" 
+        type="password" 
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="20"
+        placeholder="Digite sua senha"
+      />
+
+        <button type="button" id="btnEntrar">Entrar</button>
+        <div class="muted">No primeiro acesso, use sua própria ID como senha. Depois cadastre uma nova.</div>
+        <div id="userOk"></div>
+      </div>
+
+      <div class="card hidden" id="formBox">
+        <div id="pendenciaBox" class="pendencia-box hidden"></div>
+
+        <label for="vtr">VTR</label>
+        <select id="vtr"></select>
+
+        <div class="info-vtr" id="infoVtr"></div>
+
+        <div class="odometro-box">
+          <div class="odometro-titulo">KM ATUAL DA VTR</div>
+          <div class="odometro-valor" id="odometroValor">000000</div>
+        </div>
+
+        <button type="button" class="btn-odometro-discreto" id="btnEditarOdometro">🔐 Atualizar KM</button>
+        <div id="statusOdometro" class="muted"></div>
+
+        <label for="data">Data</label>
+        <input id="data" type="date" />
+
+        <div class="clock-box">
+          <div>
+            <div class="clock-label">HORÁRIO ATUAL</div>
+            <div class="clock-time" id="relogioAtual">--:--:--</div>
+          </div>
+          <div class="muted">Os campos de hora podem ser preenchidos automaticamente.</div>
+        </div>
+
+        <span id="badgeLinha1" class="badge-linha badge-pendente">1ª LINHA PENDENTE</span>
+
+        <label for="saidaSelect">Saída</label>
+        <select id="saidaSelect">
+          <option value="">Selecione a saída</option>
+          <option value="QTL / J4">QTL / J4</option>
+          <option value="QTL / 44">QTL / 44</option>
+          <option value="QTL / CENTRO">QTL / CENTRO</option>
+          <option value="QTL / VISTORIA">QTL / VISTORIA</option>
+          <option value="QTL / TRANSPORTE">QTL / TRANSPORTE</option>
+          <option value="QTL / PREFEITURA">QTL / PREFEITURA</option>
+          <option value="QTL / OCORRÊNCIA">QTL / OCORRÊNCIA</option>
+          <option value="QTL / BAIRRO">QTL / BAIRRO</option>
+          <option value="QTL / BR116">QTL / BR116</option>
+          <option value="QTL / RS265">QTL / RS265</option>
+          <option value="QTL / INTERIOR SLS">QTL / INTERIOR SLS</option>
+          <option value="OUTRO">Outro</option>
+        </select>
+        <input id="saidaOutro" class="hidden" type="text" placeholder="Digite a saída" />
+
+        <label for="retornoSelect">Retorno</label>
+        <select id="retornoSelect">
+          <option value="">Selecione o retorno</option>
+          <option value="J4 / QTL">J4 / QTL</option>
+          <option value="44 / QTL">44 / QTL</option>
+          <option value="CENTRO / QTL">CENTRO / QTL</option>
+          <option value="VISTORIA / QTL">VISTORIA / QTL</option>
+          <option value="TRANSPORTE / QTL">TRANSPORTE / QTL</option>
+          <option value="PREFEITURA / QTL">PREFEITURA / QTL</option>
+          <option value="OCORRÊNCIA / QTL">OCORRÊNCIA / QTL</option>
+          <option value="BAIRRO / QTL">BAIRRO / QTL</option>
+          <option value="BR116 / QTL">BR116 / QTL</option>
+          <option value="RS265 / QTL">RS265 / QTL</option>
+          <option value="INTERIOR SLS / QTL">INTERIOR SLS / QTL</option>
+          <option value="OUTRO">Outro</option>
+        </select>
+        <input id="retornoOutro" class="hidden" type="text" placeholder="Digite o retorno" />
+
+        <div class="grid-2">
+          <div>
+            <label for="kmIni">KM Inicial</label>
+            <input id="kmIni" type="number" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="horaPartida">Hora da Partida</label>
+            <input id="horaPartida" type="time" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="kmFim">KM Chegada no Destino</label>
+            <input id="kmFim" type="number" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="horaChegada">Hora da Chegada no Destino</label>
+            <input id="horaChegada" type="time" />
+          </div>
+        </div>
+
+        <div class="linha-acoes-local">
+          <button type="button" class="btn-linha" id="btnSalvarLinha1">Salvar 1ª Linha</button>
+          <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha1">✏️ Editar 1ª Linha</button>
+        </div>
+
+        <div class="bloco-retorno">
+          <h3>↩️ Retorno</h3>
+          <span id="badgeLinha2" class="badge-linha badge-pendente">2ª LINHA PENDENTE</span>
+
+          <div class="grid-2">
+            <div>
+              <label for="kmIniRetorno">KM Inicial do Retorno</label>
+              <input id="kmIniRetorno" type="number" inputmode="numeric" readonly />
+            </div>
+            <div>
+              <label for="horaSaidaRetorno">Hora da Saída do Destino</label>
+              <input id="horaSaidaRetorno" type="time" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label for="kmFimRetorno">KM Final na Chegada ao QTL</label>
+              <input id="kmFimRetorno" type="number" inputmode="numeric" />
+            </div>
+            <div>
+              <label for="horaChegadaRetorno">Hora Final da Chegada ao QTL</label>
+              <input id="horaChegadaRetorno" type="time" />
+            </div>
+          </div>
+
+          <div class="linha-acoes-local">
+            <button type="button" class="btn-linha" id="btnSalvarLinha2">Salvar 2ª Linha</button>
+            <button type="button" class="btn-editar-linha hidden" id="btnEditarLinha2">✏️ Editar 2ª Linha</button>
+          </div>
+        </div>
+
+        <div class="info-extra">
+          <b>Resumo automático</b><br>
+          KM rodado total: <span id="kmRodadoTotal">0</span><br>
+          Situação: <span id="situacaoResumo">Aguardando preenchimento</span>
+        </div>
+
+        <label for="condutorIda">Condutor 1ª Linha</label>
+        <input id="condutorIda" readonly />
+
+        <label for="condutorRetorno">Condutor 2ª Linha</label>
+        <input id="condutorRetorno" readonly />
+
+        <label for="usuario">Usuário / Carona (opcional)</label>
+        <select id="usuario">
+          <option value="">Selecione o usuário/carona (opcional)</option>
+        </select>
+
+        <button type="button" id="btnFinal">Salvar parcial</button>
+        <div id="statusSalvar"></div>
+        <div id="alertaOperacional" class="alerta-operacional">⚠️ ATENÇÃO OPERACIONAL: complete e salve as duas linhas para finalizar o registro.</div>
+      </div>
+    </div>
+
+    <div id="abaExportar" class="aba">
+      <div class="card">
+        <h2 class="subtitulo-box">📄 Exportar por VTR</h2>
+
+        <label for="filtroVtr">VTR</label>
+        <select id="filtroVtr"></select>
+
+        <div class="grid-2">
+          <div>
+            <label for="filtroMes">Mês</label>
+            <select id="filtroMes">
+              <option value="1">JANEIRO</option>
+              <option value="2">FEVEREIRO</option>
+              <option value="3">MARÇO</option>
+              <option value="4">ABRIL</option>
+              <option value="5">MAIO</option>
+              <option value="6">JUNHO</option>
+              <option value="7">JULHO</option>
+              <option value="8">AGOSTO</option>
+              <option value="9">SETEMBRO</option>
+              <option value="10">OUTUBRO</option>
+              <option value="11">NOVEMBRO</option>
+              <option value="12">DEZEMBRO</option>
+            </select>
+          </div>
+          <div>
+            <label for="filtroAno">Ano</label>
+            <select id="filtroAno"></select>
+          </div>
+        </div>
+
+        <button type="button" id="btnBuscarVtr">Buscar registros</button>
+        <button type="button" class="btn-pdf" id="btnExportarMes">📄 Exportar mês</button>
+        <div id="statusBuscaVtr" class="muted"></div>
+      </div>
+
+      <div class="card">
+        <div id="listaVtr" class="muted">Selecione VTR, mês e ano para listar os registros.</div>
+      </div>
+    </div>
+
+    <div id="abaCadastro" class="aba">
+      <div class="card">
+        <h2 class="subtitulo-box">🚒 Cadastro de VTR</h2>
+        <div id="listaCadastroVtr" class="muted">Carregando cadastro...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rodape-tabs">
+    <button type="button" class="rodape-btn active" id="tabInicioBtn">
+      <span class="icone">🏠</span>
+      <span class="texto">Início</span>
+    </button>
+    <button type="button" class="rodape-btn" id="tabLancamentoBtn">
+      <span class="icone">📋</span>
+      <span class="texto">Lançamento</span>
+    </button>
+    <button type="button" class="rodape-btn" id="tabExportarBtn">
+      <span class="icone">📄</span>
+      <span class="texto">Exportar</span>
+    </button>
+    <button type="button" class="rodape-btn" id="tabCadastroBtn">
+      <span class="icone">🚒</span>
+      <span class="texto">Cadastro</span>
+    </button>
+  </div>
+
+  <script>
+    const ADMIN_SENHA = "123456";
+    const TABELA_AUTH = "diario_usuarios_auth";
+    const TABELA_PENDENCIAS = "diario_pendencias";
+
+    const USUARIOS = [
+      { guerra: "1º SGT VICENTE", id: "2614960" },
+      { guerra: "2º SGT ANDERSON", id: "2882930" },
+      { guerra: "SD MOTTA", id: "4626338" },
+      { guerra: "1º SGT DIEFERSON", id: "2972719" },
+      { guerra: "SD CAMACHO", id: "3698696" },
+      { guerra: "1º SGT BATISTA", id: "2692449" },
+      { guerra: "SD LARSSON", id: "4490380" },
+      { guerra: "SD TOMASCHEWSKI", id: "3218627" },
+      { guerra: "1º TEN MARCELO", id: "2423286" },
+      { guerra: "SD ISQUIERDO", id: "3697665" },
+      { guerra: "SD MAX", id: "3084620" },
+      { guerra: "2º SGT LISCANO", id: "3698530" },
+      { guerra: "SD BORGES", id: "3698440" },
+      { guerra: "SD SOARES", id: "4625595" },
+      { guerra: "SD PEGLOW", id: "4783069" },
+      { guerra: "SD BATISTA", id: "3702847" },
+      { guerra: "2º SGT VINICIUS", id: "2910233" },
+      { guerra: "SD WILLIAM", id: "4355504" }
+    ];
+
+    const VTRS_INICIAIS = {
+      "ABT-0535": {
+        nome: "ABT-0535",
+        placa: "JCO-7I27",
+        cartao: "",
+        odometro_atual: 0,
+        marcamodelo: "ABT VOLKSWAGEN CONSTELLATION",
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO BOMBA TANQUE",
+        descricao: "ABT VOLKSWAGEN, CONSTELLATION, 2023/2024",
+        ano: "2023"
+      },
+      "ABT-7992": {
+        nome: "ABT-7992",
+        placa: "JBM-3781",
+        cartao: "",
+        odometro_atual: 0,
+        marcamodelo: "IVECO 170 E25 - ABT 5000L",
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO BOMBA TANQUE",
+        descricao: "IVECO 170 E25 - ABT 5000L, DESENCARCERADOR + APH + ALTURA + GERADOR + TORRE DE ILUMINAÇÃO",
+        ano: "2011"
+      },
+      "AR-426": {
+        nome: "AR-426",
+        placa: "JBN7A45",
+        cartao: "",
+        odometro_atual: 0,
+        marcamodelo: "FORD TRANSIT TCA AMBULÂNCIA",
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO RESGATE",
+        descricao: "FORD TRANSIT TCA AMBULÂNCIA",
+        ano: "2022/2023"
+      },
+      "ATP-1225": {
+        nome: "ATP-1225",
+        placa: "TQV-8D59",
+        cartao: "",
+        odometro_atual: 0,
+        marcamodelo: "PICKUP 4X4",
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO TRANSPORTE DE PESSOAL",
+        descricao: "PICKUP 4X4",
+        ano: "2025"
+      },
+      "ATP-9316": {
+        nome: "ATP-9316",
+        placa: "IUW6520",
+        cartao: "",
+        odometro_atual: 0,
+        marcamodelo: "RENAULT DUSTER - 4P - VERMELHA",
+        orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
+        status: "ATIVA",
+        tipo: "AUTO TRANSPORTE DE PESSOAL",
+        descricao: "RENAULT DUSTER - 4P - VERMELHA",
+        ano: "2013"
+      }
+    };
+
+    const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let logado = null;
+    let VTRS = JSON.parse(JSON.stringify(VTRS_INICIAIS));
+    let registrosFiltrados = [];
+    let linha1Salva = false;
+    let linha2Salva = false;
+    let loginExigidoLinha2 = false;
+    let condutorLinha1Original = "";
+
+    const MAPA_RETORNO = {
+      "QTL / J4": "J4 / QTL",
+      "QTL / 44": "44 / QTL",
+      "QTL / CENTRO": "CENTRO / QTL",
+      "QTL / VISTORIA": "VISTORIA / QTL",
+      "QTL / TRANSPORTE": "TRANSPORTE / QTL",
+      "QTL / PREFEITURA": "PREFEITURA / QTL",
+      "QTL / OCORRÊNCIA": "OCORRÊNCIA / QTL",
+      "QTL / BAIRRO": "BAIRRO / QTL",
+      "QTL / BR116": "BR116 / QTL",
+      "QTL / RS265": "RS265 / QTL",
+      "QTL / INTERIOR SLS": "INTERIOR SLS / QTL"
+    };
+
+    const elIdFunc = document.getElementById("idFunc");
+    const elSenhaLogin = document.getElementById("senhaLogin");
+    const elBtnEntrar = document.getElementById("btnEntrar");
+    const elUserOk = document.getElementById("userOk");
+    const elFormBox = document.getElementById("formBox");
+    const elVtr = document.getElementById("vtr");
+    const elInfoVtr = document.getElementById("infoVtr");
+    const elOdometroValor = document.getElementById("odometroValor");
+    const elBtnEditarOdometro = document.getElementById("btnEditarOdometro");
+    const elStatusOdometro = document.getElementById("statusOdometro");
+    const elData = document.getElementById("data");
+    const elRelogioAtual = document.getElementById("relogioAtual");
+    const elPendenciaBox = document.getElementById("pendenciaBox");
+
+    const elSaidaSelect = document.getElementById("saidaSelect");
+    const elSaidaOutro = document.getElementById("saidaOutro");
+    const elRetornoSelect = document.getElementById("retornoSelect");
+    const elRetornoOutro = document.getElementById("retornoOutro");
+
+    const elKmIni = document.getElementById("kmIni");
+    const elHoraPartida = document.getElementById("horaPartida");
+    const elKmFim = document.getElementById("kmFim");
+    const elHoraChegada = document.getElementById("horaChegada");
+
+    const elKmIniRetorno = document.getElementById("kmIniRetorno");
+    const elHoraSaidaRetorno = document.getElementById("horaSaidaRetorno");
+    const elKmFimRetorno = document.getElementById("kmFimRetorno");
+    const elHoraChegadaRetorno = document.getElementById("horaChegadaRetorno");
+
+    const elCondutorIda = document.getElementById("condutorIda");
+    const elCondutorRetorno = document.getElementById("condutorRetorno");
+    const elUsuario = document.getElementById("usuario");
+
+    const elBtnSalvarLinha1 = document.getElementById("btnSalvarLinha1");
+    const elBtnSalvarLinha2 = document.getElementById("btnSalvarLinha2");
+    const elBtnEditarLinha1 = document.getElementById("btnEditarLinha1");
+    const elBtnEditarLinha2 = document.getElementById("btnEditarLinha2");
+    const elBtnFinal = document.getElementById("btnFinal");
+    const elBadgeLinha1 = document.getElementById("badgeLinha1");
+    const elBadgeLinha2 = document.getElementById("badgeLinha2");
+    const elStatusSalvar = document.getElementById("statusSalvar");
+    const elKmRodadoTotal = document.getElementById("kmRodadoTotal");
+    const elSituacaoResumo = document.getElementById("situacaoResumo");
+    const elAlertaOperacional = document.getElementById("alertaOperacional");
+    const abaInicio = document.getElementById("abaInicio");
+    const elListaInicio = document.getElementById("listaInicio");
+    const elStatusInicio = document.getElementById("statusInicio");
+    const elBtnAtualizarInicio = document.getElementById("btnAtualizarInicio");
+    const tabInicioBtn = document.getElementById("tabInicioBtn");
+
+    const tabLancamentoBtn = document.getElementById("tabLancamentoBtn");
+    const tabExportarBtn = document.getElementById("tabExportarBtn");
+    const tabCadastroBtn = document.getElementById("tabCadastroBtn");
+    const abaLancamento = document.getElementById("abaLancamento");
+    const abaExportar = document.getElementById("abaExportar");
+    const abaCadastro = document.getElementById("abaCadastro");
+
+    const elFiltroVtr = document.getElementById("filtroVtr");
+    const elFiltroMes = document.getElementById("filtroMes");
+    const elFiltroAno = document.getElementById("filtroAno");
+    const elBtnBuscarVtr = document.getElementById("btnBuscarVtr");
+    const elBtnExportarMes = document.getElementById("btnExportarMes");
+    const elStatusBuscaVtr = document.getElementById("statusBuscaVtr");
+    const elListaVtr = document.getElementById("listaVtr");
+    const elListaCadastroVtr = document.getElementById("listaCadastroVtr");
+    const elCondutorLogadoTopo = document.getElementById("condutorLogadoTopo");
+    const elCondutorLogadoNome = document.getElementById("condutorLogadoNome");
+    const elVtrTopoBox = document.getElementById("vtrTopoBox");
+    const elVtrTopoNome = document.getElementById("vtrTopoNome");
+
+    function hojeISO() {
+      const d = new Date();
+      const ano = d.getFullYear();
+      const mes = String(d.getMonth() + 1).padStart(2, "0");
+      const dia = String(d.getDate()).padStart(2, "0");
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    function horaAtual() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    }
+
+    function horaAtualCompleta() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+    }
+
+    function atualizarRelogio() {
+      elRelogioAtual.textContent = horaAtualCompleta();
+    }
+
+    function esc(texto) {
+      return String(texto ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatarDataBR(dataISO) {
+  if (!dataISO) return "";
+  const partes = String(dataISO).split("-");
+  if (partes.length !== 3) return dataISO;
+
+  const [ano, mes, dia] = partes;
+  return `${dia}/${mes}/${ano}`;
+}
+
+    function msgOk(el, texto) {
+      el.innerHTML = `<div class="ok">${texto}</div>`;
+    }
+
+    function msgErro(el, texto) {
+      el.innerHTML = `<div class="erro">${texto}</div>`;
+    }
+
+    function msgMuted(el, texto) {
+      el.innerHTML = `<div class="muted">${texto}</div>`;
+    }
+
+    function limparNumero(valor) {
+      return String(valor || "").replace(/\D/g, "").trim();
+    }
+
+    function atualizarCondutorLogadoTopo() {
+      const nome = logado && logado.guerra ? String(logado.guerra).trim() : "Não logado";
+      const ativo = !!(logado && logado.guerra);
+
+      elCondutorLogadoNome.textContent = nome || "Não logado";
+      elCondutorLogadoTopo.title = nome || "Não logado";
+
+      elCondutorLogadoTopo.classList.toggle("condutor-logado-ativo", ativo);
+      elCondutorLogadoTopo.classList.toggle("condutor-logado-inativo", !ativo);
+    }
+    function atualizarVtrTopo() {
+  let vtrAtual = "";
+
+  if (abaLancamento.classList.contains("active") && elVtr.value) {
+    vtrAtual = String(elVtr.value).trim();
+  } else if (abaExportar.classList.contains("active") && elFiltroVtr.value) {
+    vtrAtual = String(elFiltroVtr.value).trim();
+  }
+
+  const ativo = !!vtrAtual;
+
+  elVtrTopoNome.textContent = vtrAtual || "Nenhuma VTR";
+  elVtrTopoBox.title = vtrAtual || "Nenhuma VTR";
+
+  elVtrTopoBox.classList.toggle("vtr-topo-ativa", ativo);
+  elVtrTopoBox.classList.toggle("vtr-topo-inativa", !ativo);
+}
+
+    function preencherHorarioPadrao() {
+      horarioAtualSeVazio(elHoraPartida);
+      horarioAtualSeVazio(elHoraChegada);
+      horarioAtualSeVazio(elHoraSaidaRetorno);
+      horarioAtualSeVazio(elHoraChegadaRetorno);
+    }
+
+    function mesmoUsuarioDaLinha1() {
+      if (!logado) return false;
+      const nomeLinha1 = (condutorLinha1Original || elCondutorIda.value || "").trim();
+      return !!nomeLinha1 && nomeLinha1 === String(logado.guerra || "").trim();
+    }
+
+    function deveExigirNovoLoginParaLinha2() {
+      return false;
+    }
+
+    function assumirCondutorLinha2DoUsuarioLogado() {
+      if (!logado) return;
+      if (linha1Salva && !linha2Salva) {
+        elCondutorRetorno.value = String(logado.guerra || "").trim();
+        loginExigidoLinha2 = false;
+      }
+    }
+
+    function formatarOdometro(valor) {
+      const n = Number(valor || 0);
+      return String(Math.max(0, n)).padStart(6, "0");
+    }
+
+    function obterKmAtualOdometroNumerico() {
+      return Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
+    }
+
+    function atualizarLimitesKmCampos() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmIniValor = elKmIni.value === "" ? NaN : Number(elKmIni.value);
+      const kmFimValor = elKmFim.value === "" ? NaN : Number(elKmFim.value);
+      const kmIniRetornoValor = elKmIniRetorno.value === "" ? NaN : Number(elKmIniRetorno.value);
+
+      const minKmIni = kmBase;
+      const minKmFim = !Number.isNaN(kmIniValor) ? Math.max(kmBase, kmIniValor) : kmBase;
+      const minKmIniRetorno = !Number.isNaN(kmFimValor) ? Math.max(kmBase, kmFimValor) : kmBase;
+      const minKmFimRetorno = !Number.isNaN(kmIniRetornoValor) ? Math.max(kmBase, kmIniRetornoValor) : minKmIniRetorno;
+
+      elKmIni.min = String(minKmIni);
+      elKmFim.min = String(minKmFim);
+      elKmIniRetorno.min = String(minKmIniRetorno);
+      elKmFimRetorno.min = String(minKmFimRetorno);
+    }
+
+    function obterMensagemErroRegrasKm() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmIniValor = elKmIni.value === "" ? NaN : Number(elKmIni.value);
+      const kmFimValor = elKmFim.value === "" ? NaN : Number(elKmFim.value);
+      const kmIniRetornoValor = elKmIniRetorno.value === "" ? NaN : Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = elKmFimRetorno.value === "" ? NaN : Number(elKmFimRetorno.value);
+
+      if (elKmIni.value !== "" && (Number.isNaN(kmIniValor) || kmIniValor < kmBase)) {
+        return `❌ A KM Inicial não pode ser inferior à KM atual da VTR (${kmBase}).`;
+      }
+
+      if (elKmFim.value !== "" && (Number.isNaN(kmFimValor) || kmFimValor < Math.max(kmBase, kmIniValor || kmBase))) {
+        return `❌ A KM Chegada no Destino não pode ser inferior à KM Inicial da saída.`;
+      }
+
+      if (elKmIniRetorno.value !== "" && (Number.isNaN(kmIniRetornoValor) || kmIniRetornoValor < Math.max(kmBase, kmFimValor || kmBase))) {
+        return `❌ A KM Inicial do Retorno não pode ser inferior à última KM lançada da ida.`;
+      }
+
+      if (elKmFimRetorno.value !== "" && (Number.isNaN(kmFimRetornoValor) || kmFimRetornoValor < Math.max(kmBase, kmIniRetornoValor || kmBase))) {
+        return `❌ A KM Final na Chegada ao QTL não pode ser inferior à KM Inicial do retorno.`;
+      }
+
+      return "";
+    }
+
+    function aplicarRegraMinimaKm(campo, minimo, mensagem) {
+      if (!campo || campo.value === "") {
+        atualizarLimitesKmCampos();
+        return;
+      }
+
+      const valor = Number(campo.value);
+      if (Number.isNaN(valor) || valor < minimo) {
+        campo.value = String(minimo);
+        msgErro(elStatusSalvar, mensagem.replace("{minimo}", minimo));
+      }
+
+      atualizarLimitesKmCampos();
+      atualizarResumoAutomatico();
+    }
+
+    function ajustarKmInicialMinima() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      aplicarRegraMinimaKm(
+        elKmIni,
+        kmBase,
+        "⚠️ KM Inicial ajustada para {minimo}. Ela não pode ser inferior à KM atual da VTR."
+      );
+    }
+
+    function ajustarKmFimIdaMinimo() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmReferencia = Math.max(kmBase, Number(elKmIni.value || kmBase));
+
+      aplicarRegraMinimaKm(
+        elKmFim,
+        kmReferencia,
+        "⚠️ KM Chegada no Destino ajustada para {minimo}. Ela não pode ser inferior à última KM válida."
+      );
+
+      atualizarKmInicialRetorno();
+    }
+
+    function ajustarKmFimRetornoMinimo() {
+      const kmBase = obterKmAtualOdometroNumerico();
+      const kmReferencia = Math.max(kmBase, Number(elKmIniRetorno.value || kmBase));
+
+      aplicarRegraMinimaKm(
+        elKmFimRetorno,
+        kmReferencia,
+        "⚠️ KM Final na Chegada ao QTL ajustada para {minimo}. Ela não pode ser inferior à última KM válida."
+      );
+    }
+
+    function nomeMesNumero(numero) {
+      const nomes = ["", "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+      return nomes[Number(numero)] || "";
+    }
+
+    function preencherAnos() {
+      const anoAtual = new Date().getFullYear();
+      let html = "";
+      for (let ano = anoAtual - 2; ano <= anoAtual + 2; ano++) {
+        html += `<option value="${ano}" ${ano === anoAtual ? "selected" : ""}>${ano}</option>`;
+      }
+      elFiltroAno.innerHTML = html;
+    }
+
+    async function carregarCadastroVtrsSupabase() {
+      try {
+        const { data, error } = await supabaseClient
+          .from("diario_vtrs")
+          .select("*")
+          .order("nome", { ascending: true });
+
+        if (error) throw error;
+
+        const base = JSON.parse(JSON.stringify(VTRS_INICIAIS));
+
+        (data || []).forEach(v => {
+          base[v.nome] = {
+            ...(base[v.nome] || {}),
+            nome: v.nome,
+            placa: v.placa || "",
+            cartao: v.cartao || "",
+            odometro_atual: Number(v.odometro_atual || 0),
+            marcamodelo: v.marcamodelo || "",
+            orgao: v.orgao || "",
+            status: v.status || "",
+            tipo: v.tipo || "",
+            descricao: v.descricao || "",
+            ano: v.ano || ""
+          };
+        });
+
+        VTRS = base;
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        atualizarInfoVtr();
+        atualizarVtrTopo();
+        await carregarPainelInicio();
+      } catch (e) {
+        console.error(e);
+        VTRS = JSON.parse(JSON.stringify(VTRS_INICIAIS));
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        atualizarInfoVtr();
+        atualizarVtrTopo();
+        msgErro(elListaCadastroVtr, "❌ Erro ao carregar VTRs do Supabase.");
+      }
+    }
+
+    async function salvarVtrSupabase(vtr) {
+      const payload = {
+        nome: vtr.nome,
+        placa: vtr.placa || "",
+        cartao: vtr.cartao || "",
+        odometro_atual: Number(vtr.odometro_atual || 0),
+        marcamodelo: vtr.marcamodelo || "",
+        orgao: vtr.orgao || "",
+        status: vtr.status || "",
+        tipo: vtr.tipo || "",
+        descricao: vtr.descricao || "",
+        ano: vtr.ano || "",
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("diario_vtrs")
+        .upsert([payload], { onConflict: "nome" });
+
+      if (error) throw error;
+    }
+
+    async function atualizarOdometroVtrSupabase(nomeVtr, km) {
+      const kmNumerico = Number(km || 0);
+      const vtrAtual = VTRS[nomeVtr] || { nome: nomeVtr };
+      const payload = {
+        nome: nomeVtr,
+        placa: vtrAtual.placa || "",
+        cartao: vtrAtual.cartao || "",
+        odometro_atual: kmNumerico,
+        marcamodelo: vtrAtual.marcamodelo || "",
+        orgao: vtrAtual.orgao || "",
+        status: vtrAtual.status || "",
+        tipo: vtrAtual.tipo || "",
+        descricao: vtrAtual.descricao || "",
+        ano: vtrAtual.ano || "",
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("diario_vtrs")
+        .upsert([payload], { onConflict: "nome" });
+
+      if (error) throw error;
+
+      VTRS[nomeVtr] = {
+        ...vtrAtual,
+        ...payload
+      };
+    }
+
+    function obterOdometroSupabase(vtr) {
+      return Number(VTRS[vtr]?.odometro_atual || 0);
+    }
+
+    function preencherUsuariosSelect() {
+      elUsuario.innerHTML = `<option value="">Selecione o usuário/carona (opcional)</option>` +
+        USUARIOS.map(u => `<option value="${esc(u.guerra)}">${esc(u.guerra)}</option>`).join("");
+    }
+
+    function preencherVtrsSelects() {
+      const chaves = Object.keys(VTRS).sort();
+      const options = chaves.map(ch => `<option value="${esc(ch)}">${esc(ch)}</option>`).join("");
+      elVtr.innerHTML = options;
+      elFiltroVtr.innerHTML = `<option value="">Selecione a VTR</option>${options}`;
+      atualizarVtrTopo();
+    }
+
+    function atualizarInfoVtr() {
+      atualizarVtrTopo();
+      const dados = VTRS[elVtr.value] || {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS",
+        status: "",
+        tipo: "",
+        descricao: "",
+        ano: ""
+      };
+
+      elInfoVtr.innerHTML = `
+        <b>PLACA:</b> ${esc(dados.placa)}<br>
+        <b>MARCA/MODELO:</b> ${esc(dados.marcamodelo)}<br>
+        <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}<br>
+        <b>TIPO:</b> ${esc(dados.tipo || "")}<br>
+        <b>STATUS:</b> ${esc(dados.status || "")}<br>
+        <b>ANO:</b> ${esc(dados.ano || "")}<br>
+        <b>NÚMERO DO CARTÃO:</b> ${esc(dados.cartao || "NÃO CADASTRADO")}
+      `;
+    }
+
+    function renderCadastroVtrs() {
+      const chaves = Object.keys(VTRS).sort();
+      elListaCadastroVtr.innerHTML = chaves.map(ch => {
+        const v = VTRS[ch];
+        const itemId = ch.replace(/[^a-zA-Z0-9]/g, "_");
+
+        return `
+          <div class="vtr-item">
+            <div id="view_${itemId}">
+              <b>${esc(ch)}</b><br>
+              Tipo: ${esc(v.tipo || "")}<br>
+              Placa: ${esc(v.placa || "")}<br>
+              💳 Cartão: ${esc(v.cartao || "")}<br>
+              Odômetro Atual: ${esc(formatarOdometro(v.odometro_atual || 0))}<br>
+              Marca/Modelo: ${esc(v.marcamodelo || "")}<br>
+              Órgão: ${esc(v.orgao || "")}<br>
+              Status: ${esc(v.status || "")}<br>
+              Descrição: ${esc(v.descricao || "")}<br>
+              Ano: ${esc(v.ano || "")}<br><br>
+              <button type="button" onclick="editarVtr('${esc(ch)}')" class="btn-pdf">✏️ Editar VTR</button>
+            </div>
+
+            <div id="edit_${itemId}" class="hidden" style="margin-top:12px;">
+              <label>Placa</label>
+              <input id="placa_${itemId}" value="${esc(v.placa || "")}" />
+
+              <label>Número do Cartão</label>
+              <input id="cartao_${itemId}" value="${esc(v.cartao || "")}" inputmode="numeric" />
+
+              <label>Odômetro Atual</label>
+              <input id="odometro_${itemId}" type="number" inputmode="numeric" value="${esc(v.odometro_atual || 0)}" />
+
+              <label>Marca/Modelo</label>
+              <input id="marcamodelo_${itemId}" value="${esc(v.marcamodelo || "")}" />
+
+              <label>Órgão</label>
+              <input id="orgao_${itemId}" value="${esc(v.orgao || "")}" />
+
+              <label>Status</label>
+              <input id="status_${itemId}" value="${esc(v.status || "")}" />
+
+              <label>Tipo</label>
+              <input id="tipo_${itemId}" value="${esc(v.tipo || "")}" />
+
+              <label>Descrição</label>
+              <textarea id="descricao_${itemId}">${esc(v.descricao || "")}</textarea>
+
+              <label>Ano</label>
+              <input id="ano_${itemId}" value="${esc(v.ano || "")}" />
+
+              <div class="grid-2">
+                <button type="button" class="btn-finalizar" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar</button>
+                <button type="button" class="btn-editar-linha" onclick="cancelarEdicaoVtr('${esc(ch)}')">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function editarVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      document.getElementById(`view_${itemId}`).classList.add("hidden");
+      document.getElementById(`edit_${itemId}`).classList.remove("hidden");
+    }
+
+    function cancelarEdicaoVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      document.getElementById(`view_${itemId}`).classList.remove("hidden");
+      document.getElementById(`edit_${itemId}`).classList.add("hidden");
+    }
+
+    async function salvarEdicaoVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      const odometroAtual = Number(document.getElementById(`odometro_${itemId}`).value || 0);
+
+      if (Number.isNaN(odometroAtual) || odometroAtual < 0) {
+        alert("❌ Odômetro inválido.");
+        return;
+      }
+
+      const vtrAtualizada = {
+        nome,
+        placa: document.getElementById(`placa_${itemId}`).value.trim().toUpperCase(),
+        cartao: document.getElementById(`cartao_${itemId}`).value.trim(),
+        odometro_atual: odometroAtual,
+        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim().toUpperCase(),
+        orgao: document.getElementById(`orgao_${itemId}`).value.trim().toUpperCase(),
+        status: document.getElementById(`status_${itemId}`).value.trim().toUpperCase(),
+        tipo: document.getElementById(`tipo_${itemId}`).value.trim().toUpperCase(),
+        descricao: document.getElementById(`descricao_${itemId}`).value.trim().toUpperCase(),
+        ano: document.getElementById(`ano_${itemId}`).value.trim()
+      };
+
+      try {
+        await salvarVtrSupabase(vtrAtualizada);
+        VTRS[nome] = vtrAtualizada;
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        await carregarPainelInicio();
+
+        if (elVtr.value === nome) {
+          atualizarInfoVtr();
+          elOdometroValor.textContent = formatarOdometro(odometroAtual);
+          if (!linha1Salva) elKmIni.value = odometroAtual || "";
+          atualizarLimitesKmCampos();
+          atualizarResumoAutomatico();
+        }
+
+        alert(`✅ VTR ${nome} atualizada com sucesso.`);
+      } catch (e) {
+        console.error(e);
+        alert(`❌ Erro ao salvar VTR: ${e.message || e}`);
+      }
+    }
+
+    function abrirAba(nome) {
+      abaInicio.classList.remove("active");
+      abaLancamento.classList.remove("active");
+      abaExportar.classList.remove("active");
+      abaCadastro.classList.remove("active");
+
+      tabInicioBtn.classList.remove("active");
+      tabLancamentoBtn.classList.remove("active");
+      tabExportarBtn.classList.remove("active");
+      tabCadastroBtn.classList.remove("active");
+
+      if (nome === "inicio") {
+        abaInicio.classList.add("active");
+        tabInicioBtn.classList.add("active");
+      } else if (nome === "lancamento") {
+        abaLancamento.classList.add("active");
+        tabLancamentoBtn.classList.add("active");
+      } else if (nome === "exportar") {
+        abaExportar.classList.add("active");
+        tabExportarBtn.classList.add("active");
+      } else {
+        abaCadastro.classList.add("active");
+        tabCadastroBtn.classList.add("active");
+      }
+      atualizarVtrTopo();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function compararHoras(h1, h2) {
+      if (!h1 || !h2) return 0;
+      return h1.localeCompare(h2);
+    }
+
+    function horarioAtualSeVazio(campo) {
+      if (!campo.value) campo.value = horaAtual();
+    }
+
+    function limparFormularioVisual() {
+      elSaidaSelect.value = "";
+      elSaidaOutro.value = "";
+      elSaidaOutro.classList.add("hidden");
+      elRetornoSelect.value = "";
+      elRetornoOutro.value = "";
+      elRetornoOutro.classList.add("hidden");
+      elKmIni.value = "";
+      elHoraPartida.value = "";
+      elKmFim.value = "";
+      elHoraChegada.value = "";
+      elKmIniRetorno.value = "";
+      elHoraSaidaRetorno.value = "";
+      elKmFimRetorno.value = "";
+      elHoraChegadaRetorno.value = "";
+      elCondutorIda.value = logado ? logado.guerra : "";
+      elCondutorRetorno.value = "";
+      elUsuario.value = "";
+      linha1Salva = false;
+      linha2Salva = false;
+      loginExigidoLinha2 = false;
+      condutorLinha1Original = "";
+      atualizarLimitesKmCampos();
+      atualizarEstadoFinal();
+    }
+
+    function aplicarPendenciaNaTela(p) {
+      elData.value = p.data || hojeISO();
+      elSaidaSelect.value = p.localpartida && [...elSaidaSelect.options].some(o => o.value === p.localpartida) ? p.localpartida : (p.localpartida ? "OUTRO" : "");
+      if (elSaidaSelect.value === "OUTRO") {
+        elSaidaOutro.classList.remove("hidden");
+        elSaidaOutro.value = p.localpartida || "";
+      } else {
+        elSaidaOutro.classList.add("hidden");
+        elSaidaOutro.value = "";
+      }
+
+      elRetornoSelect.value = p.localretorno && [...elRetornoSelect.options].some(o => o.value === p.localretorno) ? p.localretorno : (p.localretorno ? "OUTRO" : "");
+      if (elRetornoSelect.value === "OUTRO") {
+        elRetornoOutro.classList.remove("hidden");
+        elRetornoOutro.value = p.localretorno || "";
+      } else {
+        elRetornoOutro.classList.add("hidden");
+        elRetornoOutro.value = "";
+      }
+
+      elKmIni.value = p.kmini ?? "";
+      elHoraPartida.value = p.horapartida || "";
+      elKmFim.value = p.kmfim ?? "";
+      elHoraChegada.value = p.horachegada || "";
+
+      elKmIniRetorno.value = p.kminiretorno ?? "";
+      elHoraSaidaRetorno.value = p.horasaidaretorno || "";
+      elKmFimRetorno.value = p.kmfimretorno ?? "";
+      elHoraChegadaRetorno.value = p.horachegadaretorno || "";
+
+      elCondutorIda.value = p.condutor_ida || "";
+      elCondutorRetorno.value = p.condutor_retorno || (logado ? logado.guerra : "");
+      elUsuario.value = p.usuario || "";
+
+      linha1Salva = Boolean(p.condutor_ida && p.localpartida && p.kmini != null && p.horapartida && p.kmfim != null && p.horachegada);
+      linha2Salva = Boolean(p.condutor_retorno && p.kminiretorno != null && p.horasaidaretorno && p.kmfimretorno != null && p.horachegadaretorno);
+      condutorLinha1Original = p.condutor_ida || "";
+      loginExigidoLinha2 = linha1Salva && !linha2Salva;
+
+      atualizarEstadoFinal();
+    }
+
+    async function buscarPendenciaSupabase(vtr) {
+      const { data, error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .select("*")
+        .eq("vtr", vtr)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    }
+
+    async function salvarPendenciaSupabase() {
+      const payload = {
+        vtr: elVtr.value,
+        data: elData.value || null,
+        localpartida: obterSaidaFinal() || null,
+        localretorno: obterRetornoFinal() || null,
+        kmini: elKmIni.value === "" ? null : Number(elKmIni.value),
+        horapartida: elHoraPartida.value || null,
+        kmfim: elKmFim.value === "" ? null : Number(elKmFim.value),
+        horachegada: elHoraChegada.value || null,
+        kminiretorno: elKmIniRetorno.value === "" ? null : Number(elKmIniRetorno.value),
+        horasaidaretorno: elHoraSaidaRetorno.value || null,
+        kmfimretorno: elKmFimRetorno.value === "" ? null : Number(elKmFimRetorno.value),
+        horachegadaretorno: elHoraChegadaRetorno.value || null,
+        condutor_ida: elCondutorIda.value || null,
+        condutor_retorno: elCondutorRetorno.value || null,
+        usuario: elUsuario.value || null,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .upsert([payload], { onConflict: "vtr" });
+
+      if (error) throw error;
+    }
+
+    async function excluirPendenciaSupabase(vtr) {
+      const { error } = await supabaseClient
+        .from(TABELA_PENDENCIAS)
+        .delete()
+        .eq("vtr", vtr);
+
+      if (error) throw error;
+    }
+
+    async function carregarPendenciaDaVtr() {
+      if (!elVtr.value) return;
+
+      try {
+        const pendencia = await buscarPendenciaSupabase(elVtr.value);
+        if (pendencia) {
+          aplicarPendenciaNaTela(pendencia);
+
+          assumirCondutorLinha2DoUsuarioLogado();
+          atualizarEstadoFinal();
+          msgMuted(elStatusSalvar, "Pendência compartilhada carregada do Supabase.");
+        } else {
+          limparFormularioVisual();
+          elData.value = hojeISO();
+          const kmBase = Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
+          elKmIni.value = kmBase || "";
+          elCondutorIda.value = logado ? logado.guerra : "";
+          atualizarLimitesKmCampos();
+          atualizarEstadoFinal();
+        }
+      } catch (e) {
+  console.error(e);
+  msgErro(elStatusSalvar, `⚠️ Erro ao carregar pendência: ${e.message || e}`);
+}
+}
+
+    function atualizarMensagemPendencia() {
+      if (linha1Salva && !linha2Salva && elCondutorIda.value.trim()) {
+        const avisoLogin = '<br>✅ A 2ª linha sempre fica com o militar que estiver logado no aparelho ao assumir o retorno.';
+
+        elPendenciaBox.classList.remove("hidden");
+        elPendenciaBox.innerHTML = `
+          ⚠️ REGISTRO PENDENTE DE FECHAMENTO<br>
+          Condutor da 1ª linha: <b>${esc(elCondutorIda.value)}</b><br>
+          Condutor da 2ª linha atual: <b>${esc(elCondutorRetorno.value || "aguardando login")}</b><br>
+          Registro carregado do Supabase. Complete o retorno e finalize.${avisoLogin}
+        `;
+      } else {
+        elPendenciaBox.classList.add("hidden");
+        elPendenciaBox.innerHTML = "";
+      }
+    }
+
+    async function buscarSenhaNoSupabase(idFunc) {
+      const { data, error } = await supabaseClient
+        .from(TABELA_AUTH)
+        .select("id_func, nome_guerra, senha")
+        .eq("id_func", idFunc)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    }
+
+    async function salvarNovaSenhaNoSupabase(user, senhaNova) {
+      const { error } = await supabaseClient
+        .from(TABELA_AUTH)
+        .upsert([{
+          id_func: user.id,
+          nome_guerra: user.guerra,
+          senha: senhaNova,
+          updated_at: new Date().toISOString()
+        }], { onConflict: "id_func" });
+
+      if (error) throw error;
+    }
+
+    async function cadastrarNovaSenhaPrimeiroAcesso(user) {
+      const nova1 = prompt(`Primeiro acesso de ${user.guerra}.
+Cadastre sua nova senha numérica:`);
+      if (nova1 === null) return false;
+      const senha1 = limparNumero(nova1);
+      if (senha1.length < 4) {
+        alert("A nova senha deve conter pelo menos 4 números.");
+        return false;
+      }
+      const nova2 = prompt("Confirme a nova senha numérica:");
+      if (nova2 === null) return false;
+      const senha2 = limparNumero(nova2);
+      if (senha1 !== senha2) {
+        alert("As senhas não conferem.");
+        return false;
+      }
+      await salvarNovaSenhaNoSupabase(user, senha1);
+      alert("Senha cadastrada com sucesso.");
+      return true;
+    }
+
+    async function login() {
+      const id = elIdFunc.value.trim();
+      const senhaInformada = elSenhaLogin.value.trim();
+
+      if (!id || !senhaInformada) {
+        msgErro(elUserOk, "❌ Informe a ID Func e a senha.");
+        atualizarCondutorLogadoTopo();
+        elFormBox.classList.add("hidden");
+        return;
+      }
+
+      const user = USUARIOS.find(u => u.id === id);
+      if (!user) {
+        msgErro(elUserOk, "❌ ID não cadastrada.");
+        elFormBox.classList.add("hidden");
+        return;
+      }
+
+      elBtnEntrar.disabled = true;
+      msgMuted(elUserOk, "Validando acesso...");
+
+      try {
+        const auth = await buscarSenhaNoSupabase(user.id);
+
+        if (!auth) {
+          if (senhaInformada !== user.id) {
+            msgErro(elUserOk, "❌ No primeiro acesso, use sua própria ID como senha.");
+            elFormBox.classList.add("hidden");
+            return;
           }
-        })
-      )
-    )
-  );
+
+          const cadastrou = await cadastrarNovaSenhaPrimeiroAcesso(user);
+          if (!cadastrou) {
+            msgErro(elUserOk, "❌ Cadastro da nova senha cancelado.");
+            elFormBox.classList.add("hidden");
+            return;
+          }
+        } else {
+          if (senhaInformada !== String(auth.senha)) {
+            msgErro(elUserOk, "❌ Senha inválida.");
+            elFormBox.classList.add("hidden");
+            return;
+          }
+        }
+
+        logado = user;
+        atualizarCondutorLogadoTopo();
+        msgOk(elUserOk, `✅ ${user.guerra}`);
+        elFormBox.classList.remove("hidden");
+
+        if (!elData.value) elData.value = hojeISO();
+        elSenhaLogin.value = "";
+
+        atualizarInfoVtr();
+        await atualizarKmBaseDaVtr();
+        await carregarPendenciaDaVtr();
+
+        if (!linha1Salva) {
+          elCondutorIda.value = user.guerra;
+          condutorLinha1Original = user.guerra;
+        }
+        assumirCondutorLinha2DoUsuarioLogado();
+        atualizarEstadoFinal();
+     } catch (e) {
+  console.error(e);
+  msgErro(elUserOk, `❌ Erro no login: ${e.message || e}`);
+  elFormBox.classList.add("hidden");
+} finally {
+  elBtnEntrar.disabled = false;
+}
+}
+
+    async function obterUltimoRegistroDaVtr(vtr) {
+      const { data, error } = await supabaseClient
+        .from("diario")
+        .select("*")
+        .eq("vtr", vtr)
+        .order("data", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+      return data && data.length ? data[0] : null;
+    }
+
+    async function atualizarKmBaseDaVtr() {
+      const vtr = elVtr.value;
+      if (!vtr) return;
+
+      try {
+        msgMuted(elStatusOdometro, "Consultando KM atual...");
+        const ultimo = await obterUltimoRegistroDaVtr(vtr);
+        const kmSupabase = obterOdometroSupabase(vtr);
+
+        let kmBase = Number(kmSupabase || 0);
+        if (ultimo) {
+          const kmUltimoRegistro = Number(obterKmFinalRegistro(ultimo) || 0);
+          kmBase = Math.max(kmBase, kmUltimoRegistro);
+        }
+
+        VTRS[vtr] = {
+          ...(VTRS[vtr] || {}),
+          odometro_atual: kmBase
+        };
+
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarLimitesKmCampos();
+        atualizarResumoAutomatico();
+        msgMuted(elStatusOdometro, "KM atual carregada do Supabase.");
+      } catch (e) {
+        console.error(e);
+        const kmBase = Number(obterOdometroSupabase(vtr) || 0);
+        elOdometroValor.textContent = formatarOdometro(kmBase);
+        if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
+        atualizarLimitesKmCampos();
+        atualizarResumoAutomatico();
+        msgErro(elStatusOdometro, "⚠️ Erro ao consultar odômetro no Supabase.");
+      }
+    }
+
+    async function editarOdometroAdmin() {
+      const vtr = elVtr.value;
+      if (!vtr) {
+        msgErro(elStatusOdometro, "❌ Selecione uma VTR.");
+        return;
+      }
+
+      const senha = prompt("Senha admin:");
+      if (senha !== ADMIN_SENHA) {
+        msgErro(elStatusOdometro, "❌ Senha inválida.");
+        return;
+      }
+
+      const atual = elOdometroValor.textContent.replace(/\D/g, "") || "0";
+      const novo = prompt(`Informe a KM atual da ${vtr}:`, String(Number(atual)));
+      if (novo === null) return;
+
+      const km = Number(novo);
+      if (Number.isNaN(km) || km < 0) {
+        msgErro(elStatusOdometro, "❌ KM inválida.");
+        return;
+      }
+
+      try {
+        await atualizarOdometroVtrSupabase(vtr, km);
+        elOdometroValor.textContent = formatarOdometro(km);
+        if (!linha1Salva) elKmIni.value = km;
+        atualizarLimitesKmCampos();
+        atualizarResumoAutomatico();
+        await carregarPainelInicio();
+        msgOk(elStatusOdometro, "✅ KM atualizada no Supabase.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusOdometro, "❌ Erro ao atualizar KM no Supabase.");
+      }
+    }
+
+    function controlarCamposSaida() {
+      if (elSaidaSelect.value === "OUTRO") {
+        elSaidaOutro.classList.remove("hidden");
+      } else {
+        elSaidaOutro.classList.add("hidden");
+        elSaidaOutro.value = "";
+      }
+    }
+
+    function controlarCamposRetorno() {
+      if (elRetornoSelect.value === "OUTRO") {
+        elRetornoOutro.classList.remove("hidden");
+      } else {
+        elRetornoOutro.classList.add("hidden");
+        elRetornoOutro.value = "";
+      }
+    }
+
+    function aplicarRetornoAutomatico() {
+      controlarCamposSaida();
+      if (elSaidaSelect.value && elSaidaSelect.value !== "OUTRO") {
+        const retorno = MAPA_RETORNO[elSaidaSelect.value];
+        if (retorno) {
+          elRetornoSelect.value = retorno;
+          controlarCamposRetorno();
+        }
+      }
+      atualizarResumoAutomatico();
+      atualizarMensagemPendencia();
+    }
+
+    function atualizarKmInicialRetorno() {
+      const kmIda = Number(elKmFim.value);
+      const kmBase = obterKmAtualOdometroNumerico();
+
+      if (!Number.isNaN(kmIda) && kmIda >= kmBase) {
+        elKmIniRetorno.value = kmIda;
+      } else {
+        elKmIniRetorno.value = "";
+      }
+
+      atualizarLimitesKmCampos();
+      atualizarResumoAutomatico();
+      atualizarEstadoFinal();
+    }
+
+    function obterSaidaFinal() {
+      return elSaidaSelect.value === "OUTRO" ? elSaidaOutro.value.trim() : elSaidaSelect.value.trim();
+    }
+
+    function obterRetornoFinal() {
+      return elRetornoSelect.value === "OUTRO" ? elRetornoOutro.value.trim() : elRetornoSelect.value.trim();
+    }
+
+    function validarLinha1() {
+      const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
+      const kmIniValor = Number(elKmIni.value);
+      const kmFimValor = Number(elKmFim.value);
+      const kmBase = obterKmAtualOdometroNumerico();
+
+      if (!elData.value) return false;
+      if (!saidaFinal) return false;
+      if (!retornoFinal) return false;
+      if (elKmIni.value === "" || elKmFim.value === "") return false;
+      if (!elHoraPartida.value || !elHoraChegada.value) return false;
+      if (Number.isNaN(kmIniValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmIniValor < kmBase) return false;
+      if (kmFimValor < Math.max(kmBase, kmIniValor)) return false;
+      if (compararHoras(elHoraChegada.value, elHoraPartida.value) < 0) return false;
+      if (!elCondutorIda.value.trim()) return false;
+      return true;
+    }
+
+    function validarLinha2() {
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
+      const kmFimValor = Number(elKmFim.value);
+      const kmBase = obterKmAtualOdometroNumerico();
+
+      if (elKmIniRetorno.value === "" || elKmFimRetorno.value === "") return false;
+      if (!elHoraSaidaRetorno.value || !elHoraChegadaRetorno.value) return false;
+      if (Number.isNaN(kmIniRetornoValor) || Number.isNaN(kmFimRetornoValor) || Number.isNaN(kmFimValor)) return false;
+      if (kmIniRetornoValor < Math.max(kmBase, kmFimValor)) return false;
+      if (kmIniRetornoValor !== kmFimValor) return false;
+      if (kmFimRetornoValor < Math.max(kmBase, kmIniRetornoValor)) return false;
+      if (compararHoras(elHoraSaidaRetorno.value, elHoraChegada.value) < 0) return false;
+      if (compararHoras(elHoraChegadaRetorno.value, elHoraSaidaRetorno.value) < 0) return false;
+      if (!elCondutorRetorno.value.trim()) return false;
+      return true;
+    }
+
+    function travarCamposLinha1(travar) {
+      elSaidaSelect.disabled = travar;
+      elSaidaOutro.readOnly = travar;
+      elRetornoSelect.disabled = travar;
+      elRetornoOutro.readOnly = travar;
+      elKmIni.readOnly = travar;
+      elHoraPartida.readOnly = travar;
+      elKmFim.readOnly = travar;
+      elHoraChegada.readOnly = travar;
+    }
+
+    function travarCamposLinha2(travar) {
+      elHoraSaidaRetorno.readOnly = travar;
+      elKmFimRetorno.readOnly = travar;
+      elHoraChegadaRetorno.readOnly = travar;
+    }
+
+    function atualizarBadges() {
+      if (linha1Salva) {
+        elBadgeLinha1.textContent = "1ª LINHA SALVA";
+        elBadgeLinha1.className = "badge-linha badge-ok";
+        elBtnSalvarLinha1.textContent = "✅ Salvo 1ª Linha";
+        elBtnSalvarLinha1.classList.add("btn-linha-ok");
+        elBtnEditarLinha1.classList.remove("hidden");
+      } else {
+        elBadgeLinha1.textContent = "1ª LINHA PENDENTE";
+        elBadgeLinha1.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha1.textContent = "Salvar 1ª Linha";
+        elBtnSalvarLinha1.classList.remove("btn-linha-ok");
+        elBtnEditarLinha1.classList.add("hidden");
+      }
+
+      if (linha2Salva) {
+        elBadgeLinha2.textContent = "2ª LINHA SALVA";
+        elBadgeLinha2.className = "badge-linha badge-ok";
+        elBtnSalvarLinha2.textContent = "✅ Salvo 2ª Linha";
+        elBtnSalvarLinha2.classList.add("btn-linha-ok");
+        elBtnEditarLinha2.classList.remove("hidden");
+      } else {
+        elBadgeLinha2.textContent = "2ª LINHA PENDENTE";
+        elBadgeLinha2.className = "badge-linha badge-pendente";
+        elBtnSalvarLinha2.textContent = "Salvar 2ª Linha";
+        elBtnSalvarLinha2.classList.remove("btn-linha-ok");
+        elBtnEditarLinha2.classList.add("hidden");
+      }
+    }
+
+    function segundaLinhaAtendida() {
+      return linha2Salva || validarLinha2();
+    }
+
+    function atualizarResumoAutomatico() {
+      const kmIni = Number(elKmIni.value || 0);
+      const kmFinal = Number(elKmFimRetorno.value || elKmFim.value || 0);
+      let rodado = 0;
+      if (!Number.isNaN(kmIni) && !Number.isNaN(kmFinal) && kmFinal >= kmIni) rodado = kmFinal - kmIni;
+      elKmRodadoTotal.textContent = rodado;
+
+      if (linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2()) {
+        elSituacaoResumo.textContent = "Pronto para finalizar";
+      } else if (linha1Salva || linha2Salva) {
+        elSituacaoResumo.textContent = "Salvo parcialmente";
+      } else {
+        elSituacaoResumo.textContent = "Aguardando preenchimento";
+      }
+    }
+
+    function atualizarEstadoFinal() {
+      atualizarBadges();
+      atualizarResumoAutomatico();
+      atualizarMensagemPendencia();
+
+      const pronto = linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2();
+
+      travarCamposLinha1(linha1Salva);
+      travarCamposLinha2(linha2Salva);
+
+      if (pronto) {
+        elBtnFinal.textContent = "Finalizar";
+        elBtnFinal.classList.add("btn-finalizar");
+        elBtnFinal.classList.remove("btn-salvar-parcial");
+        elAlertaOperacional.classList.add("hidden");
+      } else {
+        elBtnFinal.textContent = "Salvar parcial";
+        elBtnFinal.classList.remove("btn-finalizar");
+        elBtnFinal.classList.add("btn-salvar-parcial");
+        elAlertaOperacional.classList.remove("hidden");
+      }
+    }
+
+    async function salvarLinha1() {
+      preencherHorarioPadrao();
+
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
+        return;
+      }
+
+      if (!elCondutorIda.value.trim()) {
+        elCondutorIda.value = logado.guerra;
+      }
+
+      const erroKm = obterMensagemErroRegrasKm();
+      if (erroKm) {
+        msgErro(elStatusSalvar, erroKm);
+        return;
+      }
+
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Verifique a 1ª linha. Horários e KM devem seguir ordem crescente e respeitar a KM atual da VTR.");
+        return;
+      }
+
+      linha1Salva = true;
+      condutorLinha1Original = elCondutorIda.value.trim() || logado.guerra;
+      loginExigidoLinha2 = false;
+      atualizarKmInicialRetorno();
+
+      if (!elHoraSaidaRetorno.value) elHoraSaidaRetorno.value = elHoraChegada.value;
+      assumirCondutorLinha2DoUsuarioLogado();
+
+      try {
+        await salvarPendenciaSupabase();
+        atualizarEstadoFinal();
+        msgOk(elStatusSalvar, "✅ 1ª linha salva no Supabase. Outro dispositivo poderá continuar.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Erro ao salvar 1ª linha no Supabase.");
+      }
+    }
+
+    async function salvarLinha2() {
+      if (!validarLinha1()) {
+        msgErro(elStatusSalvar, "❌ Salve primeiro a 1ª linha corretamente.");
+        return;
+      }
+
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro.");
+        return;
+      }
+
+      preencherHorarioPadrao();
+      assumirCondutorLinha2DoUsuarioLogado();
+
+      const erroKm = obterMensagemErroRegrasKm();
+      if (erroKm) {
+        msgErro(elStatusSalvar, erroKm);
+        return;
+      }
+
+      if (!validarLinha2()) {
+        msgErro(elStatusSalvar, "❌ Verifique a 2ª linha. Horários e KM devem seguir ordem crescente e respeitar a KM atual da VTR.");
+        return;
+      }
+
+      linha2Salva = true;
+      loginExigidoLinha2 = false;
+
+      try {
+        await salvarPendenciaSupabase();
+        atualizarEstadoFinal();
+        msgOk(elStatusSalvar, "✅ 2ª linha salva no Supabase.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Erro ao salvar 2ª linha no Supabase.");
+      }
+    }
+
+    function editarLinha1() {
+      linha1Salva = false;
+      linha2Salva = false;
+      loginExigidoLinha2 = false;
+      condutorLinha1Original = logado ? logado.guerra : "";
+      travarCamposLinha1(false);
+      travarCamposLinha2(false);
+      elCondutorRetorno.value = logado ? logado.guerra : "";
+      atualizarLimitesKmCampos();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "1ª linha liberada para edição. Refaça a 2ª linha depois.");
+    }
+
+    function editarLinha2() {
+      linha2Salva = false;
+      loginExigidoLinha2 = false;
+      travarCamposLinha2(false);
+      assumirCondutorLinha2DoUsuarioLogado();
+      atualizarLimitesKmCampos();
+      atualizarEstadoFinal();
+      msgMuted(elStatusSalvar, "2ª linha liberada para edição.");
+    }
+
+    async function finalizarOuSalvarParcial() {
+      const erroKm = obterMensagemErroRegrasKm();
+      const pronto = !erroKm && linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2();
+
+      if (!pronto) {
+        if (erroKm) {
+          msgErro(elStatusSalvar, erroKm);
+          return;
+        }
+        try {
+          await salvarPendenciaSupabase();
+          atualizarEstadoFinal();
+          msgMuted(elStatusSalvar, "Pendência salva no Supabase. Complete as duas linhas para finalizar.");
+        } catch (e) {
+          console.error(e);
+          msgErro(elStatusSalvar, "❌ Erro ao salvar pendência parcial.");
+        }
+        return;
+      }
+
+      if (!logado) {
+        msgErro(elStatusSalvar, "❌ Faça o login primeiro");
+        return;
+      }
+
+      if (!linha2Salva && validarLinha2()) {
+        linha2Salva = true;
+        loginExigidoLinha2 = false;
+      }
+
+      const saidaFinal = obterSaidaFinal();
+      const retornoFinal = obterRetornoFinal();
+
+      const kmIniValor = Number(elKmIni.value);
+      const kmFimValor = Number(elKmFim.value);
+      const kmIniRetornoValor = Number(elKmIniRetorno.value);
+      const kmFimRetornoValor = Number(elKmFimRetorno.value);
+
+      const dadosVtr = VTRS[elVtr.value] || {
+        placa: "NÃO CADASTRADO",
+        marcamodelo: "NÃO CADASTRADO",
+        orgao: "CBMRS CB SLS"
+      };
+
+      elBtnFinal.disabled = true;
+      msgMuted(elStatusSalvar, "Finalizando...");
+
+      try {
+        const { error } = await supabaseClient
+          .from("diario")
+          .insert([{
+            vtr: elVtr.value,
+            placa: dadosVtr.placa,
+            marcamodelo: dadosVtr.marcamodelo,
+            orgao: dadosVtr.orgao,
+            data: elData.value,
+            localpartida: saidaFinal,
+            localretorno: retornoFinal,
+            kmini: kmIniValor,
+            horapartida: elHoraPartida.value,
+            kmfim: kmFimValor,
+            horachegada: elHoraChegada.value,
+            kminiretorno: kmIniRetornoValor,
+            horasaidaretorno: elHoraSaidaRetorno.value,
+            kmfimretorno: kmFimRetornoValor,
+            horachegadaretorno: elHoraChegadaRetorno.value,
+            condutor: elCondutorIda.value,
+            condutor_retorno: elCondutorRetorno.value,
+            usuario: elUsuario.value.trim(),
+            assinaturacondutor: "",
+            assinaturausuario: ""
+          }]);
+
+        if (error) {
+          msgErro(elStatusSalvar, `❌ Erro ao finalizar: ${error.message}`);
+          return;
+        }
+
+        await excluirPendenciaSupabase(elVtr.value);
+
+        await atualizarOdometroVtrSupabase(elVtr.value, kmFimRetornoValor);
+        await carregarPainelInicio();
+        msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
+
+        elSaidaSelect.value = "";
+        elSaidaOutro.value = "";
+        elSaidaOutro.classList.add("hidden");
+        elRetornoSelect.value = "";
+        elRetornoOutro.value = "";
+        elRetornoOutro.classList.add("hidden");
+        elKmIni.value = kmFimRetornoValor;
+        elHoraPartida.value = horaAtual();
+        elKmFim.value = "";
+        elHoraChegada.value = horaAtual();
+        elKmIniRetorno.value = "";
+        elHoraSaidaRetorno.value = horaAtual();
+        elKmFimRetorno.value = "";
+        elHoraChegadaRetorno.value = horaAtual();
+        elCondutorIda.value = logado ? logado.guerra : "";
+        elCondutorRetorno.value = "";
+        elUsuario.value = "";
+        elOdometroValor.textContent = formatarOdometro(kmFimRetornoValor);
+        atualizarLimitesKmCampos();
+        linha1Salva = false;
+        linha2Salva = false;
+        loginExigidoLinha2 = false;
+        condutorLinha1Original = logado ? logado.guerra : "";
+        atualizarEstadoFinal();
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusSalvar, "❌ Falha inesperada ao finalizar");
+      } finally {
+        elBtnFinal.disabled = false;
+      }
+    }
+
+    function obterKmFinalRegistro(registro) {
+      if (registro && registro.kmfimretorno != null && registro.kmfimretorno !== "") return Number(registro.kmfimretorno) || 0;
+      if (registro && registro.kmfim != null && registro.kmfim !== "") return Number(registro.kmfim) || 0;
+      return 0;
+    }
+
+    function obterKmRodadoRegistro(registro) {
+      const kmIni = Number(registro?.kmini ?? 0);
+      const kmFinal = obterKmFinalRegistro(registro);
+      if (Number.isNaN(kmIni) || Number.isNaN(kmFinal) || kmFinal < kmIni) return 0;
+      return kmFinal - kmIni;
+    }
+
+    function obterDataHoraFimRegistro(registro) {
+      if (!registro?.data) return null;
+      const hora = registro.horachegadaretorno || registro.horachegada || "23:59";
+      const dt = new Date(`${registro.data}T${hora}:00`);
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    }
+
+    function renderPainelInicio(lista) {
+      if (!lista.length) {
+        elListaInicio.innerHTML = '<div class="muted">Nenhuma VTR encontrada.</div>';
+        return;
+      }
+
+      elListaInicio.innerHTML = `<div class="inicio-grid">${lista.map(item => `
+        <div class="inicio-item">
+          <div class="inicio-item-topo">
+            <div class="inicio-vtr-nome">${esc(item.nome)}</div>
+            <div class="inicio-vtr-tipo">${esc(item.tipo || 'VTR')}</div>
+          </div>
+          <div class="inicio-linha">
+            <div>
+              <div class="inicio-label">KM atual</div>
+              <div class="muted">Última posição conhecida</div>
+            </div>
+            <div class="inicio-valor">${esc(formatarOdometro(item.kmAtual))}</div>
+          </div>
+          <div class="inicio-linha">
+            <div>
+              <div class="inicio-label">Rodado 09:00 → agora</div>
+              <div class="muted">Janela operacional do plantão</div>
+            </div>
+            <div class="inicio-valor-menor">${esc(String(item.km24h))} km</div>
+          </div>
+          <div class="inicio-rodape">
+            Placa: <b>${esc(item.placa || '-')}</b><br>
+            <span class="inicio-cartao-linha"><span class="inicio-cartao-icone">💳</span> Número do Cartão: <b>${esc(item.cartao || '-')}</b></span>
+          </div>
+          <button
+            type="button"
+            class="btn-mobilidade-home"
+            onclick="copiarEAbrirMobilidade('${esc(item.cartao || '')}')">
+            💳 Copiar + abrir app
+          </button>
+        </div>
+      `).join('')}</div>`;
+    }
+
+  async function carregarPainelInicio() {
+  const agora = new Date();
+
+  // Janela operacional: 09:00 até agora
+  let inicioJanela = new Date();
+  inicioJanela.setHours(9, 0, 0, 0);
+
+  // Se ainda não passou das 09:00, considera desde ontem às 09:00
+  if (agora < inicioJanela) {
+    inicioJanela.setDate(inicioJanela.getDate() - 1);
+  }
+
+  // Busca registros com margem de segurança
+  const dataConsulta = new Date(inicioJanela);
+  dataConsulta.setDate(dataConsulta.getDate() - 1);
+
+  const inicioFiltro = `${dataConsulta.getFullYear()}-${String(dataConsulta.getMonth() + 1).padStart(2, '0')}-${String(dataConsulta.getDate()).padStart(2, '0')}`;
+  const chaves = Object.keys(VTRS).sort();
+
+  msgMuted(elStatusInicio, 'Atualizando painel das VTRs...');
+  elBtnAtualizarInicio.disabled = true;
+
+  try {
+    const resultados = await Promise.all(chaves.map(async (nomeVtr) => {
+      let kmAtual = 0;
+      let km24h = 0;
+
+      // Busca último registro da VTR
+      const { data: ultimoData, error: ultimoError } = await supabaseClient
+        .from('diario')
+        .select('*')
+        .eq('vtr', nomeVtr)
+        .order('data', { ascending: false })
+        .order('id', { ascending: false })
+        .limit(1);
+
+      if (ultimoError) throw ultimoError;
+
+      const ultimo = ultimoData && ultimoData.length ? ultimoData[0] : null;
+
+      if (ultimo) {
+        kmAtual = Math.max(Number(VTRS[nomeVtr]?.odometro_atual || 0), obterKmFinalRegistro(ultimo));
+      } else {
+        kmAtual = Number(VTRS[nomeVtr]?.odometro_atual || 0);
+      }
+
+      // Busca registros dentro da janela operacional
+      const { data: recentes, error: recentesError } = await supabaseClient
+        .from('diario')
+        .select('*')
+        .eq('vtr', nomeVtr)
+        .gte('data', inicioFiltro)
+        .order('data', { ascending: false })
+        .order('id', { ascending: false });
+
+      if (recentesError) throw recentesError;
+
+      km24h = (recentes || []).reduce((total, reg) => {
+        const fimRegistro = obterDataHoraFimRegistro(reg);
+
+        if (!fimRegistro) return total;
+        if (fimRegistro < inicioJanela || fimRegistro > agora) return total;
+
+        return total + obterKmRodadoRegistro(reg);
+      }, 0);
+
+      return {
+        nome: nomeVtr,
+        placa: VTRS[nomeVtr]?.placa || '',
+        cartao: VTRS[nomeVtr]?.cartao || '',
+        tipo: VTRS[nomeVtr]?.tipo || '',
+        kmAtual,
+        km24h
+      };
+    }));
+
+    renderPainelInicio(resultados);
+    msgOk(elStatusInicio, `✅ Painel atualizado às ${horaAtualCompleta()}`);
+  } catch (e) {
+    console.error(e);
+    msgErro(elStatusInicio, '❌ Erro ao carregar painel inicial.');
+    elListaInicio.innerHTML = '<div class="muted">Não foi possível carregar o resumo das VTRs.</div>';
+  } finally {
+    elBtnAtualizarInicio.disabled = false;
+  }
+}
+
+    function copiarEAbrirMobilidade(numeroCartao) {
+      if (!numeroCartao) {
+        alert("Cartão não cadastrado para esta VTR.");
+        return;
+      }
+
+      const abrirApp = () => {
+        window.location.href = "intent://#Intent;package=com.embratec.ecofrotas;scheme=android-app;end";
+      };
+
+      navigator.clipboard.writeText(String(numeroCartao))
+        .then(() => abrirApp())
+        .catch(() => {
+          prompt("Copie manualmente o cartão:", numeroCartao);
+          abrirApp();
+        });
+    }
+
+    async function buscarRegistrosPorVtr() {
+      const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
+
+      if (!vtr) {
+        msgErro(elStatusBuscaVtr, "❌ Selecione uma VTR");
+        msgMuted(elListaVtr, "Selecione VTR, mês e ano para listar os registros.");
+        return;
+      }
+
+      const inicio = `${ano}-${String(mes).padStart(2, "0")}-01`;
+      const ultimoDia = new Date(ano, mes, 0).getDate();
+      const fim = `${ano}-${String(mes).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+
+      msgMuted(elStatusBuscaVtr, "Buscando...");
+      msgMuted(elListaVtr, "Carregando registros...");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("diario")
+          .select("*")
+          .eq("vtr", vtr)
+          .gte("data", inicio)
+          .lte("data", fim)
+          .order("data", { ascending: true })
+          .order("id", { ascending: true });
+
+        if (error) {
+          msgErro(elStatusBuscaVtr, `❌ Erro ao buscar: ${error.message}`);
+          msgMuted(elListaVtr, "Falha ao carregar.");
+          return;
+        }
+
+        registrosFiltrados = data || [];
+        const referencia = `${nomeMesNumero(mes)} ${ano}`;
+
+        msgOk(elStatusBuscaVtr, `✅ ${registrosFiltrados.length} registro(s) encontrado(s) em ${referencia}`);
+
+        if (!registrosFiltrados.length) {
+          msgMuted(elListaVtr, "Nenhum registro encontrado para esta VTR neste mês.");
+          return;
+        }
+
+        elListaVtr.innerHTML = registrosFiltrados.map(r => `
+          <div class="registro">
+            <b>${esc(r.vtr)}</b><br>
+            Data: ${esc(formatarDataBR(r.data))}<br>
+            Ida: ${esc(r.localpartida)} | KM ${esc(r.kmini)} → ${esc(r.kmfim)} | ${esc(r.horapartida)} → ${esc(r.horachegada)} | Condutor: ${esc(r.condutor || "")}<br>
+            Retorno: ${esc(r.localretorno || "")} | KM ${esc(r.kminiretorno ?? r.kmfim ?? "")} → ${esc(r.kmfimretorno ?? "")} | ${esc(r.horasaidaretorno ?? "")} → ${esc(r.horachegadaretorno ?? "")} | Condutor: ${esc(r.condutor_retorno || r.condutor || "")}<br>
+            Usuário/Carona: ${esc(r.usuario || "")}
+          </div>
+        `).join("");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusBuscaVtr, "❌ Falha inesperada ao buscar");
+        msgMuted(elListaVtr, "Falha ao carregar.");
+      }
+    }
+
+    function quebrarEmPaginas(linhas, porPagina) {
+      const paginas = [];
+      for (let i = 0; i < linhas.length; i += porPagina) paginas.push(linhas.slice(i, i + porPagina));
+      return paginas.length ? paginas : [[]];
+    }
+
+    function gerarLinhasDoRegistro(r) {
+      const kmIniRet = r.kminiretorno != null && r.kminiretorno !== "" ? r.kminiretorno : r.kmfim;
+      return [
+        {
+          data: formatarDataBR(r.data),
+          local: r.localpartida,
+          kmIni: r.kmini,
+          horaPartida: r.horapartida,
+          kmFim: r.kmfim,
+          horaChegada: r.horachegada,
+          condutor: r.condutor,
+          usuario: r.usuario || ""
+        },
+        {
+          data: formatarDataBR(r.data),
+          local: r.localretorno || "",
+          kmIni: kmIniRet ?? "",
+          horaPartida: r.horasaidaretorno || "",
+          kmFim: r.kmfimretorno ?? "",
+          horaChegada: r.horachegadaretorno || "",
+          condutor: r.condutor_retorno || r.condutor || "",
+          usuario: r.usuario || ""
+        }
+      ];
+    }
+
+    function gerarLinhasTabelaPdf(linhas, linhasPorPagina = 14) {
+      const htmlLinhas = linhas.map(r => `
+        <tr class="linha-dados">
+          <td>${esc(r.data)}</td>
+          <td>${esc(r.local)}</td>
+          <td>${esc(r.kmIni)}</td>
+          <td>${esc(r.horaPartida)}</td>
+          <td>${esc(r.kmFim)}</td>
+          <td>${esc(r.horaChegada)}</td>
+          <td>${esc(r.condutor)}</td>
+          <td></td>
+          <td>${esc(r.usuario)}</td>
+          <td></td>
+        </tr>
+      `).join("");
+
+      const faltantes = Math.max(0, linhasPorPagina - linhas.length);
+      const vazias = Array.from({ length: faltantes }, () => `
+        <tr class="linha-dados">
+          <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+        </tr>
+      `).join("");
+
+      return htmlLinhas + vazias;
+    }
+
+    function gerarBlocoPaginaPdf(vtr, referencia, dadosVtr, linhasPagina, numeroPagina, totalPaginas) {
+      const linhasTabela = gerarLinhasTabelaPdf(linhasPagina, 14);
+
+      return `
+        <div class="folha ${numeroPagina < totalPaginas ? 'quebra-pagina' : ''}">
+          <table>
+            <colgroup>
+              <col class="w1"><col class="w2"><col class="w3"><col class="w4"><col class="w5">
+              <col class="w6"><col class="w7"><col class="w8"><col class="w9"><col class="w10">
+            </colgroup>
+
+            <tr class="titulo">
+              <td colspan="10">DIÁRIO DE BORDO FÍSICO</td>
+            </tr>
+
+            <tr class="subref">
+              <td colspan="10">${esc(vtr)} - ${esc(referencia)} - PÁGINA ${numeroPagina}/${totalPaginas}</td>
+            </tr>
+
+            <tr class="identificacao">
+              <td colspan="3" class="al-esq"><b>PLACA:</b> ${esc(dadosVtr.placa || "")}</td>
+              <td colspan="4" class="al-esq"><b>MARCA/MODELO:</b> ${esc(dadosVtr.marcamodelo || "")}</td>
+              <td colspan="3" class="al-esq"><b>ÓRGÃO/ENTIDADE:</b> ${esc(dadosVtr.orgao || "")}</td>
+            </tr>
+
+            <tr class="cabecalho">
+              <td>DATA</td>
+              <td>LOCAL DE PARTIDA</td>
+              <td>KM DO VEÍC. NA PARTIDA</td>
+              <td>HORA DA PARTIDA</td>
+              <td>KM DO VEIC. NO DESTINO</td>
+              <td>HORA DA CHEGADA</td>
+              <td>NOME CONDUTOR</td>
+              <td>ASSINATURA CONDUTOR</td>
+              <td>NOME USUÁRIO</td>
+              <td>ASSINATURA USUÁRIO</td>
+            </tr>
+
+            ${linhasTabela}
+          </table>
+        </div>
+      `;
+    }
+
+    function exportarMes() {
+      if (!registrosFiltrados.length) {
+        alert("Nenhum registro carregado para exportar.");
+        return;
+      }
+
+      if (!window.jspdf || !window.jspdf.jsPDF || typeof window.jspdf.jsPDF !== "function") {
+        alert("Biblioteca PDF não carregada. Verifique a internet e tente novamente.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+
+      const vtr = elFiltroVtr.value;
+      const mes = Number(elFiltroMes.value);
+      const ano = Number(elFiltroAno.value);
+      const referencia = `${nomeMesNumero(mes)} ${ano}`;
+      const dadosVtr = VTRS[vtr] || {};
+      const linhasPorPagina = 14;
+
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+        compress: true
+      });
+
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const marginX = 4;
+      const topY = 4;
+      const bottomY = 4;
+      const tableW = pageW - (marginX * 2);
+
+      const colRatios = [14, 34, 22, 18, 20, 18, 33, 20, 24, 24];
+      const ratioTotal = colRatios.reduce((s, n) => s + n, 0);
+      const colWidths = colRatios.map(v => (v / ratioTotal) * tableW);
+
+      const colX = [marginX];
+      for (let i = 1; i < colWidths.length; i++) {
+        colX.push(colX[i - 1] + colWidths[i - 1]);
+      }
+
+      const hTitulo = 8;
+      const hSub = 7;
+      const hIdent = 7;
+      const hCab = 12;
+      const areaLinhas = pageH - topY - bottomY - hTitulo - hSub - hIdent - hCab;
+      const hLinha = areaLinhas / linhasPorPagina;
+
+      function normalizarValor(v) {
+        return v === null || v === undefined ? "" : String(v);
+      }
+
+      function drawTextBox(txt, x, y, w, h, opts = {}) {
+        const align = opts.align || "center";
+        const bold = !!opts.bold;
+        const size = opts.size || 7;
+        const paddingX = opts.paddingX ?? 1.2;
+        const paddingTop = opts.paddingTop ?? 0;
+        const maxWidth = Math.max(1, w - (paddingX * 2));
+        const linhas = Array.isArray(txt)
+          ? txt
+          : doc.splitTextToSize(normalizarValor(txt), maxWidth);
+
+        doc.setFont("helvetica", bold ? "bold" : "normal");
+        doc.setFontSize(size);
+
+        const lineHeight = size * 0.36 + 1.1;
+        const totalHeight = Math.max(lineHeight, linhas.length * lineHeight);
+        const startY = y + ((h - totalHeight) / 2) + (lineHeight / 2) + paddingTop;
+
+        linhas.forEach((linha, idx) => {
+          const yy = startY + idx * lineHeight;
+          let xx = x + (w / 2);
+
+          if (align === "left") xx = x + paddingX;
+          if (align === "right") xx = x + w - paddingX;
+
+          doc.text(linha, xx, yy, {
+            align,
+            baseline: "middle"
+          });
+        });
+      }
+
+      function drawCell(x, y, w, h, txt, opts = {}) {
+        doc.rect(x, y, w, h);
+        drawTextBox(txt, x, y, w, h, opts);
+      }
+
+      function drawPageHeader(pageNum, totalPaginas) {
+  let y = topY;
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setTextColor(0, 0, 0);
+  doc.setLineWidth(0.25);
+
+  drawCell(marginX, y, tableW, hTitulo, "DIÁRIO DE BORDO FÍSICO", {
+    bold: true,
+    size: 11
+  });
+  y += hTitulo;
+
+  drawCell(marginX, y, tableW, hSub, `${vtr} - ${referencia} - PÁGINA ${pageNum}/${totalPaginas}`, {
+    bold: true,
+    size: 8.8
+  });
+  y += hSub;
+
+  const wA = colWidths[0] + colWidths[1] + colWidths[2];
+  const wB = colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6];
+  const wC = colWidths[7] + colWidths[8] + colWidths[9];
+
+  drawCell(marginX, y, wA, hIdent, `PLACA: ${dadosVtr.placa || ""}`, {
+    align: "left",
+    bold: true,
+    size: 7.2,
+    paddingX: 1.4
+  });
+
+  drawCell(marginX + wA, y, wB, hIdent, `MARCA/MODELO: ${dadosVtr.marcamodelo || ""}`, {
+    align: "left",
+    bold: true,
+    size: 7.0,
+    paddingX: 1.4
+  });
+
+  drawCell(marginX + wA + wB, y, wC, hIdent, `ÓRGÃO/ENTIDADE: ${dadosVtr.orgao || ""}`, {
+    align: "left",
+    bold: true,
+    size: 6.3,
+    paddingX: 1.2
+  });
+  y += hIdent;
+
+  const headers = [
+    "DATA",
+    "LOCAL DE PARTIDA",
+    "KM DO VEÍC. NA\nPARTIDA",
+    "HORA DA\nPARTIDA",
+    "KM DO VEÍC. NO\nDESTINO",
+    "HORA DA\nCHEGADA",
+    "NOME CONDUTOR",
+    "ASSINATURA\nCONDUTOR",
+    "NOME USUÁRIO",
+    "ASSINATURA\nUSUÁRIO"
+  ];
+
+  for (let i = 0; i < headers.length; i++) {
+    drawCell(colX[i], y, colWidths[i], hCab, headers[i], {
+      bold: true,
+      size: 7,
+      align: "center",
+      paddingX: 1.0
+    });
+  }
+  y += hCab;
+
+  return y;
+}
+
+      const linhasExpandidas = registrosFiltrados.flatMap(gerarLinhasDoRegistro);
+      const paginas = [];
+      for (let i = 0; i < linhasExpandidas.length; i += linhasPorPagina) {
+        paginas.push(linhasExpandidas.slice(i, i + linhasPorPagina));
+      }
+      if (!paginas.length) paginas.push([]);
+
+      paginas.forEach((pagina, paginaIndex) => {
+        if (paginaIndex > 0) doc.addPage("a4", "landscape");
+
+        let y = drawPageHeader(paginaIndex + 1, paginas.length);
+
+        const body = pagina.map(r => [
+          normalizarValor(r.data),
+          normalizarValor(r.local),
+          normalizarValor(r.kmIni),
+          normalizarValor(r.horaPartida),
+          normalizarValor(r.kmFim),
+          normalizarValor(r.horaChegada),
+          normalizarValor(r.condutor),
+          "",
+          normalizarValor(r.usuario),
+          ""
+        ]);
+
+       while (body.length < linhasPorPagina) {
+  body.push(["", "", "", "", "", "", "", "", "", ""]);
+}
+
+body.forEach((row) => {
+  for (let i = 0; i < row.length; i++) {
+    const ehTextoEsquerda = false;
+    const size = i === 6 ? 7.5 : (i === 1 ? 7.5 : 8);
+
+    drawCell(colX[i], y, colWidths[i], hLinha, row[i], {
+      align: ehTextoEsquerda ? "left" : "center",
+      size,
+      paddingX: ehTextoEsquerda ? 1.2 : 1.0
+    });
+  }
+  y += hLinha;
+});
+      });
+
+      const nomeArquivo = `${vtr}_${nomeMesNumero(mes)}_${ano}.pdf`
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\-.]/g, "");
+
+      doc.save(nomeArquivo);
+    }
+
+    tabInicioBtn.addEventListener("click", () => abrirAba("inicio"));
+    tabLancamentoBtn.addEventListener("click", () => abrirAba("lancamento"));
+    tabExportarBtn.addEventListener("click", () => abrirAba("exportar"));
+    tabCadastroBtn.addEventListener("click", () => abrirAba("cadastro"));
+
+    elBtnEntrar.addEventListener("click", login);
+    elFiltroVtr.addEventListener("change", atualizarVtrTopo);
+    elBtnSalvarLinha1.addEventListener("click", salvarLinha1);
+    elBtnSalvarLinha2.addEventListener("click", salvarLinha2);
+    elBtnEditarLinha1.addEventListener("click", editarLinha1);
+    elBtnEditarLinha2.addEventListener("click", editarLinha2);
+    elBtnFinal.addEventListener("click", finalizarOuSalvarParcial);
+    elBtnBuscarVtr.addEventListener("click", buscarRegistrosPorVtr);
+    elBtnExportarMes.addEventListener("click", exportarMes);
+    elBtnEditarOdometro.addEventListener("click", editarOdometroAdmin);
+    elBtnAtualizarInicio.addEventListener("click", carregarPainelInicio);
+
+    elVtr.addEventListener("change", async function() {
+      atualizarInfoVtr();
+      await atualizarKmBaseDaVtr();
+      await carregarPendenciaDaVtr();
+    });
+
+    elSaidaSelect.addEventListener("change", aplicarRetornoAutomatico);
+    elSaidaSelect.addEventListener("change", controlarCamposSaida);
+    elRetornoSelect.addEventListener("change", controlarCamposRetorno);
+    elKmIni.addEventListener("blur", ajustarKmInicialMinima);
+    elKmIni.addEventListener("input", atualizarLimitesKmCampos);
+    elKmFim.addEventListener("input", () => {
+      atualizarKmInicialRetorno();
+      atualizarLimitesKmCampos();
+    });
+    elKmFim.addEventListener("blur", ajustarKmFimIdaMinimo);
+    elKmFimRetorno.addEventListener("input", atualizarLimitesKmCampos);
+    elKmFimRetorno.addEventListener("blur", ajustarKmFimRetornoMinimo);
+
+    [elHoraPartida, elHoraChegada, elHoraSaidaRetorno, elHoraChegadaRetorno].forEach(campo => {
+      campo.addEventListener("focus", () => horarioAtualSeVazio(campo));
+    });
+
+   elIdFunc.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+elSenhaLogin.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+elIdFunc.addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "");
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
-  );
+elSenhaLogin.addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "");
 });
+
+elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
+
+[elHoraSaidaRetorno, elHoraChegadaRetorno, elKmFimRetorno, elUsuario].forEach(campo => {
+      campo.addEventListener("input", atualizarEstadoFinal);
+      campo.addEventListener("change", atualizarEstadoFinal);
+    });
+
+window.editarVtr = editarVtr;
+window.cancelarEdicaoVtr = cancelarEdicaoVtr;
+window.salvarEdicaoVtr = salvarEdicaoVtr;
+window.copiarEAbrirMobilidade = copiarEAbrirMobilidade;
+
+async function carregarInicio() {
+      atualizarCondutorLogadoTopo();
+      atualizarVtrTopo();
+      preencherUsuariosSelect();
+      preencherAnos();
+      elFiltroMes.value = String(new Date().getMonth() + 1);
+      elData.value = hojeISO();
+      atualizarLimitesKmCampos();
+      atualizarEstadoFinal();
+      abrirAba("inicio");
+      atualizarRelogio();
+      setInterval(atualizarRelogio, 1000);
+      await carregarCadastroVtrsSupabase();
+    }
+
+    carregarInicio();
+  </script>
+</body>
+</html>
