@@ -645,7 +645,7 @@
         <div id="statusOdometro" class="muted"></div>
 
         <label for="data">Data</label>
-        <input id="data" type="date" />
+        <input id="data" type="date" readonly />
 
         <div class="clock-box">
           <div>
@@ -1044,6 +1044,72 @@
     function horaAtualCompleta() {
       const d = new Date();
       return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+    }
+
+    async function obterDataLogicaDaVtr(vtr) {
+      const hoje = hojeISO();
+      if (!vtr) return hoje;
+
+      try {
+        const ultimo = await obterUltimoRegistroDaVtr(vtr);
+        if (!ultimo || !ultimo.data) return hoje;
+
+        const ultimaData = String(ultimo.data);
+        if (ultimaData > hoje) return hoje;
+
+        const kmUltimo = Number(obterKmFinalRegistro(ultimo) || 0);
+        const odometroAtual = Number((VTRS[vtr] && VTRS[vtr].odometro_atual) || 0);
+
+        if (odometroAtual > kmUltimo) return hoje;
+
+        return ultimaData;
+      } catch (e) {
+        console.error(e);
+        return hoje;
+      }
+    }
+
+    async function definirDataLogicaDaVtr() {
+      const dataPermitida = await obterDataLogicaDaVtr(elVtr.value);
+      const hoje = hojeISO();
+
+      elData.value = dataPermitida;
+      elData.min = dataPermitida;
+      elData.max = hoje;
+      elData.readOnly = true;
+      elData.style.pointerEvents = "none";
+    }
+
+    async function validarDataLogicaAntesDeSalvar() {
+      const vtr = elVtr.value;
+      const hoje = hojeISO();
+
+      if (!vtr) {
+        msgErro(elStatusSalvar, "❌ Selecione uma VTR.");
+        return false;
+      }
+
+      if (!elData.value) {
+        msgErro(elStatusSalvar, "❌ A data do registro está vazia.");
+        return false;
+      }
+
+      if (elData.value > hoje) {
+        msgErro(elStatusSalvar, "❌ A data não pode ser futura.");
+        return false;
+      }
+
+      const dataPermitida = await obterDataLogicaDaVtr(vtr);
+
+      if (elData.value !== dataPermitida) {
+        elData.value = dataPermitida;
+        elData.min = dataPermitida;
+        elData.max = hoje;
+        msgErro(elStatusSalvar, `❌ A data deste registro deve seguir a sequência lógica da VTR: ${formatarDataBR(dataPermitida)}.`);
+        return false;
+      }
+
+      return true;
     }
 
     function atualizarRelogio() {
@@ -1662,13 +1728,17 @@
         const pendencia = await buscarPendenciaSupabase(elVtr.value);
         if (pendencia) {
           aplicarPendenciaNaTela(pendencia);
+          elData.min = pendencia.data || "";
+          elData.max = hojeISO();
+          elData.readOnly = true;
+          elData.style.pointerEvents = "none";
 
           assumirCondutorLinha2DoUsuarioLogado();
           atualizarEstadoFinal();
           msgMuted(elStatusSalvar, "Pendência compartilhada carregada do Supabase.");
         } else {
           limparFormularioVisual();
-          elData.value = hojeISO();
+          await definirDataLogicaDaVtr();
           const kmBase = Number(elOdometroValor.textContent.replace(/\D/g, "") || "0");
           elKmIni.value = kmBase || "";
           elCondutorIda.value = logado ? logado.guerra : "";
@@ -1793,11 +1863,11 @@ Cadastre sua nova senha numérica:`);
         msgOk(elUserOk, `✅ ${user.guerra}`);
         elFormBox.classList.remove("hidden");
 
-        if (!elData.value) elData.value = hojeISO();
         elSenhaLogin.value = "";
 
         atualizarInfoVtr();
         await atualizarKmBaseDaVtr();
+        await definirDataLogicaDaVtr();
         await carregarPendenciaDaVtr();
 
         if (!linha1Salva) {
@@ -2095,6 +2165,9 @@ Cadastre sua nova senha numérica:`);
         elCondutorIda.value = logado.guerra;
       }
 
+      const dataOk = await validarDataLogicaAntesDeSalvar();
+      if (!dataOk) return;
+
       const erroKm = obterMensagemErroRegrasKm();
       if (erroKm) {
         msgErro(elStatusSalvar, erroKm);
@@ -2186,6 +2259,9 @@ Cadastre sua nova senha numérica:`);
     }
 
     async function finalizarOuSalvarParcial() {
+      const dataOk = await validarDataLogicaAntesDeSalvar();
+      if (!dataOk) return;
+
       const erroKm = obterMensagemErroRegrasKm();
       const pronto = !erroKm && linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2();
 
@@ -2355,7 +2431,7 @@ Cadastre sua nova senha numérica:`);
             type="button"
             class="btn-mobilidade-home"
             onclick="copiarEAbrirMobilidade('${esc(item.cartao || '')}')">
-            💳 Copiar + abrir app
+            💳 Verificar Saldo 💸
           </button>
         </div>
       `).join('')}</div>`;
@@ -2861,6 +2937,7 @@ body.forEach((row) => {
     elVtr.addEventListener("change", async function() {
       atualizarInfoVtr();
       await atualizarKmBaseDaVtr();
+      await definirDataLogicaDaVtr();
       await carregarPendenciaDaVtr();
     });
 
@@ -2892,6 +2969,9 @@ elSenhaLogin.addEventListener("input", function () {
   this.value = this.value.replace(/\D/g, "");
 });
 
+elData.addEventListener("keydown", e => e.preventDefault());
+elData.addEventListener("click", e => e.preventDefault());
+
 elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
 
 [elHoraSaidaRetorno, elHoraChegadaRetorno, elKmFimRetorno, elUsuario].forEach(campo => {
@@ -2910,7 +2990,11 @@ async function carregarInicio() {
       preencherUsuariosSelect();
       preencherAnos();
       elFiltroMes.value = String(new Date().getMonth() + 1);
+      elData.readOnly = true;
+      elData.style.pointerEvents = "none";
       elData.value = hojeISO();
+      elData.min = hojeISO();
+      elData.max = hojeISO();
       atualizarLimitesKmCampos();
       atualizarEstadoFinal();
       abrirAba("inicio");
