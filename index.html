@@ -943,6 +943,7 @@
     let linha2Salva = false;
     let loginExigidoLinha2 = false;
     let condutorLinha1Original = "";
+    let cadastroAdminLiberado = false;
 
     const MAPA_RETORNO = {
       "QTL / J4": "J4 / QTL",
@@ -1569,7 +1570,27 @@
       }
     }
 
+    function validarAcessoCadastro() {
+      if (cadastroAdminLiberado) return true;
+
+      const senha = prompt("🔐 Área restrita.\nDigite a senha do administrador:");
+      if (senha === null) return false;
+
+      if (String(senha) !== String(ADMIN_SENHA)) {
+        alert("❌ Senha incorreta.");
+        return false;
+      }
+
+      cadastroAdminLiberado = true;
+      alert("✅ Acesso ao cadastro liberado.");
+      return true;
+    }
+
     function abrirAba(nome) {
+      if (nome === "cadastro" && !validarAcessoCadastro()) {
+        return;
+      }
+
       abaInicio.classList.remove("active");
       abaLancamento.classList.remove("active");
       abaExportar.classList.remove("active");
