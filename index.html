@@ -2040,6 +2040,10 @@ Cadastre sua nova senha numérica:`);
       }
     }
 
+    function segundaLinhaAtendida() {
+      return linha2Salva || validarLinha2();
+    }
+
     function atualizarResumoAutomatico() {
       const kmIni = Number(elKmIni.value || 0);
       const kmFinal = Number(elKmFimRetorno.value || elKmFim.value || 0);
@@ -2047,7 +2051,7 @@ Cadastre sua nova senha numérica:`);
       if (!Number.isNaN(kmIni) && !Number.isNaN(kmFinal) && kmFinal >= kmIni) rodado = kmFinal - kmIni;
       elKmRodadoTotal.textContent = rodado;
 
-      if (linha1Salva && linha2Salva && validarLinha1() && validarLinha2()) {
+      if (linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2()) {
         elSituacaoResumo.textContent = "Pronto para finalizar";
       } else if (linha1Salva || linha2Salva) {
         elSituacaoResumo.textContent = "Salvo parcialmente";
@@ -2061,7 +2065,7 @@ Cadastre sua nova senha numérica:`);
       atualizarResumoAutomatico();
       atualizarMensagemPendencia();
 
-      const pronto = linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+      const pronto = linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2();
 
       travarCamposLinha1(linha1Salva);
       travarCamposLinha2(linha2Salva);
@@ -2183,7 +2187,7 @@ Cadastre sua nova senha numérica:`);
 
     async function finalizarOuSalvarParcial() {
       const erroKm = obterMensagemErroRegrasKm();
-      const pronto = !erroKm && linha1Salva && linha2Salva && validarLinha1() && validarLinha2();
+      const pronto = !erroKm && linha1Salva && segundaLinhaAtendida() && validarLinha1() && validarLinha2();
 
       if (!pronto) {
         if (erroKm) {
@@ -2204,6 +2208,11 @@ Cadastre sua nova senha numérica:`);
       if (!logado) {
         msgErro(elStatusSalvar, "❌ Faça o login primeiro");
         return;
+      }
+
+      if (!linha2Salva && validarLinha2()) {
+        linha2Salva = true;
+        loginExigidoLinha2 = false;
       }
 
       const saidaFinal = obterSaidaFinal();
@@ -2346,7 +2355,7 @@ Cadastre sua nova senha numérica:`);
             type="button"
             class="btn-mobilidade-home"
             onclick="copiarEAbrirMobilidade('${esc(item.cartao || '')}')">
-            💳 Verificar Saldo 💵
+            💳 Copiar + abrir app
           </button>
         </div>
       `).join('')}</div>`;
@@ -2884,6 +2893,11 @@ elSenhaLogin.addEventListener("input", function () {
 });
 
 elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
+
+[elHoraSaidaRetorno, elHoraChegadaRetorno, elKmFimRetorno, elUsuario].forEach(campo => {
+      campo.addEventListener("input", atualizarEstadoFinal);
+      campo.addEventListener("change", atualizarEstadoFinal);
+    });
 
 window.editarVtr = editarVtr;
 window.cancelarEdicaoVtr = cancelarEdicaoVtr;
