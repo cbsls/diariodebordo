@@ -1,4 +1,4 @@
-const CACHE_NAME = 'diario-bordo-v2';
+const CACHE_NAME = 'diario-bordo-v3';
 const URLS_TO_CACHE = [
   './',
   './index.html',
