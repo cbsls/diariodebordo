@@ -479,6 +479,49 @@
       padding:12px;
     }
 
+
+    .inicio-cartao-linha {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:6px;
+      flex-wrap:wrap;
+      font-weight:700;
+      color:#24303f;
+    }
+
+    .inicio-cartao-icone {
+      width:22px;
+      height:22px;
+      border-radius:8px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#22c55e,#15803d);
+      color:#fff;
+      font-size:13px;
+      box-shadow:0 2px 8px rgba(21,128,61,.25);
+      flex:0 0 22px;
+    }
+
+    .btn-mobilidade-home {
+      width:100%;
+      margin-top:10px;
+      padding:12px 14px;
+      border:none;
+      border-radius:14px;
+      background:linear-gradient(135deg,#2e7d32,#43a047);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(46,125,50,.22);
+    }
+
+    .btn-mobilidade-home:active {
+      transform:scale(.98);
+    }
+
     .rodape-tabs {
       position:fixed;
       left:0;
@@ -519,79 +562,6 @@
       background:var(--primary);
       color:#fff;
       box-shadow:0 6px 16px rgba(213,19,19,.25);
-    }
-
-
-    .inicio-cartao {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      margin-top:6px;
-      font-size:14px;
-      color:#24303f;
-      flex-wrap:wrap;
-    }
-
-    .icon-ticket {
-      width:18px;
-      height:18px;
-      object-fit:contain;
-      border-radius:4px;
-      flex:0 0 18px;
-    }
-
-    .btn-mobilidade-home {
-      width:100%;
-      margin-top:10px;
-      padding:12px 14px;
-      border:none;
-      border-radius:14px;
-      background:linear-gradient(135deg,#2e7d32,#43a047);
-      color:#fff;
-      font-size:15px;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow:0 4px 12px rgba(46,125,50,.22);
-    }
-
-    .btn-mobilidade-home:active {
-      transform:scale(.98);
-    }
-
-    .cadastro-acoes {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .btn-editar-vtr {
-      background:#0f4c81;
-      font-size:15px;
-      padding:12px;
-    }
-
-    .btn-cancelar-vtr {
-      background:#6b7280;
-      font-size:15px;
-      padding:12px;
-    }
-
-    .cadastro-form-edicao {
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px dashed #d8dde4;
-    }
-
-    .cadastro-form-edicao label {
-      font-size:14px;
-      margin:6px 0 4px;
-    }
-
-    .cadastro-form-edicao input {
-      font-size:15px;
-      padding:12px 14px;
-      margin-bottom:10px;
     }
 
     @media (max-width: 700px) {
@@ -904,6 +874,7 @@
         nome: "ABT-0535",
         placa: "JCO-7I27",
         cartao: "",
+        odometro_atual: 0,
         marcamodelo: "ABT VOLKSWAGEN CONSTELLATION",
         orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
         status: "ATIVA",
@@ -915,6 +886,7 @@
         nome: "ABT-7992",
         placa: "JBM-3781",
         cartao: "",
+        odometro_atual: 0,
         marcamodelo: "IVECO 170 E25 - ABT 5000L",
         orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
         status: "ATIVA",
@@ -926,6 +898,7 @@
         nome: "AR-426",
         placa: "JBN7A45",
         cartao: "",
+        odometro_atual: 0,
         marcamodelo: "FORD TRANSIT TCA AMBULÂNCIA",
         orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
         status: "ATIVA",
@@ -937,6 +910,7 @@
         nome: "ATP-1225",
         placa: "TQV-8D59",
         cartao: "",
+        odometro_atual: 0,
         marcamodelo: "PICKUP 4X4",
         orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
         status: "ATIVA",
@@ -948,6 +922,7 @@
         nome: "ATP-9316",
         placa: "IUW6520",
         cartao: "",
+        odometro_atual: 0,
         marcamodelo: "RENAULT DUSTER - 4P - VERMELHA",
         orgao: "6º BBM / 3ª CIA / 4º PEL / SÃO LOURENÇO DO SUL",
         status: "ATIVA",
@@ -957,14 +932,12 @@
       }
     };
 
-    const TICKET_LOG_ICON = "data:image/png;base64,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";
-
     const SUPABASE_URL = "https://nypebmbqcbrvbutamzrh.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VXTVVV8BENUaKIMWjhrk2w_JRNQkEvg";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let logado = null;
-    let VTRS = carregarCadastroVtrs();
+    let VTRS = JSON.parse(JSON.stringify(VTRS_INICIAIS));
     let registrosFiltrados = [];
     let linha1Salva = false;
     let linha2Salva = false;
@@ -1279,32 +1252,103 @@
       elFiltroAno.innerHTML = html;
     }
 
-    function carregarCadastroVtrs() {
+    async function carregarCadastroVtrsSupabase() {
       try {
-        const salvo = localStorage.getItem("diario_vtrs_cadastro");
-        if (!salvo) return JSON.parse(JSON.stringify(VTRS_INICIAIS));
-        const parsed = JSON.parse(salvo);
-        return { ...JSON.parse(JSON.stringify(VTRS_INICIAIS)), ...parsed };
-      } catch {
-        return JSON.parse(JSON.stringify(VTRS_INICIAIS));
+        const { data, error } = await supabaseClient
+          .from("diario_vtrs")
+          .select("*")
+          .order("nome", { ascending: true });
+
+        if (error) throw error;
+
+        const base = JSON.parse(JSON.stringify(VTRS_INICIAIS));
+
+        (data || []).forEach(v => {
+          base[v.nome] = {
+            ...(base[v.nome] || {}),
+            nome: v.nome,
+            placa: v.placa || "",
+            cartao: v.cartao || "",
+            odometro_atual: Number(v.odometro_atual || 0),
+            marcamodelo: v.marcamodelo || "",
+            orgao: v.orgao || "",
+            status: v.status || "",
+            tipo: v.tipo || "",
+            descricao: v.descricao || "",
+            ano: v.ano || ""
+          };
+        });
+
+        VTRS = base;
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        atualizarInfoVtr();
+        atualizarVtrTopo();
+        await carregarPainelInicio();
+      } catch (e) {
+        console.error(e);
+        VTRS = JSON.parse(JSON.stringify(VTRS_INICIAIS));
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        atualizarInfoVtr();
+        atualizarVtrTopo();
+        msgErro(elListaCadastroVtr, "❌ Erro ao carregar VTRs do Supabase.");
       }
     }
 
-    function salvarCadastroVtrs() {
-      localStorage.setItem("diario_vtrs_cadastro", JSON.stringify(VTRS));
+    async function salvarVtrSupabase(vtr) {
+      const payload = {
+        nome: vtr.nome,
+        placa: vtr.placa || "",
+        cartao: vtr.cartao || "",
+        odometro_atual: Number(vtr.odometro_atual || 0),
+        marcamodelo: vtr.marcamodelo || "",
+        orgao: vtr.orgao || "",
+        status: vtr.status || "",
+        tipo: vtr.tipo || "",
+        descricao: vtr.descricao || "",
+        ano: vtr.ano || "",
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("diario_vtrs")
+        .upsert([payload], { onConflict: "nome" });
+
+      if (error) throw error;
     }
 
-    function chaveOdometro(vtr) {
-      return `diario_odometro_${vtr}`;
+    async function atualizarOdometroVtrSupabase(nomeVtr, km) {
+      const kmNumerico = Number(km || 0);
+      const vtrAtual = VTRS[nomeVtr] || { nome: nomeVtr };
+      const payload = {
+        nome: nomeVtr,
+        placa: vtrAtual.placa || "",
+        cartao: vtrAtual.cartao || "",
+        odometro_atual: kmNumerico,
+        marcamodelo: vtrAtual.marcamodelo || "",
+        orgao: vtrAtual.orgao || "",
+        status: vtrAtual.status || "",
+        tipo: vtrAtual.tipo || "",
+        descricao: vtrAtual.descricao || "",
+        ano: vtrAtual.ano || "",
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from("diario_vtrs")
+        .upsert([payload], { onConflict: "nome" });
+
+      if (error) throw error;
+
+      VTRS[nomeVtr] = {
+        ...vtrAtual,
+        ...payload
+      };
     }
 
-    function obterOdometroManual(vtr) {
-      const valor = localStorage.getItem(chaveOdometro(vtr));
-      return valor ? Number(valor) : null;
-    }
-
-    function salvarOdometroManual(vtr, km) {
-      localStorage.setItem(chaveOdometro(vtr), String(km));
+    function obterOdometroSupabase(vtr) {
+      return Number(VTRS[vtr]?.odometro_atual || 0);
     }
 
     function preencherUsuariosSelect() {
@@ -1338,12 +1382,12 @@
         <b>ÓRGÃO/ENTIDADE:</b> ${esc(dados.orgao)}<br>
         <b>TIPO:</b> ${esc(dados.tipo || "")}<br>
         <b>STATUS:</b> ${esc(dados.status || "")}<br>
-        <b>ANO:</b> ${esc(dados.ano || "")}
+        <b>ANO:</b> ${esc(dados.ano || "")}<br>
+        <b>NÚMERO DO CARTÃO:</b> ${esc(dados.cartao || "NÃO CADASTRADO")}
       `;
     }
 
-    
-function renderCadastroVtrs() {
+    function renderCadastroVtrs() {
       const chaves = Object.keys(VTRS).sort();
       elListaCadastroVtr.innerHTML = chaves.map(ch => {
         const v = VTRS[ch];
@@ -1356,104 +1400,106 @@ function renderCadastroVtrs() {
               Tipo: ${esc(v.tipo || "")}<br>
               Placa: ${esc(v.placa || "")}<br>
               💳 Cartão: ${esc(v.cartao || "")}<br>
+              Odômetro Atual: ${esc(formatarOdometro(v.odometro_atual || 0))}<br>
               Marca/Modelo: ${esc(v.marcamodelo || "")}<br>
               Órgão: ${esc(v.orgao || "")}<br>
               Status: ${esc(v.status || "")}<br>
               Descrição: ${esc(v.descricao || "")}<br>
-              Ano: ${esc(v.ano || "")}
+              Ano: ${esc(v.ano || "")}<br><br>
+              <button type="button" onclick="editarVtr('${esc(ch)}')" class="btn-pdf">✏️ Editar VTR</button>
             </div>
 
-            <div class="cadastro-acoes">
-              <button type="button" class="btn-editar-vtr" onclick="toggleEditarVtr('${esc(ch)}', true)">✏️ Editar VTR</button>
-              <button type="button" class="btn-cancelar-vtr hidden" id="btnCancelar_${itemId}" onclick="toggleEditarVtr('${esc(ch)}', false)">Cancelar</button>
-            </div>
+            <div id="edit_${itemId}" class="hidden" style="margin-top:12px;">
+              <label>Placa</label>
+              <input id="placa_${itemId}" value="${esc(v.placa || "")}" />
 
-            <div class="cadastro-form-edicao hidden" id="edit_${itemId}">
-              <label for="placa_${itemId}">Placa</label>
-              <input id="placa_${itemId}" type="text" value="${esc(v.placa || "")}" />
+              <label>Número do Cartão</label>
+              <input id="cartao_${itemId}" value="${esc(v.cartao || "")}" inputmode="numeric" />
 
-              <label for="cartao_${itemId}">💳 Número do Cartão</label>
-              <input id="cartao_${itemId}" type="text" inputmode="numeric" placeholder="Digite o número do cartão" value="${esc(v.cartao || "")}" />
+              <label>Odômetro Atual</label>
+              <input id="odometro_${itemId}" type="number" inputmode="numeric" value="${esc(v.odometro_atual || 0)}" />
 
-              <label for="marcamodelo_${itemId}">Marca / Modelo</label>
-              <input id="marcamodelo_${itemId}" type="text" value="${esc(v.marcamodelo || "")}" />
+              <label>Marca/Modelo</label>
+              <input id="marcamodelo_${itemId}" value="${esc(v.marcamodelo || "")}" />
 
-              <label for="orgao_${itemId}">Órgão / Entidade</label>
-              <input id="orgao_${itemId}" type="text" value="${esc(v.orgao || "")}" />
+              <label>Órgão</label>
+              <input id="orgao_${itemId}" value="${esc(v.orgao || "")}" />
 
-              <label for="tipo_${itemId}">Tipo</label>
-              <input id="tipo_${itemId}" type="text" value="${esc(v.tipo || "")}" />
+              <label>Status</label>
+              <input id="status_${itemId}" value="${esc(v.status || "")}" />
 
-              <label for="status_${itemId}">Status</label>
-              <input id="status_${itemId}" type="text" value="${esc(v.status || "")}" />
+              <label>Tipo</label>
+              <input id="tipo_${itemId}" value="${esc(v.tipo || "")}" />
 
-              <label for="descricao_${itemId}">Descrição</label>
-              <input id="descricao_${itemId}" type="text" value="${esc(v.descricao || "")}" />
+              <label>Descrição</label>
+              <textarea id="descricao_${itemId}">${esc(v.descricao || "")}</textarea>
 
-              <label for="ano_${itemId}">Ano</label>
-              <input id="ano_${itemId}" type="text" value="${esc(v.ano || "")}" />
+              <label>Ano</label>
+              <input id="ano_${itemId}" value="${esc(v.ano || "")}" />
 
-              <button type="button" class="btn-editar-vtr" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar VTR</button>
+              <div class="grid-2">
+                <button type="button" class="btn-finalizar" onclick="salvarEdicaoVtr('${esc(ch)}')">💾 Salvar</button>
+                <button type="button" class="btn-editar-linha" onclick="cancelarEdicaoVtr('${esc(ch)}')">Cancelar</button>
+              </div>
             </div>
           </div>
         `;
       }).join("");
     }
 
-    function toggleEditarVtr(nomeVtr, abrir) {
-      const itemId = String(nomeVtr).replace(/[^a-zA-Z0-9]/g, "_");
-      const boxEdit = document.getElementById(`edit_${itemId}`);
-      const btnCancelar = document.getElementById(`btnCancelar_${itemId}`);
-      if (!boxEdit || !btnCancelar) return;
-
-      boxEdit.classList.toggle("hidden", !abrir);
-      btnCancelar.classList.toggle("hidden", !abrir);
+    function editarVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      document.getElementById(`view_${itemId}`).classList.add("hidden");
+      document.getElementById(`edit_${itemId}`).classList.remove("hidden");
     }
 
-    function salvarEdicaoVtr(nomeVtr) {
-      const itemId = String(nomeVtr).replace(/[^a-zA-Z0-9]/g, "_");
-      if (!VTRS[nomeVtr]) return;
-
-      VTRS[nomeVtr] = {
-        ...VTRS[nomeVtr],
-        placa: document.getElementById(`placa_${itemId}`).value.trim().toUpperCase(),
-        cartao: limparNumero(document.getElementById(`cartao_${itemId}`).value),
-        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim(),
-        orgao: document.getElementById(`orgao_${itemId}`).value.trim(),
-        tipo: document.getElementById(`tipo_${itemId}`).value.trim(),
-        status: document.getElementById(`status_${itemId}`).value.trim(),
-        descricao: document.getElementById(`descricao_${itemId}`).value.trim(),
-        ano: document.getElementById(`ano_${itemId}`).value.trim()
-      };
-
-      salvarCadastroVtrs();
-      preencherVtrsSelects();
-      renderCadastroVtrs();
-      atualizarInfoVtr();
-      carregarPainelInicio();
-      msgOk(elStatusInicio, "✅ Cadastro da VTR atualizado.");
+    function cancelarEdicaoVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      document.getElementById(`view_${itemId}`).classList.remove("hidden");
+      document.getElementById(`edit_${itemId}`).classList.add("hidden");
     }
 
-    function copiarEAbrirMobilidade(numeroCartao) {
-      if (!numeroCartao) {
-        alert("Cartão não cadastrado para esta VTR.");
+    async function salvarEdicaoVtr(nome) {
+      const itemId = nome.replace(/[^a-zA-Z0-9]/g, "_");
+      const odometroAtual = Number(document.getElementById(`odometro_${itemId}`).value || 0);
+
+      if (Number.isNaN(odometroAtual) || odometroAtual < 0) {
+        alert("❌ Odômetro inválido.");
         return;
       }
 
-      const abrirApp = () => {
-        window.location.href = "intent://#Intent;package=com.embratec.ecofrotas;scheme=android-app;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.embratec.ecofrotas;end";
+      const vtrAtualizada = {
+        nome,
+        placa: document.getElementById(`placa_${itemId}`).value.trim().toUpperCase(),
+        cartao: document.getElementById(`cartao_${itemId}`).value.trim(),
+        odometro_atual: odometroAtual,
+        marcamodelo: document.getElementById(`marcamodelo_${itemId}`).value.trim().toUpperCase(),
+        orgao: document.getElementById(`orgao_${itemId}`).value.trim().toUpperCase(),
+        status: document.getElementById(`status_${itemId}`).value.trim().toUpperCase(),
+        tipo: document.getElementById(`tipo_${itemId}`).value.trim().toUpperCase(),
+        descricao: document.getElementById(`descricao_${itemId}`).value.trim().toUpperCase(),
+        ano: document.getElementById(`ano_${itemId}`).value.trim()
       };
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(String(numeroCartao))
-          .then(() => abrirApp())
-          .catch(() => {
-            prompt("Copie manualmente o cartão:", String(numeroCartao));
-            abrirApp();
-          });
-      } else {
-        prompt("Copie manualmente o cartão:", String(numeroCartao));
-        abrirApp();
+      try {
+        await salvarVtrSupabase(vtrAtualizada);
+        VTRS[nome] = vtrAtualizada;
+        preencherVtrsSelects();
+        renderCadastroVtrs();
+        await carregarPainelInicio();
+
+        if (elVtr.value === nome) {
+          atualizarInfoVtr();
+          elOdometroValor.textContent = formatarOdometro(odometroAtual);
+          if (!linha1Salva) elKmIni.value = odometroAtual || "";
+          atualizarLimitesKmCampos();
+          atualizarResumoAutomatico();
+        }
+
+        alert(`✅ VTR ${nome} atualizada com sucesso.`);
+      } catch (e) {
+        console.error(e);
+        alert(`❌ Erro ao salvar VTR: ${e.message || e}`);
       }
     }
 
@@ -1789,33 +1835,32 @@ Cadastre sua nova senha numérica:`);
       try {
         msgMuted(elStatusOdometro, "Consultando KM atual...");
         const ultimo = await obterUltimoRegistroDaVtr(vtr);
-        const kmManual = obterOdometroManual(vtr);
+        const kmSupabase = obterOdometroSupabase(vtr);
 
-        let kmBase = 0;
+        let kmBase = Number(kmSupabase || 0);
         if (ultimo) {
-          if (ultimo.kmfimretorno != null && ultimo.kmfimretorno !== "") {
-            kmBase = Number(ultimo.kmfimretorno);
-          } else if (ultimo.kmfim != null && ultimo.kmfim !== "") {
-            kmBase = Number(ultimo.kmfim);
-          }
-        } else if (kmManual != null) {
-          kmBase = kmManual;
+          const kmUltimoRegistro = Number(obterKmFinalRegistro(ultimo) || 0);
+          kmBase = Math.max(kmBase, kmUltimoRegistro);
         }
 
+        VTRS[vtr] = {
+          ...(VTRS[vtr] || {}),
+          odometro_atual: kmBase
+        };
+
         elOdometroValor.textContent = formatarOdometro(kmBase);
         if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
         atualizarLimitesKmCampos();
         atualizarResumoAutomatico();
-        msgMuted(elStatusOdometro, "KM atual carregada.");
+        msgMuted(elStatusOdometro, "KM atual carregada do Supabase.");
       } catch (e) {
         console.error(e);
-        const kmManual = obterOdometroManual(vtr);
-        const kmBase = kmManual != null ? kmManual : 0;
+        const kmBase = Number(obterOdometroSupabase(vtr) || 0);
         elOdometroValor.textContent = formatarOdometro(kmBase);
         if (!linha1Salva && !elKmIni.value) elKmIni.value = kmBase || "";
         atualizarLimitesKmCampos();
         atualizarResumoAutomatico();
-        msgErro(elStatusOdometro, "⚠️ Usando KM do odômetro local.");
+        msgErro(elStatusOdometro, "⚠️ Erro ao consultar odômetro no Supabase.");
       }
     }
 
@@ -1842,11 +1887,18 @@ Cadastre sua nova senha numérica:`);
         return;
       }
 
-      salvarOdometroManual(vtr, km);
-      elOdometroValor.textContent = formatarOdometro(km);
-      if (!linha1Salva) elKmIni.value = km;
-      atualizarLimitesKmCampos();
-      msgOk(elStatusOdometro, "✅ KM atualizada.");
+      try {
+        await atualizarOdometroVtrSupabase(vtr, km);
+        elOdometroValor.textContent = formatarOdometro(km);
+        if (!linha1Salva) elKmIni.value = km;
+        atualizarLimitesKmCampos();
+        atualizarResumoAutomatico();
+        await carregarPainelInicio();
+        msgOk(elStatusOdometro, "✅ KM atualizada no Supabase.");
+      } catch (e) {
+        console.error(e);
+        msgErro(elStatusOdometro, "❌ Erro ao atualizar KM no Supabase.");
+      }
     }
 
     function controlarCamposSaida() {
@@ -2204,7 +2256,8 @@ Cadastre sua nova senha numérica:`);
 
         await excluirPendenciaSupabase(elVtr.value);
 
-        salvarOdometroManual(elVtr.value, kmFimRetornoValor);
+        await atualizarOdometroVtrSupabase(elVtr.value, kmFimRetornoValor);
+        await carregarPainelInicio();
         msgOk(elStatusSalvar, "☁️ Registro finalizado com sucesso");
 
         elSaidaSelect.value = "";
@@ -2259,8 +2312,7 @@ Cadastre sua nova senha numérica:`);
       return Number.isNaN(dt.getTime()) ? null : dt;
     }
 
-    
-function renderPainelInicio(lista) {
+    function renderPainelInicio(lista) {
       if (!lista.length) {
         elListaInicio.innerHTML = '<div class="muted">Nenhuma VTR encontrada.</div>';
         return;
@@ -2287,18 +2339,14 @@ function renderPainelInicio(lista) {
             <div class="inicio-valor-menor">${esc(String(item.km24h))} km</div>
           </div>
           <div class="inicio-rodape">
-            Placa: <b>${esc(item.placa || '-')}</b>
-            <div class="inicio-cartao">
-              <img src="${TICKET_LOG_ICON}" alt="Ticket Log" class="icon-ticket">
-              <span>💳 Cartão:</span>
-              <b>${esc(item.cartao || '-')}</b>
-            </div>
+            Placa: <b>${esc(item.placa || '-')}</b><br>
+            <span class="inicio-cartao-linha"><span class="inicio-cartao-icone">💳</span> Número do Cartão: <b>${esc(item.cartao || '-')}</b></span>
           </div>
           <button
             type="button"
             class="btn-mobilidade-home"
             onclick="copiarEAbrirMobilidade('${esc(item.cartao || '')}')">
-            💳 Copiar + abrir app
+            💳 Verificar Saldo 💵
           </button>
         </div>
       `).join('')}</div>`;
@@ -2345,10 +2393,9 @@ function renderPainelInicio(lista) {
       const ultimo = ultimoData && ultimoData.length ? ultimoData[0] : null;
 
       if (ultimo) {
-        kmAtual = obterKmFinalRegistro(ultimo);
+        kmAtual = Math.max(Number(VTRS[nomeVtr]?.odometro_atual || 0), obterKmFinalRegistro(ultimo));
       } else {
-        const kmManual = obterOdometroManual(nomeVtr);
-        kmAtual = kmManual != null ? Number(kmManual) : 0;
+        kmAtual = Number(VTRS[nomeVtr]?.odometro_atual || 0);
       }
 
       // Busca registros dentro da janela operacional
@@ -2374,8 +2421,8 @@ function renderPainelInicio(lista) {
       return {
         nome: nomeVtr,
         placa: VTRS[nomeVtr]?.placa || '',
-        tipo: VTRS[nomeVtr]?.tipo || '',
         cartao: VTRS[nomeVtr]?.cartao || '',
+        tipo: VTRS[nomeVtr]?.tipo || '',
         kmAtual,
         km24h
       };
@@ -2391,6 +2438,25 @@ function renderPainelInicio(lista) {
     elBtnAtualizarInicio.disabled = false;
   }
 }
+
+    function copiarEAbrirMobilidade(numeroCartao) {
+      if (!numeroCartao) {
+        alert("Cartão não cadastrado para esta VTR.");
+        return;
+      }
+
+      const abrirApp = () => {
+        window.location.href = "intent://#Intent;package=com.embratec.ecofrotas;scheme=android-app;end";
+      };
+
+      navigator.clipboard.writeText(String(numeroCartao))
+        .then(() => abrirApp())
+        .catch(() => {
+          prompt("Copie manualmente o cartão:", numeroCartao);
+          abrirApp();
+        });
+    }
+
     async function buscarRegistrosPorVtr() {
       const vtr = elFiltroVtr.value;
       const mes = Number(elFiltroMes.value);
@@ -2819,22 +2885,24 @@ elSenhaLogin.addEventListener("input", function () {
 
 elHoraChegadaRetorno.addEventListener("keydown", e => { if (e.key === "Enter") finalizarOuSalvarParcial(); });
 
-function carregarInicio() {
+window.editarVtr = editarVtr;
+window.cancelarEdicaoVtr = cancelarEdicaoVtr;
+window.salvarEdicaoVtr = salvarEdicaoVtr;
+window.copiarEAbrirMobilidade = copiarEAbrirMobilidade;
+
+async function carregarInicio() {
       atualizarCondutorLogadoTopo();
       atualizarVtrTopo();
       preencherUsuariosSelect();
-      preencherVtrsSelects();
       preencherAnos();
       elFiltroMes.value = String(new Date().getMonth() + 1);
       elData.value = hojeISO();
-      atualizarInfoVtr();
-      renderCadastroVtrs();
       atualizarLimitesKmCampos();
       atualizarEstadoFinal();
       abrirAba("inicio");
       atualizarRelogio();
       setInterval(atualizarRelogio, 1000);
-      carregarPainelInicio();
+      await carregarCadastroVtrsSupabase();
     }
 
     carregarInicio();
